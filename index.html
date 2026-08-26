@@ -2440,64 +2440,6 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
     return t.id === article.franchise;
   })[0] || null : null;
   return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 }),
-
-      /* @__PURE__ */ React.createElement("div", {
-        style: {borderTop:"3px solid rgba(0,0,0,0.15)",background:"rgba(10,10,20,0.99)",overflowX:"auto",WebkitOverflowScrolling:"touch"}
-      },
-        React.createElement("div", {
-          style: {maxWidth:1260,margin:"0 auto",padding:"0 20px",display:"flex",alignItems:"stretch",height:60}
-        },
-          React.createElement("div", {
-            style: {display:"flex",alignItems:"center",gap:8,paddingRight:18,borderRight:"1px solid rgba(255,255,255,0.12)",flexShrink:0}
-          },
-            React.createElement("span", {style:{width:9,height:9,borderRadius:"50%",background:"#ef4444",flexShrink:0,boxShadow:"0 0 8px #ef4444"}}),
-            React.createElement("span", {
-              style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:"0.25em",color:"#ef4444"}
-            }, "LIVE")
-          ),
-          React.createElement("div", {
-            style: {display:"flex",gap:0,overflowX:"auto",scrollbarWidth:"none",msOverflowStyle:"none",flex:1}
-          },
-            window.LIVE_MATCHES.map(function(m, i) {
-              var lc2 = window.LG[m.lg].color;
-              var isLive = m.status === "LIVE";
-              var isFinal = m.status === "FINAL";
-              var hc = window.TC[m.homeTeam+"_"+m.lg] || {bg:lc2,fg:"#fff"};
-              var ac = window.TC[m.awayTeam+"_"+m.lg] || {bg:"#444",fg:"#fff"};
-              return React.createElement("button", {
-                key: i,
-                onClick: function() { goMatch(m); },
-                style: {
-                  display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,
-                  padding:"0 18px",height:60,
-                  background:"transparent",
-                  borderRight:"1px solid rgba(255,255,255,0.08)",
-                  border:"none",borderRight:"1px solid rgba(255,255,255,0.08)",
-                  cursor:"pointer",flexShrink:0,minWidth:110,
-                  transition:"background 0.15s"
-                }
-              },
-                React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6}},
-                  isLive ? React.createElement("span", {style:{width:7,height:7,borderRadius:"50%",background:"#ef4444",flexShrink:0,boxShadow:"0 0 6px #ef4444"}}) : null,
-                  React.createElement("div", {style:{width:24,height:24,borderRadius:3,background:hc.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
-                    React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:900,color:hc.fg,lineHeight:1}}, m.homeTeam.slice(0,3))
-                  ),
-                  (isLive||isFinal) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:900,color:"#fff"}}, m.homeScore) : null,
-                  React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,color:"rgba(255,255,255,0.25)",margin:"0 2px"}},"–"),
-                  (isLive||isFinal) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:900,color:"#fff"}}, m.awayScore) : null,
-                  React.createElement("div", {style:{width:24,height:24,borderRadius:3,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
-                    React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:900,color:ac.fg,lineHeight:1}}, m.awayTeam.slice(0,3))
-                  )
-                ),
-                React.createElement("span", {
-                  style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:700,
-                    color:isLive?"#ef4444":isFinal?"#6b7280":"#9ca3af",letterSpacing:"0.08em",whiteSpace:"nowrap"}
-                }, isLive ? m.period : isFinal ? "FINAL" : window.LG[m.lg].label+" · "+m.time)
-              );
-            })
-          )
-        )
-      ),
 ), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99 }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ React.createElement(TB, { id: article.franchise, lg, sz: 16 })), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", padding: "22px 26px", borderRadius: "0 0 4px 4px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.8, marginBottom: 16, borderLeft: "3px solid " + lc, paddingLeft: 12, fontStyle: "italic" } }, article.chapo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#ccc", marginBottom: 20 } }, "Zone US \xB7 ", article.date), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.body || article.chapo)), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
     return /* @__PURE__ */ React.createElement("div", { key: i, onClick: function() {
       onBack();
@@ -3145,7 +3087,7 @@ function CalendarPage({ lg, onMatchClick }) {
   const confs = window.CONF_STANDINGS[lg] || {};
   const confKeys = Object.keys(confs);
   const bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
-  React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "160px 1fr", gap: 20, alignItems: "flex-start" } },
+  return React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "160px 1fr", gap: 20, alignItems: "flex-start" } },
       React.createElement("div", { style: { position: "sticky", top: 70 } },
         React.createElement("img", { src: window.VERT_BANNERS[lg], alt: lg, style: { width: "100%", height: "auto", borderRadius: 8, display: "block", boxShadow: "0 4px 16px rgba(0,0,0,0.15)" } })
       ),
@@ -4565,6 +4507,66 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
                   style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:6,fontWeight:700,
                     color:isLive?"#ef4444":isFinal?"#6b7280":"#9ca3af",letterSpacing:"0.05em",whiteSpace:"nowrap"}
                 }, isLive ? m.period : isFinal ? "FINAL" : m.time)
+              );
+            })
+          )
+        )
+      )
+    ,
+      ,
+
+      /* @__PURE__ */ React.createElement("div", {
+        style: {borderTop:"3px solid rgba(0,0,0,0.15)",background:"rgba(10,10,20,0.99)",overflowX:"auto",WebkitOverflowScrolling:"touch"}
+      },
+        React.createElement("div", {
+          style: {maxWidth:1260,margin:"0 auto",padding:"0 20px",display:"flex",alignItems:"stretch",height:60}
+        },
+          React.createElement("div", {
+            style: {display:"flex",alignItems:"center",gap:8,paddingRight:18,borderRight:"1px solid rgba(255,255,255,0.12)",flexShrink:0}
+          },
+            React.createElement("span", {style:{width:9,height:9,borderRadius:"50%",background:"#ef4444",flexShrink:0,boxShadow:"0 0 8px #ef4444"}}),
+            React.createElement("span", {
+              style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:"0.25em",color:"#ef4444"}
+            }, "LIVE")
+          ),
+          React.createElement("div", {
+            style: {display:"flex",gap:0,overflowX:"auto",scrollbarWidth:"none",msOverflowStyle:"none",flex:1}
+          },
+            window.LIVE_MATCHES.map(function(m, i) {
+              var lc2 = window.LG[m.lg].color;
+              var isLive = m.status === "LIVE";
+              var isFinal = m.status === "FINAL";
+              var hc = window.TC[m.homeTeam+"_"+m.lg] || {bg:lc2,fg:"#fff"};
+              var ac = window.TC[m.awayTeam+"_"+m.lg] || {bg:"#444",fg:"#fff"};
+              return React.createElement("button", {
+                key: i,
+                onClick: function() { goMatch(m); },
+                style: {
+                  display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,
+                  padding:"0 18px",height:60,
+                  background:"transparent",
+                  borderRight:"1px solid rgba(255,255,255,0.08)",
+                  border:"none",borderRight:"1px solid rgba(255,255,255,0.08)",
+                  cursor:"pointer",flexShrink:0,minWidth:110,
+                  transition:"background 0.15s"
+                }
+              },
+                React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6}},
+                  isLive ? React.createElement("span", {style:{width:7,height:7,borderRadius:"50%",background:"#ef4444",flexShrink:0,boxShadow:"0 0 6px #ef4444"}}) : null,
+                  React.createElement("div", {style:{width:24,height:24,borderRadius:3,background:hc.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
+                    React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:900,color:hc.fg,lineHeight:1}}, m.homeTeam.slice(0,3))
+                  ),
+                  (isLive||isFinal) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:900,color:"#fff"}}, m.homeScore) : null,
+                  React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,color:"rgba(255,255,255,0.25)",margin:"0 2px"}},"–"),
+                  (isLive||isFinal) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:900,color:"#fff"}}, m.awayScore) : null,
+                  React.createElement("div", {style:{width:24,height:24,borderRadius:3,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
+                    React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:900,color:ac.fg,lineHeight:1}}, m.awayTeam.slice(0,3))
+                  )
+                ),
+                React.createElement("span", {
+                  style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:700,
+                    color:isLive?"#ef4444":isFinal?"#6b7280":"#9ca3af",letterSpacing:"0.08em",whiteSpace:"nowrap"}
+                }, isLive ? m.period : isFinal ? "FINAL" : window.LG[m.lg].label+" · "+m.time)
               );
             })
           )
