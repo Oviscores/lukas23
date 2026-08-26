@@ -266,6 +266,8 @@ const LG = {
   NBA: { color: "#C8102E", dark: "#1D428A", label: "Basketball", emoji: "\u{1F3C0}" },
   MLB: { color: "#002D62", dark: "#D50A0A", label: "Baseball", emoji: "\u26BE" }
 };
+window.LG = LG;
+
 const TC = {
   MTL_NHL: { bg: "#AF1E2D", fg: "#fff" },
   TOR_NHL: { bg: "#00205B", fg: "#fff" },
@@ -312,6 +314,8 @@ const TC = {
   BAL_MLB: { bg: "#DF4601", fg: "#fff" },
   TOR_MLB: { bg: "#134A8E", fg: "#fff" }
 };
+window.TC = TC;
+
 const TA = {
   MTL_NHL: "CH",
   TOR_NHL: "TOR",
@@ -1674,6 +1678,8 @@ const LIVE_MATCHES = [
   { id: "m9", lg: "NBA", status: "FINAL", period: "Final", homeTeam: "DEN", awayTeam: "LAL", homeScore: 112, awayScore: 104, time: "21h30", arena: "Ball Arena", city: "Denver" },
   { id: "m10", lg: "MLB", status: "UPCOMING", period: null, homeTeam: "HOU", awayTeam: "SEA", homeScore: null, awayScore: null, time: "20h10", arena: "Minute Maid Park", city: "Houston" }
 ];
+window.LIVE_MATCHES = LIVE_MATCHES;
+
 const H2H = {
   "TOR-BOS": { wins: [4, 6], last5: ["TOR 3-1", "BOS 4-2", "TOR 2-1", "BOS 3-0", "TOR 4-3"], avgGoals: 5.4 },
   "EDM-VGK": { wins: [3, 5], last5: ["VGK 4-1", "EDM 3-2", "VGK 2-1", "EDM 4-3", "EDM 3-1"], avgGoals: 4.8 },
