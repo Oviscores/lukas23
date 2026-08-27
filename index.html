@@ -2986,14 +2986,16 @@ function CalendarPage({ lg, onMatchClick }) {
   const todayRef = React.useRef(null);
   const scrollRef = React.useRef(null);
   React.useEffect(function() {
-    if (todayRef.current && scrollRef.current) {
-      var container = scrollRef.current;
-      var btn = todayRef.current;
-      var containerW = container.offsetWidth;
-      var btnLeft = btn.offsetLeft;
-      var btnW = btn.offsetWidth;
-      container.scrollLeft = btnLeft - containerW / 2 + btnW / 2;
-    }
+    setTimeout(function() {
+      if (todayRef.current && scrollRef.current) {
+        var container = scrollRef.current;
+        var btn = todayRef.current;
+        var containerW = container.offsetWidth;
+        var btnLeft = btn.offsetLeft;
+        var btnW = btn.offsetWidth;
+        container.scrollLeft = btnLeft - containerW / 2 + btnW / 2;
+      }
+    }, 50);
   }, [lg]);
   const lc = LG[lg].color;
   const dk = LG[lg].dark || "#111";
