@@ -1756,6 +1756,161 @@ async function initLiveScores() {
 initLiveScores();
 setInterval(initLiveScores, 30000);
 
+
+// ============================================================
+// API CALENDAR - Fetch real schedule data
+// ============================================================
+
+function formatDateFR(dateStr) {
+  const d = new Date(dateStr);
+  const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+  const months = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc'];
+  return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
+}
+
+function getStatusFromNHL(gameState) {
+  if (gameState === 'LIVE' || gameState === 'CRIT') return 'Live';
+  if (gameState === 'OFF' || gameState === 'FINAL') return 'Final';
+  return 'Preview';
+}
+
+async function fetchCalendarData(lg) {
+  const PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+  
+  if (lg === 'NHL') {
+    try {
+      const r = await fetch(PROXY + '?league=nhl');
+      const d = await r.json();
+      if (!d.gamesByDate) return null;
+      
+      const today = new Date().toISOString().split('T')[0];
+      const days = d.gamesByDate.map(function(dateGroup) {
+        const matches = (dateGroup.games || []).map(function(g) {
+          const ht = g.homeTeam || {};
+          const at = g.awayTeam || {};
+          const timeUTC = g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+          return {
+            id: 'nhl_' + g.id,
+            away: at.abbrev || '',
+            home: ht.abbrev || '',
+            as: at.score || 0,
+            hs: ht.score || 0,
+            st: getStatusFromNHL(g.gameState || ''),
+            time: timeUTC,
+            awayLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (at.abbrev||'NHL') + '_light.svg',
+            homeLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (ht.abbrev||'NHL') + '_light.svg'
+          };
+        });
+        return {
+          date: dateGroup.date,
+          label: formatDateFR(dateGroup.date),
+          matches: matches
+        };
+      });
+      
+      const todayIdx = days.findIndex(function(d) { return d.date === today; });
+      return { days: days, todayIdx: todayIdx >= 0 ? todayIdx : 0 };
+    } catch(e) { console.log('NHL Calendar error:', e); return null; }
+  }
+  
+  if (lg === 'MLB') {
+    try {
+      // Fetch 7 jours: 3 avant aujourd'hui + aujourd'hui + 3 après
+      const today = new Date();
+      const promises = [];
+      for (let i = -3; i <= 3; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() + i);
+        const dateStr = d.toISOString().split('T')[0];
+        promises.push(
+          fetch(PROXY + '?league=mlb&date=' + dateStr)
+            .then(function(r) { return r.json(); })
+            .then(function(data) { return { date: dateStr, data: data }; })
+            .catch(function() { return { date: dateStr, data: null }; })
+        );
+      }
+      
+      const results = await Promise.all(promises);
+      const days = results.map(function(result) {
+        const games = result.data && result.data.dates && result.data.dates[0] 
+          ? result.data.dates[0].games || [] : [];
+        const matches = games.map(function(g) {
+          const ht = g.teams?.home || {};
+          const at = g.teams?.away || {};
+          const timeUTC = g.gameDate ? new Date(g.gameDate).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+          return {
+            id: 'mlb_' + g.gamePk,
+            away: at.team?.abbreviation || '',
+            home: ht.team?.abbreviation || '',
+            as: at.score || 0,
+            hs: ht.score || 0,
+            st: g.status?.abstractGameState || 'Preview',
+            time: timeUTC,
+            awayLogo: at.team?.id ? 'https://www.mlbstatic.com/team-logos/' + at.team.id + '.svg' : '',
+            homeLogo: ht.team?.id ? 'https://www.mlbstatic.com/team-logos/' + ht.team.id + '.svg' : ''
+          };
+        });
+        return { date: result.date, label: formatDateFR(result.date), matches: matches };
+      });
+      
+      const todayStr = today.toISOString().split('T')[0];
+      const todayIdx = days.findIndex(function(d) { return d.date === todayStr; });
+      return { days: days, todayIdx: todayIdx >= 0 ? todayIdx : 3 };
+    } catch(e) { console.log('MLB Calendar error:', e); return null; }
+  }
+  
+  if (lg === 'NBA') {
+    try {
+      const r = await fetch(PROXY + '?league=nba');
+      const d = await r.json();
+      if (!d.scoreboard) return null;
+      
+      const today = new Date().toISOString().split('T')[0];
+      const games = d.scoreboard.games || [];
+      const matches = games.map(function(g) {
+        const ht = g.homeTeam || {};
+        const at = g.awayTeam || {};
+        const status = g.gameStatus === 3 ? 'Final' : g.gameStatus === 2 ? 'Live' : 'Preview';
+        const timeUTC = g.gameTimeUTC ? new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+        return {
+          id: 'nba_' + g.gameId,
+          away: at.teamTricode || '',
+          home: ht.teamTricode || '',
+          as: at.score || 0,
+          hs: ht.score || 0,
+          st: status,
+          time: timeUTC,
+          awayLogo: at.teamId ? 'https://cdn.nba.com/logos/nba/' + at.teamId + '/primary/L/logo.svg' : '',
+          homeLogo: ht.teamId ? 'https://cdn.nba.com/logos/nba/' + ht.teamId + '/primary/L/logo.svg' : ''
+        };
+      });
+      
+      return { days: [{ date: today, label: formatDateFR(today), matches: matches }], todayIdx: 0 };
+    } catch(e) { console.log('NBA Calendar error:', e); return null; }
+  }
+  
+  return null;
+}
+
+// Cache des données calendrier par ligue
+window.__CAL_CACHE__ = {};
+
+async function refreshCalendar(lg) {
+  const data = await fetchCalendarData(lg);
+  if (data) {
+    window.__CAL_CACHE__[lg] = data;
+    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+  }
+}
+
+// Initialiser les calendriers
+['NHL', 'MLB', 'NBA'].forEach(function(lg) { refreshCalendar(lg); });
+setInterval(function() {
+  ['NHL', 'MLB', 'NBA'].forEach(function(lg) { refreshCalendar(lg); });
+}, 60000);
+
+
+
 const H2H = {
   "TOR-BOS": { wins: [4, 6], last5: ["TOR 3-1", "BOS 4-2", "TOR 2-1", "BOS 3-0", "TOR 4-3"], avgGoals: 5.4 },
   "EDM-VGK": { wins: [3, 5], last5: ["VGK 4-1", "EDM 3-2", "VGK 2-1", "EDM 4-3", "EDM 3-1"], avgGoals: 4.8 },
@@ -3165,8 +3320,14 @@ function CalendarPage({ lg, onMatchClick }) {
   }, [lg]);
   const lc = LG[lg].color;
   const dk = LG[lg].dark || "#111";
-  const schedule = CAL_SCHEDULE[lg];
-  const [dayIdx, setDayIdx] = useState(schedule.todayIdx);
+  const schedule = window.__CAL_CACHE__[lg] || CAL_SCHEDULE[lg];
+  const defaultIdx = schedule.todayIdx || 0;
+  const [dayIdx, setDayIdx] = useState(defaultIdx);
+  React.useEffect(function() {
+    if (window.__CAL_CACHE__[lg]) {
+      setDayIdx(window.__CAL_CACHE__[lg].todayIdx || 0);
+    }
+  }, [window.__CAL_CACHE__[lg]]);
   const day = schedule.days[dayIdx];
   const confs = CONF_STANDINGS[lg] || {};
   const confKeys = Object.keys(confs);
