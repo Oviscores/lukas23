@@ -1646,7 +1646,7 @@ async function fetchLiveScores() {
     if (d.gamesByDate) {
       const today = new Date().toISOString().split('T')[0];
       for (const dateGroup of d.gamesByDate) {
-        if (dateGroup.date === today || results.length === 0) {
+        if (dateGroup.date === today) {
           for (const g of (dateGroup.games || [])) {
             const ht = g.homeTeam || {};
             const at = g.awayTeam || {};
