@@ -4374,16 +4374,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
       lg
     );
   }))),
-      /* Hamburger mobile */
-      React.createElement("button", {
-        className: "hamburger",
-        onClick: function() { setMenuOpen(function(o) { return !o; }); },
-        style: { background: "none", border: "none", cursor: "pointer", padding: "8px", flexShrink: 0 }
-      },
-        React.createElement("div", { style: { width: 22, height: 2, background: "#333", marginBottom: 5, borderRadius: 2 } }),
-        React.createElement("div", { style: { width: 22, height: 2, background: "#333", marginBottom: 5, borderRadius: 2 } }),
-        React.createElement("div", { style: { width: 22, height: 2, background: "#333", borderRadius: 2 } })
-      )
+      /* Hamburger mobile — retiré du bas, mis en premier via CSS */
     ))),
       menuOpen && React.createElement("div", {
         style: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 200, background: "rgba(0,0,0,0.5)" },
