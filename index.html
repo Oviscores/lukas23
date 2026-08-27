@@ -40,6 +40,7 @@
 /* Mobile calendrier */
 @media (max-width: 768px) {
   .matches-grid { grid-template-columns: 1fr !important; }
+  .stats-grid { grid-template-columns: 1fr !important; }
   .match-row { font-size: 12px !important; }
 }
 ::-webkit-scrollbar { width: 0; height: 0; }
@@ -2436,7 +2437,7 @@ function PlayerPage({ playerId, lg, onBack, articles, onArticleClick }) {
     return /* @__PURE__ */ React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } }, /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, g.date), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "#111" } }, g.opp), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "#888" } }, g.ha), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: won ? "#16a34a" : "#ef4444", background: won ? "#16a34a18" : "#ef444418", padding: "1px 6px", borderRadius: 2 } }, g.res)), [g.g, g.a, g.pts].map(function(v, vi) {
       return /* @__PURE__ */ React.createElement("td", { key: vi, style: { padding: "5px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 2 ? 13 : 10, fontWeight: vi === 2 ? 900 : vi > 0 && v > 0 ? 700 : 400, color: vi === 2 && g.pts > 2 ? lc : vi === 2 ? "#333" : "#555" } }, v);
     }), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: g.pm.startsWith("+") ? lc : "#ef4444" } }, g.pm), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555" } }, g.sog), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#888" } }, g.toi));
-  }))))), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "ACTUALIT\xC9S \u2014 " + p.name.toUpperCase() }), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 } }, related.map(function(a, i) {
+  }))))), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "ACTUALIT\xC9S \u2014 " + p.name.toUpperCase() }), /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 } }, related.map(function(a, i) {
     return /* @__PURE__ */ React.createElement(
       "div",
       {
