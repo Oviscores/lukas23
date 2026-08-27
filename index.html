@@ -1628,6 +1628,126 @@ const LIVE_MATCHES = [
   { id: "m10", lg: "MLB", status: "UPCOMING", period: null, homeTeam: "HOU", awayTeam: "SEA", homeScore: null, awayScore: null, time: "20h10", arena: "Minute Maid Park", city: "Houston" }
 ]
 window.LIVE_MATCHES = LIVE_MATCHES;;
+
+
+// ============================================================
+// API INTEGRATION - Zone US
+// Proxy: https://zoneus-proxy.vivienfrappier.workers.dev
+// ============================================================
+
+async function fetchLiveScores() {
+  const PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+  const results = [];
+
+  // NHL
+  try {
+    const r = await fetch(PROXY + '?league=nhl');
+    const d = await r.json();
+    if (d.gamesByDate) {
+      const today = new Date().toISOString().split('T')[0];
+      for (const dateGroup of d.gamesByDate) {
+        if (dateGroup.date === today || results.length === 0) {
+          for (const g of (dateGroup.games || [])) {
+            const ht = g.homeTeam || {};
+            const at = g.awayTeam || {};
+            const state = g.gameState || 'FUT';
+            const isLive = state === 'LIVE' || state === 'CRIT';
+            const isFinal = state === 'OFF' || state === 'FINAL';
+            results.push({
+              id: 'nhl_' + g.id,
+              lg: 'NHL',
+              status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING',
+              period: g.periodDescriptor ? 'P' + g.periodDescriptor.number : '',
+              homeTeam: ht.abbrev || '',
+              awayTeam: at.abbrev || '',
+              homeScore: ht.score || 0,
+              awayScore: at.score || 0,
+              time: g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
+              homeLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (ht.abbrev||'NHL') + '_light.svg',
+              awayLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (at.abbrev||'NHL') + '_light.svg'
+            });
+          }
+        }
+      }
+    }
+  } catch(e) { console.log('NHL API error:', e.message); }
+
+  // MLB
+  try {
+    const r = await fetch(PROXY + '?league=mlb');
+    const d = await r.json();
+    if (d.dates && d.dates[0]) {
+      for (const g of (d.dates[0].games || [])) {
+        const ht = g.teams?.home || {};
+        const at = g.teams?.away || {};
+        const state = g.status?.abstractGameState || '';
+        const isLive = state === 'Live';
+        const isFinal = state === 'Final';
+        const htId = ht.team?.id;
+        const atId = at.team?.id;
+        results.push({
+          id: 'mlb_' + g.gamePk,
+          lg: 'MLB',
+          status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING',
+          period: g.linescore ? (g.linescore.currentInningOrdinal || '') : '',
+          homeTeam: ht.team?.abbreviation || '',
+          awayTeam: at.team?.abbreviation || '',
+          homeScore: ht.score || 0,
+          awayScore: at.score || 0,
+          time: g.gameDate ? new Date(g.gameDate).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
+          homeLogo: htId ? 'https://www.mlbstatic.com/team-logos/' + htId + '.svg' : '',
+          awayLogo: atId ? 'https://www.mlbstatic.com/team-logos/' + atId + '.svg' : ''
+        });
+      }
+    }
+  } catch(e) { console.log('MLB API error:', e.message); }
+
+  // NBA
+  try {
+    const r = await fetch(PROXY + '?league=nba');
+    const d = await r.json();
+    if (d.scoreboard && d.scoreboard.games) {
+      for (const g of d.scoreboard.games) {
+        const ht = g.homeTeam || {};
+        const at = g.awayTeam || {};
+        const status = g.gameStatus || 1;
+        const isLive = status === 2;
+        const isFinal = status === 3;
+        results.push({
+          id: 'nba_' + g.gameId,
+          lg: 'NBA',
+          status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING',
+          period: isLive ? 'Q' + (g.period || 1) : '',
+          homeTeam: ht.teamTricode || '',
+          awayTeam: at.teamTricode || '',
+          homeScore: ht.score || 0,
+          awayScore: at.score || 0,
+          time: g.gameTimeUTC ? new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
+          homeLogo: ht.teamId ? 'https://cdn.nba.com/logos/nba/' + ht.teamId + '/primary/L/logo.svg' : '',
+          awayLogo: at.teamId ? 'https://cdn.nba.com/logos/nba/' + at.teamId + '/primary/L/logo.svg' : ''
+        });
+      }
+    }
+  } catch(e) { console.log('NBA API error:', e.message); }
+
+  return results;
+}
+
+// Initialiser et rafraîchir toutes les 30 secondes
+async function initLiveScores() {
+  try {
+    const scores = await fetchLiveScores();
+    if (scores.length > 0) {
+      window.LIVE_MATCHES = scores;
+      // Déclencher re-render si possible
+      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+    }
+  } catch(e) { console.log('initLiveScores error:', e); }
+}
+
+initLiveScores();
+setInterval(initLiveScores, 30000);
+
 const H2H = {
   "TOR-BOS": { wins: [4, 6], last5: ["TOR 3-1", "BOS 4-2", "TOR 2-1", "BOS 3-0", "TOR 4-3"], avgGoals: 5.4 },
   "EDM-VGK": { wins: [3, 5], last5: ["VGK 4-1", "EDM 3-2", "VGK 2-1", "EDM 4-3", "EDM 3-1"], avgGoals: 4.8 },
@@ -4162,6 +4282,8 @@ function AllNewsPage({ feed, onArticleClick, onBack }) {
 
 function ZoneUS() {
     const [menuOpen, setMenuOpen] = React.useState(false);
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  React.useEffect(function() { window.__zoneus_refresh__ = forceUpdate; return function() { delete window.__zoneus_refresh__; }; }, []);
   const [arts, setArts] = useState(ARTICLES);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
