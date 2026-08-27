@@ -1730,6 +1730,14 @@ async function fetchLiveScores() {
     }
   } catch(e) { console.log('NBA API error:', e.message); }
 
+  // Trier: LIVE en premier, puis UPCOMING par heure, puis FINAL
+  results.sort(function(a, b) {
+    var order = { 'LIVE': 0, 'UPCOMING': 1, 'FINAL': 2 };
+    var oa = order[a.status] !== undefined ? order[a.status] : 1;
+    var ob = order[b.status] !== undefined ? order[b.status] : 1;
+    if (oa !== ob) return oa - ob;
+    return (a.time || '').localeCompare(b.time || '');
+  });
   return results;
 }
 
