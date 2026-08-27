@@ -6,6 +6,33 @@
   <title>Zone US</title>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<style>
+.logo-mobile { display: none; }
+.hamburger { display: none; }
+
+/* Desktop large */
+@media (max-width: 1100px) {
+  .col3 { grid-template-columns: 180px 1fr 180px !important; }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .col3 > *:first-child, .col3 > *:last-child { display: none !important; }
+  .col3 { grid-template-columns: 1fr !important; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hamburger { display: flex !important; flex-direction: column; justify-content: center; gap: 5px; }
+  .nitem { display: none !important; }
+  .logo-desktop { display: none !important; }
+  .logo-mobile { display: block !important; }
+  .col3 > *:first-child, .col3 > *:last-child { display: none !important; }
+  .col3 { grid-template-columns: 1fr !important; padding: 8px 10px 30px !important; }
+}
+
+::-webkit-scrollbar { width: 0; height: 0; }
+</style>
 </head>
 <body>
   <div id="root"></div>
