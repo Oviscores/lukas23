@@ -1878,20 +1878,33 @@ async function fetchCalendarData(lg) {
       var dates = getDateRange(addDays(today,-3), 8);
       var results = await Promise.all(dates.map(function(ds) {
         var dn = ds.replace(/-/g,'');
-        return fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba&date='+ds).then(function(r){return r.json();}).then(function(data){return{date:ds,data:data};}).catch(function(){return{date:ds,data:null};});
+        return (function(ds) {
+          var dn = ds.replace(/-/g,'');
+          return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates='+dn)
+            .then(function(r){return r.json();})
+            .then(function(data){return{date:ds,data:data};})
+            .catch(function(){return{date:ds,data:null};});
+        })(ds);
       }));
       var days = results.map(function(res) {
-        var sb = res.data&&res.data.scoreboard?res.data.scoreboard:null;
-        var games = sb?sb.games||[]:[];
+        var events = res.data&&res.data.events?res.data.events:[];
         return {
           date: res.date, label: formatDateFR(res.date),
-          matches: games.map(function(g) {
-            var ht=g.homeTeam||{}, at=g.awayTeam||{};
-            var st = g.gameStatus===3?'Final':g.gameStatus===2?'Live':'Preview';
-            var timeStr = g.gameTimeUTC?new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
-            return {id:'nba_'+g.gameId, away:at.teamTricode||'', home:ht.teamTricode||'',
-              as:at.score||0, hs:ht.score||0, st:st, time:timeStr,
-              awayLogo:at.teamId?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+at.teamId+'&lg=NBA':'', homeLogo:ht.teamId?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+ht.teamId+'&lg=NBA':''};
+          matches: events.map(function(ev) {
+            var comp = ev.competitions&&ev.competitions[0]?ev.competitions[0]:{};
+            var teams = comp.competitors||[];
+            var home = teams.find(function(t){return t.homeAway==='home';})||{};
+            var away = teams.find(function(t){return t.homeAway==='away';})||{};
+            var homeAbr = home.team&&home.team.abbreviation?home.team.abbreviation:'';
+            var awayAbr = away.team&&away.team.abbreviation?away.team.abbreviation:'';
+            var status = comp.status&&comp.status.type?comp.status.type.name:'';
+            var st = status==='STATUS_FINAL'?'Final':status==='STATUS_IN_PROGRESS'?'Live':'Preview';
+            var timeStr = comp.date?new Date(comp.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
+            return {id:ev.id||'', away:awayAbr, home:homeAbr,
+              as:away.score?parseInt(away.score):0, hs:home.score?parseInt(home.score):0,
+              st:st, time:timeStr,
+              awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+awayAbr+'&lg=NBA',
+              homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+homeAbr+'&lg=NBA'};
           })
         };
       });
