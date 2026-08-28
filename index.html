@@ -3086,13 +3086,13 @@ function LeaguePage({ lg, articles, onArticleClick, onMatchClick, onTeamClick = 
   const mc = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.10)", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" };
   const Hd = ({ label, color }) => /* @__PURE__ */ React.createElement("div", { style: { background: color || "rgba(20,20,20,0.75)", padding: "6px 14px", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 14, letterSpacing: "0.1em", color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, label));
   const MoreBtn = ({ label, onClick }) => {
-    var todayMatches = (function() {
+  var todayMatches = (function() {
     var cache = window.__CAL_CACHE__ && window.__CAL_CACHE__[lg];
     if (cache && cache.days) {
       var today = new Date().toISOString().split('T')[0];
       var todayData = cache.days.find(function(d) { return d.date === today; });
       if (todayData) return todayData.matches || [];
-      return []; // API chargée, pas de matchs
+      return [];
     }
     var cs = CAL_SCHEDULE[lg];
     return cs && cs.days[cs.todayIdx] ? cs.days[cs.todayIdx].matches : [];
