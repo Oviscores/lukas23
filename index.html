@@ -2640,21 +2640,21 @@ const NBA_IDS = {"ATL": 1610612737, "BOS": 1610612738, "BKN": 1610612751, "CHA":
 
 function getTeamLogo(teamAbr, lg, sz) {
   sz = sz || 28;
+  var imgStyle = { width: sz, height: sz, objectFit: 'contain', flexShrink: 0, display: 'block' };
   if (lg === 'NHL') {
     return React.createElement('img', {
       src: 'https://assets.nhle.com/logos/nhl/svg/' + teamAbr + '_light.svg',
-      alt: teamAbr,
-      style: { width: sz, height: sz, objectFit: 'contain' },
+      alt: teamAbr, style: imgStyle,
       onError: function(e) { e.target.style.display = 'none'; }
     });
   }
   if (lg === 'MLB') {
-    // MLB logos par nom d'équipe - on utilise ESPN
     return React.createElement('img', {
-      src: 'https://a.espncdn.com/i/teamlogos/mlb/500/' + teamAbr.toLowerCase() + '.png',
-      alt: teamAbr,
-      style: { width: sz, height: sz, objectFit: 'contain' },
-      onError: function(e) { e.target.style.display = 'none'; }
+      src: 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/' + teamAbr + '.svg',
+      alt: teamAbr, style: imgStyle,
+      onError: function(e) { 
+        e.target.src = 'https://a.espncdn.com/i/teamlogos/mlb/500/' + teamAbr.toLowerCase() + '.png';
+      }
     });
   }
   if (lg === 'NBA') {
@@ -2662,8 +2662,7 @@ function getTeamLogo(teamAbr, lg, sz) {
     if (teamId) {
       return React.createElement('img', {
         src: 'https://cdn.nba.com/logos/nba/' + teamId + '/primary/L/logo.svg',
-        alt: teamAbr,
-        style: { width: sz, height: sz, objectFit: 'contain' },
+        alt: teamAbr, style: imgStyle,
         onError: function(e) { e.target.style.display = 'none'; }
       });
     }
@@ -2671,8 +2670,7 @@ function getTeamLogo(teamAbr, lg, sz) {
   if (lg === 'NFL') {
     return React.createElement('img', {
       src: 'https://a.espncdn.com/i/teamlogos/nfl/500/' + teamAbr.toLowerCase() + '.png',
-      alt: teamAbr,
-      style: { width: sz, height: sz, objectFit: 'contain' },
+      alt: teamAbr, style: imgStyle,
       onError: function(e) { e.target.style.display = 'none'; }
     });
   }
