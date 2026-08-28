@@ -3519,7 +3519,13 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
           }
           if (all.length > 0) scores[l] = all.slice(0,5);
         }
-        if (!scores[l]) scores[l] = SCORES[l]||[];
+        if (!scores[l]) {
+          if (l === 'NBA' && window.__NBA_STATIC__) {
+            scores[l] = window.__NBA_STATIC__;
+          } else {
+            scores[l] = SCORES[l]||[];
+          }
+        }
       });
       return scores;
     })()
@@ -5102,6 +5108,15 @@ try {
     init();
   }
 })();
+
+// Données statiques NBA playoffs 2025-2026
+window.__NBA_STATIC__ = [
+  { away: 'NYK', home: 'SAS', as: 108, hs: 97,  st: 'Final', date: '2026-06-03', dateLabel: 'Mer 3 jun' },
+  { away: 'SAS', home: 'NYK', as: 115, hs: 109, st: 'Final', date: '2026-06-05', dateLabel: 'Ven 5 jun' },
+  { away: 'NYK', home: 'SAS', as: 102, hs: 118, st: 'Final', date: '2026-06-08', dateLabel: 'Lun 8 jun' },
+  { away: 'SAS', home: 'NYK', as: 99,  hs: 103, st: 'Final', date: '2026-06-10', dateLabel: 'Mer 10 jun' },
+  { away: 'NYK', home: 'SAS', as: 112, hs: 105, st: 'Final', date: '2026-06-12', dateLabel: 'Ven 12 jun' }
+];
 </script>
 </body>
 </html>
