@@ -2643,8 +2643,8 @@ function getTeamLogo(teamAbr, lg, sz) {
   var imgStyle = { width: sz, height: sz, objectFit: 'contain', flexShrink: 0, display: 'block' };
   if (lg === 'NHL') {
     return React.createElement('img', {
-      src: 'https://assets.nhle.com/logos/nhl/svg/' + teamAbr + '_light.svg',
-      alt: teamAbr, style: Object.assign({}, imgStyle, { width: Math.round(sz * 1.4), height: Math.round(sz * 1.4) }),
+      src: 'https://assets.nhle.com/logos/nhl/svg/' + teamAbr + '_dark.svg',
+      alt: teamAbr, style: imgStyle,
       onError: function(e) { e.target.style.display = 'none'; }
     });
   }
