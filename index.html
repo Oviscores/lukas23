@@ -1904,22 +1904,35 @@ async function fetchCalendarData(lg) {
     try {
       var dates = getDateRange(addDays(today,-3), 8);
       var results = await Promise.all(dates.map(function(ds) {
-        return fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nfl&date='+ds).then(function(r){return r.json();}).then(function(data){return{date:ds,data:data};}).catch(function(){return{date:ds,data:null};});
+        return (function(ds) {
+          var dn = ds.replace(/-/g,'');
+          return fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates='+dn)
+            .then(function(r){return r.json();})
+            .then(function(data){return{date:ds,data:data,source:'espn'};})
+            .catch(function(){return{date:ds,data:null};});
+        })(ds);
       }));
       var allDays = [];
       results.forEach(function(res) {
-        var games = res.data&&res.data.body?res.data.body:[];
-        if (games.length===0) return;
+        var events = res.data&&res.data.events?res.data.events:[];
+        if (events.length===0) return;
         allDays.push({
           date: res.date, label: formatDateFR(res.date),
-          matches: games.map(function(g) {
-            var epoch = g.gameTime_epoch?parseFloat(g.gameTime_epoch)*1000:0;
-            var timeStr = epoch?new Date(epoch).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):g.gameTime||'';
-            var st = g.gameStatus==='Completed'?'Final':g.gameStatus==='In Progress'?'Live':'Preview';
-            return {id:g.gameID||'', away:g.away||'', home:g.home||'',
-              as:g.awayPts?parseInt(g.awayPts):0, hs:g.homePts?parseInt(g.homePts):0,
-              st:st, time:timeStr, week:g.gameWeek||'',
-              awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(g.away||'')+'&lg=NFL', homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(g.home||'')+'&lg=NFL'};
+          matches: events.map(function(ev) {
+            var comp = ev.competitions&&ev.competitions[0]?ev.competitions[0]:{};
+            var teams = comp.competitors||[];
+            var home = teams.find(function(t){return t.homeAway==='home';})||{};
+            var away = teams.find(function(t){return t.homeAway==='away';})||{};
+            var homeAbr = home.team&&home.team.abbreviation?home.team.abbreviation:'';
+            var awayAbr = away.team&&away.team.abbreviation?away.team.abbreviation:'';
+            var status = comp.status&&comp.status.type?comp.status.type.name:'';
+            var st = status==='STATUS_FINAL'?'Final':status==='STATUS_IN_PROGRESS'?'Live':'Preview';
+            var timeStr = comp.date?new Date(comp.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
+            return {id:ev.id||'', away:awayAbr, home:homeAbr,
+              as:away.score?parseInt(away.score):0, hs:home.score?parseInt(home.score):0,
+              st:st, time:timeStr, week:ev.week?'S'+ev.week.number:'',
+              awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+awayAbr+'&lg=NFL',
+              homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+homeAbr+'&lg=NFL'};
           })
         });
       });
