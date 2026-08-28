@@ -2688,12 +2688,6 @@ function getTeamLogo(teamAbr, lg, sz) {
       fontWeight: 900, color: c.fg, lineHeight: 1 }
   }, a.slice(0,3)));
 }
-) {
-  const k = id + "_" + lg;
-  const c = TC[k] || { bg: "#555", fg: "#fff" };
-  const a = TA[k] || id;
-  return /* @__PURE__ */ React.createElement("svg", { width: sz, height: sz, viewBox: "0 0 40 40", style: { flexShrink: 0, display: "block" } }, /* @__PURE__ */ React.createElement("circle", { cx: "20", cy: "20", r: "19", fill: c.bg }), /* @__PURE__ */ React.createElement("text", { x: "20", y: a.length > 2 ? 24 : 25, textAnchor: "middle", fill: c.fg, fontSize: a.length > 2 ? 9 : 12, fontWeight: "900", fontFamily: "Arial Black,sans-serif" }, a));
-}
 function Logo({ w = 90, onClick }) {
   return /* @__PURE__ */ React.createElement("img", { src: window.LOGO, alt: "Zone US", width: w, onClick, style: { display: "block", objectFit: "contain", cursor: onClick ? "pointer" : "default" } });
 }
