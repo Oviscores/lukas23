@@ -5002,5 +5002,73 @@ try {
 }
 
   </script>
+<script>
+(function() {
+  const PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+  const NBA_IDS = {"ATL":1610612737,"BOS":1610612738,"BKN":1610612751,"CHA":1610612766,"CHI":1610612741,"CLE":1610612739,"DAL":1610612742,"DEN":1610612743,"DET":1610612765,"GSW":1610612744,"HOU":1610612745,"IND":1610612754,"LAC":1610612746,"LAL":1610612747,"MEM":1610612763,"MIA":1610612748,"MIL":1610612749,"MIN":1610612750,"NOP":1610612740,"NYK":1610612752,"OKC":1610612760,"ORL":1610612753,"PHI":1610612755,"PHX":1610612756,"POR":1610612757,"SAC":1610612758,"SAS":1610612759,"TOR":1610612761,"UTA":1610612762,"WAS":1610612764};
+
+  // Toutes les abréviations valides par ligue
+  const NHL_TEAMS = new Set(['ANA','ARI','BOS','BUF','CAR','CBJ','CGY','CHI','COL','DAL','DET','EDM','FLA','LAK','MIN','MTL','NJD','NSH','NYI','NYR','OTT','PHI','PIT','SEA','SJS','STL','TBL','TOR','UTA','VAN','VGK','WPG','WSH']);
+  const MLB_TEAMS = new Set(['ARI','ATL','BAL','BOS','CHC','CWS','CIN','CLE','COL','DET','HOU','KCR','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SDP','SEA','SF','STL','TBR','TEX','TOR','WSH']);
+  const NBA_TEAMS = new Set(Object.keys(NBA_IDS));
+  const NFL_TEAMS = new Set(['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LAC','LAR','LV','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WSH']);
+
+  function getLg(abbr) {
+    if (NHL_TEAMS.has(abbr)) return 'NHL';
+    if (NBA_TEAMS.has(abbr)) return 'NBA';
+    if (NFL_TEAMS.has(abbr)) return 'NFL';
+    if (MLB_TEAMS.has(abbr)) return 'MLB';
+    return null;
+  }
+
+  function patchBadge(div) {
+    if (div.dataset.patched) return;
+    const span = div.querySelector('span');
+    if (!span) return;
+    const abbr = span.textContent.trim();
+    if (abbr.length < 2 || abbr.length > 4 || !/^[A-Z]{2,4}$/.test(abbr)) return;
+    const lg = getLg(abbr);
+    if (!lg) return;
+    div.dataset.patched = '1';
+    const sz = div.offsetWidth || parseInt(div.style.width) || 24;
+    const img = document.createElement('img');
+    img.src = PROXY + '?logo=' + abbr + '&lg=' + lg;
+    img.alt = abbr;
+    img.style.cssText = 'width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;display:block;';
+    img.onerror = function() { img.style.display = 'none'; div.dataset.patched = '0'; };
+    div.style.background = 'transparent';
+    div.innerHTML = '';
+    div.appendChild(img);
+  }
+
+  function patchAll() {
+    document.querySelectorAll('div[style*="borderRadius"]').forEach(function(div) {
+      if (div.dataset.patched) return;
+      const span = div.querySelector('span');
+      if (!span) return;
+      const abbr = span.textContent.trim();
+      if (abbr.length >= 2 && abbr.length <= 4 && /^[A-Z]{2,4}$/.test(abbr)) {
+        patchBadge(div);
+      }
+    });
+  }
+
+  // Lancer après chargement React
+  function init() {
+    setTimeout(patchAll, 800);
+    setTimeout(patchAll, 2000);
+    new MutationObserver(function() {
+      clearTimeout(window._patchTimer);
+      window._patchTimer = setTimeout(patchAll, 200);
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
 </body>
 </html>
