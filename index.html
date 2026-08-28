@@ -2628,15 +2628,6 @@ function LB({ lg, sz = 18 }) {
   return React.createElement("div", { style: { width: sz, height: sz, borderRadius: "50%", background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" } },
     logos[lg] ? React.createElement("img", { src: logos[lg], alt: lg, style: { width: sz*0.85, height: sz*0.85, objectFit: "contain" }, onError: function(e){e.target.style.display="none";} }) : null
   );
-}) {
-  const cfg = {
-    NHL: { bg: "#000", fg: "#fff", stroke: "#fff" },
-    NFL: { bg: "#013369", fg: "#D50A0A", stroke: "#D50A0A" },
-    NBA: { bg: "#1D428A", fg: "#C8102E", stroke: "#C8102E" },
-    MLB: { bg: "#041E42", fg: "#fff", stroke: "#D50A0A" }
-  }[lg] || { bg: "#333", fg: "#fff", stroke: "#fff" };
-  return /* @__PURE__ */ React.createElement("svg", { width: sz, height: sz, viewBox: "0 0 40 40", style: { flexShrink: 0, display: "block" } }, /* @__PURE__ */ React.createElement("circle", { cx: "20", cy: "20", r: "19", fill: cfg.bg }), /* @__PURE__ */ React.createElement("circle", { cx: "20", cy: "20", r: "19", fill: "none", stroke: cfg.stroke, strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { x: "20", y: "26", textAnchor: "middle", fill: cfg.fg, fontSize: "11", fontWeight: "900", fontFamily: "Arial Black,sans-serif" }, lg));
-}
 function TB({ id, lg, sz = 14 }) {
   const k = id + "_" + lg;
   const c = TC[k] || { bg: "#555", fg: "#fff" };
