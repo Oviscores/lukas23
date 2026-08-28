@@ -175,17 +175,9 @@ const NBA_IDS = {"ATL":1610612737,"BOS":1610612738,"BKN":1610612751,"CHA":161061
 function getTeamLogo(abbr, lg, sz) {
   sz = sz || 28;
   var s = { width: sz, height: sz, objectFit: 'contain', flexShrink: 0, display: 'block' };
-  var src = null;
-  if (lg === 'NHL') src = 'https://assets.nhle.com/logos/nhl/svg/' + abbr + '_dark.svg';
-  else if (lg === 'MLB') src = 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/' + abbr + '.svg';
-  else if (lg === 'NBA') { var id = NBA_IDS[abbr]; if (id) src = 'https://cdn.nba.com/logos/nba/' + id + '/primary/L/logo.svg'; }
-  else if (lg === 'NFL') src = 'https://a.espncdn.com/i/teamlogos/nfl/500/' + abbr.toLowerCase() + '.png';
-  if (src) return React.createElement('img', { src: src, alt: abbr, style: s, onError: function(e){e.target.style.display='none';} });
-  var k = abbr + '_' + (window.TC || {});
-  var c = (typeof TC !== 'undefined' ? TC : (window.TC || {}))[abbr + '_' + lg] || { bg: '#555', fg: '#fff' };
-  return React.createElement('div', { style: { width: sz, height: sz, borderRadius: 3, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 } },
-    React.createElement('span', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: Math.floor(sz*0.4), fontWeight: 900, color: c.fg } }, (abbr||'').slice(0,3))
-  );
+  if (!abbr || !lg) return React.createElement('div', { style: { width: sz, height: sz } });
+  var src = 'https://zoneus-proxy.vivienfrappier.workers.dev?logo=' + abbr + '&lg=' + lg;
+  return React.createElement('img', { src: src, alt: abbr, style: s, onError: function(e){e.target.style.display='none';} });
 }
 </script>
 <script>
