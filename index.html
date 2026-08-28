@@ -3538,13 +3538,21 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
         var cache = window.__CAL_CACHE__ && window.__CAL_CACHE__[l];
         if (cache && cache.days) {
           var today = new Date().toISOString().split('T')[0];
-          var todayData = cache.days.find(function(d) { return d.date === today; });
-          if (todayData && todayData.matches && todayData.matches.length > 0) {
-            scores[l] = todayData.matches.map(function(m) {
-              return { away: m.away, home: m.home, as: m.as, hs: m.hs, st: m.st,
-                awayLogo: m.awayLogo, homeLogo: m.homeLogo };
-            });
-          }
+          // Prendre tous les matchs terminés (Final) des jours passés + aujourd'hui
+          var allFinished = [];
+          cache.days.forEach(function(d) {
+            if (d.date <= today) {
+              (d.matches || []).forEach(function(m) {
+                if (m.st === 'Final' || m.st === 'Live') {
+                  allFinished.push({ away: m.away, home: m.home, as: m.as, hs: m.hs, st: m.st,
+                    awayLogo: m.awayLogo, homeLogo: m.homeLogo, date: d.date });
+                }
+              });
+            }
+          });
+          // Trier par date décroissante et prendre les 5 derniers
+          allFinished.sort(function(a, b) { return b.date.localeCompare(a.date); });
+          if (allFinished.length > 0) scores[l] = allFinished.slice(0, 5);
         }
         if (!scores[l]) scores[l] = SCORES[l] || [];
       });
