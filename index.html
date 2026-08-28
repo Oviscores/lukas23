@@ -1876,40 +1876,49 @@ async function fetchCalendarData(lg) {
   // === NBA ===
   if (lg === 'NBA') {
     try {
-      const r = await fetch(PROXY + '?league=nba');
-      const d = await r.json();
-      if (!d.scoreboard) return null;
-      
-      const games = d.scoreboard.games || [];
-      const gameDate = d.scoreboard.gameDate || today;
-      
-      const matches = games.map(function(g) {
-        const ht = g.homeTeam || {};
-        const at = g.awayTeam || {};
-        const status = g.gameStatus === 3 ? 'Final' : g.gameStatus === 2 ? 'Live' : 'Preview';
-        const timeStr = g.gameTimeUTC ? new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris'}) : '';
-        return {
-          id: 'nba_' + g.gameId,
-          away: at.teamTricode || '',
-          home: ht.teamTricode || '',
-          as: at.score || 0,
-          hs: ht.score || 0,
-          st: status,
-          time: timeStr,
-          period: g.gameStatus === 2 ? 'Q' + (g.period || 1) : '',
-          awayLogo: at.teamId ? 'https://cdn.nba.com/logos/nba/' + at.teamId + '/primary/L/logo.svg' : '',
-          homeLogo: ht.teamId ? 'https://cdn.nba.com/logos/nba/' + ht.teamId + '/primary/L/logo.svg' : ''
-        };
+      // Fetcher 7 jours: 3 avant + aujourd'hui + 3 après
+      const dates = getDateRange(3, 4);
+      const promises = dates.map(function(dateStr) {
+        return fetch(PROXY + '?league=nba&date=' + dateStr)
+          .then(function(r) { return r.json(); })
+          .then(function(data) { return { date: dateStr, data: data }; })
+          .catch(function() { return { date: dateStr, data: null }; });
       });
       
-      return { days: [{ date: gameDate, label: formatDateFR(gameDate), matches: matches }], todayIdx: 0 };
+      const results = await Promise.all(promises);
+      const days = results.map(function(result) {
+        const sb = result.data && result.data.scoreboard ? result.data.scoreboard : null;
+        const games = sb ? sb.games || [] : [];
+        const matches = games.map(function(g) {
+          const ht = g.homeTeam || {};
+          const at = g.awayTeam || {};
+          const status = g.gameStatus === 3 ? 'Final' : g.gameStatus === 2 ? 'Live' : 'Preview';
+          const timeStr = g.gameTimeUTC ? new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris'}) : '';
+          return {
+            id: 'nba_' + g.gameId,
+            away: at.teamTricode || '',
+            home: ht.teamTricode || '',
+            as: at.score || 0,
+            hs: ht.score || 0,
+            st: status,
+            time: timeStr,
+            period: g.gameStatus === 2 ? 'Q' + (g.period || 1) : '',
+            awayLogo: at.teamId ? 'https://cdn.nba.com/logos/nba/' + at.teamId + '/primary/L/logo.svg' : '',
+            homeLogo: ht.teamId ? 'https://cdn.nba.com/logos/nba/' + ht.teamId + '/primary/L/logo.svg' : ''
+          };
+        });
+        return { date: result.date, label: formatDateFR(result.date), matches: matches };
+      });
+      
+      const todayIdx = Math.max(0, days.findIndex(function(d) { return d.date === today; }));
+      return { days: days, todayIdx: todayIdx };
     } catch(e) { console.log('NBA Calendar error:', e); return null; }
   }
 
   // === NFL ===
   if (lg === 'NFL') {
     try {
-      const dates = getDateRange(0, 7);
+      const dates = getDateRange(3, 4);
       const promises = dates.map(function(dateStr) {
         const d = dateStr.replace(/-/g, '');
         return fetch(PROXY + '?league=nfl&date=' + dateStr)
