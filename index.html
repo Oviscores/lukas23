@@ -3494,7 +3494,7 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
   return /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 8 } }, Object.entries(
     (function() {
       var scores = {};
-      ['NHL','MLB','NBA','NFL'].forEach(function(l) {
+      ['MLB','NFL','NHL','NBA'].forEach(function(l) {
         var cache = window.__CAL_CACHE__ && window.__CAL_CACHE__[l];
         if (cache && cache.days) {
           var today = new Date().toISOString().split('T')[0];
