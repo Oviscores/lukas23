@@ -1801,205 +1801,169 @@ function getStatusNHL(state) {
 
 // Cache global par ligue - stocke tous les jours chargés
 window.__CAL_CACHE__ = { NHL: null, MLB: null, NBA: null, NFL: null };
-window.__CAL_LOADED_RANGES__ = { NHL: [], MLB: [], NBA: [], NFL: [] };
 
-async function fetchDatesForLeague(lg, dates) {
-  const PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-  const results = [];
+function formatDateFR(dateStr) {
+  var d = new Date(dateStr + 'T12:00:00Z');
+  var days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  var months = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+  return days[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + months[d.getUTCMonth()];
+}
+
+function addDays(dateStr, n) {
+  var d = new Date(dateStr + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().split('T')[0];
+}
+
+function getDateRange(startDate, days) {
+  var dates = [];
+  for (var i = 0; i < days; i++) dates.push(addDays(startDate, i));
+  return dates;
+}
+
+async function fetchCalendarData(lg) {
+  var today = new Date().toISOString().split('T')[0];
 
   if (lg === 'NHL') {
-    // NHL retourne toujours plusieurs semaines d'un coup
     try {
-      const r = await fetch(PROXY + '?league=nhl');
-      const d = await r.json();
-      if (d.gamesByDate) {
-        d.gamesByDate.forEach(function(dateGroup) {
-          const matches = (dateGroup.games || []).map(function(g) {
-            const ht = g.homeTeam || {};
-            const at = g.awayTeam || {};
-            const timeStr = g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris'}) : '';
-            return {
-              id: 'nhl_' + g.id,
-              away: at.abbrev || '',
-              home: ht.abbrev || '',
-              as: at.score !== undefined ? at.score : 0,
-              hs: ht.score !== undefined ? ht.score : 0,
-              st: getStatusNHL(g.gameState || ''),
-              time: timeStr,
-              period: g.periodDescriptor ? 'P' + g.periodDescriptor.number : '',
-              awayLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (at.abbrev||'NHL') + '_light.svg',
-              homeLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (ht.abbrev||'NHL') + '_light.svg',
-              arena: g.venue ? g.venue.default : '',
-              awayRecord: at.record || '',
-              homeRecord: ht.record || ''
-            };
-          });
-          results.push({ date: dateGroup.date, label: formatDateFR(dateGroup.date), matches: matches });
-        });
-      }
-    } catch(e) { console.log('NHL fetch error:', e); }
-    return results;
+      var r = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl');
+      var d = await r.json();
+      if (!d.gamesByDate) return null;
+      var days = d.gamesByDate.map(function(dg) {
+        return {
+          date: dg.date,
+          label: formatDateFR(dg.date),
+          matches: (dg.games||[]).map(function(g) {
+            var ht = g.homeTeam||{}, at = g.awayTeam||{};
+            var state = g.gameState||'';
+            var st = (state==='LIVE'||state==='CRIT') ? 'Live' : (state==='OFF'||state==='FINAL') ? 'Final' : 'Preview';
+            var timeStr = g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}) : '';
+            return {id:'nhl_'+g.id, away:at.abbrev||'', home:ht.abbrev||'', as:at.score||0, hs:ht.score||0, st:st, time:timeStr,
+              awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(at.abbrev||'')+'&lg=NHL', homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(ht.abbrev||'')+'&lg=NHL'};
+          })
+        };
+      });
+      var idx = Math.max(0, days.findIndex(function(d){return d.date>=today;}));
+      return {days:days, todayIdx:idx};
+    } catch(e) { return null; }
   }
 
-  // Pour MLB, NBA, NFL: fetcher chaque date individuellement
-  const promises = dates.map(function(dateStr) {
-    const endpoint = PROXY + '?league=' + lg.toLowerCase() + '&date=' + dateStr;
-    return fetch(endpoint)
-      .then(function(r) { return r.json(); })
-      .then(function(data) { return { date: dateStr, data: data }; })
-      .catch(function() { return { date: dateStr, data: null }; });
-  });
-
-  const fetchResults = await Promise.all(promises);
-
-  fetchResults.forEach(function(result) {
-    let matches = [];
-
-    if (lg === 'MLB' && result.data && result.data.dates && result.data.dates[0]) {
-      matches = (result.data.dates[0].games || []).map(function(g) {
-        const ht = g.teams && g.teams.home ? g.teams.home : {};
-        const at = g.teams && g.teams.away ? g.teams.away : {};
-        const timeStr = g.gameDate ? new Date(g.gameDate).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris'}) : '';
+  if (lg === 'MLB') {
+    try {
+      var dates = getDateRange(addDays(today,-3), 8);
+      var results = await Promise.all(dates.map(function(ds) {
+        return fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb&date='+ds).then(function(r){return r.json();}).then(function(data){return{date:ds,data:data};}).catch(function(){return{date:ds,data:null};});
+      }));
+      var days = results.map(function(res) {
+        var games = res.data&&res.data.dates&&res.data.dates[0] ? res.data.dates[0].games||[] : [];
         return {
-          id: 'mlb_' + g.gamePk,
-          away: at.team ? at.team.abbreviation : '',
-          home: ht.team ? ht.team.abbreviation : '',
-          as: at.score !== undefined ? at.score : 0,
-          hs: ht.score !== undefined ? ht.score : 0,
-          st: g.status ? g.status.abstractGameState : 'Preview',
-          time: timeStr,
-          period: g.linescore ? (g.linescore.currentInningOrdinal || '') : '',
-          awayLogo: at.team && at.team.id ? 'https://www.mlbstatic.com/team-logos/' + at.team.id + '.svg' : '',
-          homeLogo: ht.team && ht.team.id ? 'https://www.mlbstatic.com/team-logos/' + ht.team.id + '.svg' : '',
-          awayRecord: at.leagueRecord ? at.leagueRecord.wins + '-' + at.leagueRecord.losses : '',
-          homeRecord: ht.leagueRecord ? ht.leagueRecord.wins + '-' + ht.leagueRecord.losses : ''
+          date: res.date, label: formatDateFR(res.date),
+          matches: games.map(function(g) {
+            var ht=g.teams&&g.teams.home?g.teams.home:{}, at=g.teams&&g.teams.away?g.teams.away:{};
+            var timeStr = g.gameDate ? new Date(g.gameDate).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}) : '';
+            var htId = ht.team&&ht.team.id, atId = at.team&&at.team.id;
+            return {id:'mlb_'+g.gamePk, away:at.team?at.team.abbreviation:'', home:ht.team?ht.team.abbreviation:'',
+              as:at.score||0, hs:ht.score||0, st:g.status?g.status.abstractGameState:'Preview', time:timeStr,
+              awayLogo:atId?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+atId+'&lg=MLB':'', homeLogo:htId?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+htId+'&lg=MLB':''};
+          })
         };
       });
-    }
+      var idx = Math.max(0, days.findIndex(function(d){return d.date>=today;}));
+      return {days:days, todayIdx:idx};
+    } catch(e) { return null; }
+  }
 
-    if (lg === 'NBA' && result.data) {
-      const sb = result.data.scoreboard || result.data.resultSets ? result.data : null;
-      const games = sb && sb.scoreboard ? sb.scoreboard.games || [] : [];
-      matches = games.map(function(g) {
-        const ht = g.homeTeam || {};
-        const at = g.awayTeam || {};
-        const status = g.gameStatus === 3 ? 'Final' : g.gameStatus === 2 ? 'Live' : 'Preview';
-        const timeStr = g.gameTimeUTC ? new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris'}) : '';
+  if (lg === 'NBA') {
+    try {
+      var dates = getDateRange(addDays(today,-3), 8);
+      var results = await Promise.all(dates.map(function(ds) {
+        var dn = ds.replace(/-/g,'');
+        return fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba&date='+ds).then(function(r){return r.json();}).then(function(data){return{date:ds,data:data};}).catch(function(){return{date:ds,data:null};});
+      }));
+      var days = results.map(function(res) {
+        var sb = res.data&&res.data.scoreboard?res.data.scoreboard:null;
+        var games = sb?sb.games||[]:[];
         return {
-          id: 'nba_' + g.gameId,
-          away: at.teamTricode || '',
-          home: ht.teamTricode || '',
-          as: at.score || 0,
-          hs: ht.score || 0,
-          st: status,
-          time: timeStr,
-          period: g.gameStatus === 2 ? 'Q' + (g.period || 1) : '',
-          awayLogo: at.teamId ? 'https://cdn.nba.com/logos/nba/' + at.teamId + '/primary/L/logo.svg' : '',
-          homeLogo: ht.teamId ? 'https://cdn.nba.com/logos/nba/' + ht.teamId + '/primary/L/logo.svg' : ''
+          date: res.date, label: formatDateFR(res.date),
+          matches: games.map(function(g) {
+            var ht=g.homeTeam||{}, at=g.awayTeam||{};
+            var st = g.gameStatus===3?'Final':g.gameStatus===2?'Live':'Preview';
+            var timeStr = g.gameTimeUTC?new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
+            return {id:'nba_'+g.gameId, away:at.teamTricode||'', home:ht.teamTricode||'',
+              as:at.score||0, hs:ht.score||0, st:st, time:timeStr,
+              awayLogo:at.teamId?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+at.teamId+'&lg=NBA':'', homeLogo:ht.teamId?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+ht.teamId+'&lg=NBA':''};
+          })
         };
       });
-    }
+      var idx = Math.max(0, days.findIndex(function(d){return d.date>=today;}));
+      return {days:days, todayIdx:idx};
+    } catch(e) { return null; }
+  }
 
-    if (lg === 'NFL' && result.data && result.data.body) {
-      matches = result.data.body.map(function(g) {
-        const timeEpoch = g.gameTime_epoch ? parseFloat(g.gameTime_epoch) * 1000 : 0;
-        const timeStr = timeEpoch ? new Date(timeEpoch).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris'}) : g.gameTime || '';
-        const state = g.gameStatus === 'Completed' ? 'Final' : g.gameStatus === 'In Progress' ? 'Live' : 'Preview';
-        return {
-          id: g.gameID || '',
-          away: g.away || '',
-          home: g.home || '',
-          as: g.awayPts ? parseInt(g.awayPts) : 0,
-          hs: g.homePts ? parseInt(g.homePts) : 0,
-          st: state,
-          time: timeStr,
-          period: g.gameClock || '',
-          week: g.gameWeek || ''
-        };
+  if (lg === 'NFL') {
+    try {
+      var dates = getDateRange(addDays(today,-3), 8);
+      var results = await Promise.all(dates.map(function(ds) {
+        return fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nfl&date='+ds).then(function(r){return r.json();}).then(function(data){return{date:ds,data:data};}).catch(function(){return{date:ds,data:null};});
+      }));
+      var allDays = [];
+      results.forEach(function(res) {
+        var games = res.data&&res.data.body?res.data.body:[];
+        if (games.length===0) return;
+        allDays.push({
+          date: res.date, label: formatDateFR(res.date),
+          matches: games.map(function(g) {
+            var epoch = g.gameTime_epoch?parseFloat(g.gameTime_epoch)*1000:0;
+            var timeStr = epoch?new Date(epoch).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):g.gameTime||'';
+            var st = g.gameStatus==='Completed'?'Final':g.gameStatus==='In Progress'?'Live':'Preview';
+            return {id:g.gameID||'', away:g.away||'', home:g.home||'',
+              as:g.awayPts?parseInt(g.awayPts):0, hs:g.homePts?parseInt(g.homePts):0,
+              st:st, time:timeStr, week:g.gameWeek||'',
+              awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(g.away||'')+'&lg=NFL', homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(g.home||'')+'&lg=NFL'};
+          })
+        });
       });
-    }
+      if (allDays.length===0) {
+        getDateRange(addDays(today,-3),8).forEach(function(ds){ allDays.push({date:ds,label:formatDateFR(ds),matches:[]}); });
+      }
+      var idx = Math.max(0, allDays.findIndex(function(d){return d.date>=today;}));
+      return {days:allDays, todayIdx:idx};
+    } catch(e) { return null; }
+  }
 
-    if (matches.length > 0 || ['MLB','NBA'].includes(lg)) {
-      results.push({ date: result.date, label: formatDateFR(result.date), matches: matches });
-    }
-  });
-
-  return results;
+  return null;
 }
 
-// Fusionner et trier les jours dans le cache
-function mergeDays(existing, newDays) {
-  const map = {};
-  (existing || []).forEach(function(d) { map[d.date] = d; });
-  newDays.forEach(function(d) { map[d.date] = d; });
-  return Object.values(map).sort(function(a, b) { return a.date.localeCompare(b.date); });
-}
-
-// Charger une plage de dates pour une ligue
 async function loadCalendarRange(lg, startDate, numDays) {
-  const today = new Date().toISOString().split('T')[0];
-  const dates = lg === 'NHL' ? [] : getDateRange(startDate, numDays);
-  
+  var today = new Date().toISOString().split('T')[0];
   try {
-    const newDays = await fetchDatesForLeague(lg, dates);
-    if (newDays.length > 0) {
-      const existing = window.__CAL_CACHE__[lg] ? window.__CAL_CACHE__[lg].days : [];
-      const merged = mergeDays(existing, newDays);
-      const todayIdx = Math.max(0, merged.findIndex(function(d) { return d.date >= today; }));
-      window.__CAL_CACHE__[lg] = { days: merged, todayIdx: todayIdx };
+    var newDays = await fetchCalendarData(lg);
+    if (newDays && newDays.days && newDays.days.length > 0) {
+      window.__CAL_CACHE__[lg] = newDays;
       if (window.__zoneus_refresh__) window.__zoneus_refresh__();
     }
-  } catch(e) { console.log(lg + ' calendar load error:', e); }
+  } catch(e) { console.log(lg+' calendar error:', e); }
 }
 
-// Charger plus de jours quand l'utilisateur approche des bords
-window.__CAL_EXTEND__ = {};
-
-function extendCalendarIfNeeded(lg, currentIdx) {
-  const cache = window.__CAL_CACHE__[lg];
-  if (!cache || !cache.days) return;
-  
-  const total = cache.days.length;
-  const key = lg + '_' + Math.floor(currentIdx / 7);
-  
-  // Si on est dans les 3 derniers jours → charger +14 jours après
-  if (currentIdx >= total - 3 && !window.__CAL_EXTEND__[key + '_after']) {
-    window.__CAL_EXTEND__[key + '_after'] = true;
-    const lastDate = cache.days[total - 1].date;
-    const nextStart = addDays(lastDate, 1);
-    loadCalendarRange(lg, nextStart, 14);
+window.__CAL_EXTEND_FN__ = function(lg, idx) {
+  var cache = window.__CAL_CACHE__[lg];
+  if (!cache||!cache.days) return;
+  var total = cache.days.length;
+  var key = lg+'_'+Math.floor(idx/7);
+  if (idx>=total-3 && !window.__CAL_EXT__[key+'_after']) {
+    window.__CAL_EXT__[key+'_after'] = true;
+    loadCalendarRange(lg, null, 14);
   }
-  
-  // Si on est dans les 3 premiers jours → charger +14 jours avant
-  if (currentIdx <= 2 && !window.__CAL_EXTEND__[key + '_before']) {
-    window.__CAL_EXTEND__[key + '_before'] = true;
-    const firstDate = cache.days[0].date;
-    const prevStart = addDays(firstDate, -14);
-    loadCalendarRange(lg, prevStart, 14);
-  }
-}
+};
+window.__CAL_EXT__ = {};
 
-window.__CAL_EXTEND_FN__ = extendCalendarIfNeeded;
-
-// Initialisation: charger 14 jours avant + 14 jours après pour toutes les ligues
 async function initAllCalendars() {
-  const today = new Date().toISOString().split('T')[0];
-  const startDate = addDays(today, -14);
-  
-  // Charger toutes les ligues en parallèle
-  await Promise.all(['NHL', 'MLB', 'NBA', 'NFL'].map(function(lg) {
-    return loadCalendarRange(lg, startDate, 28);
-  }));
+  await Promise.all(['NHL','MLB','NBA','NFL'].map(function(lg){ return loadCalendarRange(lg,null,28); }));
 }
 
 initAllCalendars();
-
-// Rafraîchir les données du jour toutes les 60 secondes
 setInterval(function() {
-  const today = new Date().toISOString().split('T')[0];
-  ['NHL', 'MLB', 'NBA', 'NFL'].forEach(function(lg) {
-    loadCalendarRange(lg, today, 1);
-  });
+  ['NHL','MLB','NBA','NFL'].forEach(function(lg){ loadCalendarRange(lg,null,1); });
 }, 60000);
 
 
