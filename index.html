@@ -2622,7 +2622,23 @@ const STATS_FULL = {
     ]
   }
 };
-function LB({ lg, sz = 18 }) {
+function LB({ lg, sz = 18 }
+const NBA_IDS = {"ATL":1610612737,"BOS":1610612738,"BKN":1610612751,"CHA":1610612766,"CHI":1610612741,"CLE":1610612739,"DAL":1610612742,"DEN":1610612743,"DET":1610612765,"GSW":1610612744,"HOU":1610612745,"IND":1610612754,"LAC":1610612746,"LAL":1610612747,"MEM":1610612763,"MIA":1610612748,"MIL":1610612749,"MIN":1610612750,"NOP":1610612740,"NYK":1610612752,"OKC":1610612760,"ORL":1610612753,"PHI":1610612755,"PHX":1610612756,"POR":1610612757,"SAC":1610612758,"SAS":1610612759,"TOR":1610612761,"UTA":1610612762,"WAS":1610612764};
+function getTeamLogo(abbr, lg, sz) {
+  sz = sz || 28;
+  var s = { width: sz, height: sz, objectFit: 'contain', flexShrink: 0, display: 'block' };
+  var src = null;
+  if (lg === 'NHL') src = 'https://assets.nhle.com/logos/nhl/svg/' + abbr + '_dark.svg';
+  else if (lg === 'MLB') src = 'https://www.mlbstatic.com/team-logos/team-cap-on-dark/' + abbr + '.svg';
+  else if (lg === 'NBA') { var id = NBA_IDS[abbr]; if (id) src = 'https://cdn.nba.com/logos/nba/' + id + '/primary/L/logo.svg'; }
+  else if (lg === 'NFL') src = 'https://a.espncdn.com/i/teamlogos/nfl/500/' + abbr.toLowerCase() + '.png';
+  if (src) return React.createElement('img', { src: src, alt: abbr, style: s, onError: function(e){e.target.style.display='none';} });
+  var k = abbr + '_' + lg;
+  var c = TC[k] || { bg: '#555', fg: '#fff' };
+  return React.createElement('div', { style: { width: sz, height: sz, borderRadius: 3, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 } },
+    React.createElement('span', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: Math.floor(sz*0.4), fontWeight: 900, color: c.fg } }, abbr.slice(0,3))
+  );
+}) {
   const logos = { NHL: 'https://a.espncdn.com/i/teamlogos/leagues/500/nhl.png', NFL: 'https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png', NBA: 'https://a.espncdn.com/i/teamlogos/leagues/500/nba.png', MLB: 'https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png' };
   const cfg = { NHL:{bg:"#000"}, NFL:{bg:"#013369"}, NBA:{bg:"#1D428A"}, MLB:{bg:"#041E42"} }[lg] || {bg:"#333"};
   return React.createElement("div", { style: { width: sz, height: sz, borderRadius: "50%", background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" } },
@@ -4885,15 +4901,11 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
               },
                 React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6}},
                   isLive ? React.createElement("span", {style:{width:7,height:7,borderRadius:"50%",background:"#ef4444",boxShadow:"0 0 6px #ef4444"}}) : null,
-                  React.createElement("div", {style:{width:24,height:24,borderRadius:3,background:hc.bg,display:"flex",alignItems:"center",justifyContent:"center"}},
-                    React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:900,color:hc.fg}}, m.homeTeam.slice(0,3))
-                  ),
+                  getTeamLogo(m.homeTeam, m.lg, 24),
                   (isLive||isFinal) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:900,color:"#fff"}}, m.homeScore) : null,
                   React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,color:"rgba(255,255,255,0.25)",margin:"0 2px"}}, "\u2013"),
                   (isLive||isFinal) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:900,color:"#fff"}}, m.awayScore) : null,
-                  React.createElement("div", {style:{width:24,height:24,borderRadius:3,background:ac.bg,display:"flex",alignItems:"center",justifyContent:"center"}},
-                    React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:900,color:ac.fg}}, m.awayTeam.slice(0,3))
-                  )
+                  getTeamLogo(m.awayTeam, m.lg, 24)
                 ),
                 React.createElement("span", {
                   style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:700,
