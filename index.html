@@ -3213,7 +3213,7 @@ function ScoreCard({ g, lg, onMatchClick }) {
         e.currentTarget.style.borderColor = "rgba(255,255,255,0.6)";
       }
     },
-    [{ id: g.away, sc: g.as, win: !hw }, { id: g.home, sc: g.hs, win: hw }].map((t, ti) => /* @__PURE__ */ React.createElement("div", { key: ti, style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3 } }, /* @__PURE__ */ getTeamLogo(t.id, lg, 11), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: t.win ? 700 : 500, color: t.win ? "#111" : "#555" } }, t.id)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: t.win ? 800 : 600, color: t.win ? "#111" : "#666" } }, t.sc)))
+    [{ id: g.away, sc: g.as, win: !hw }, { id: g.home, sc: g.hs, win: hw }].map((t, ti) => /* @__PURE__ */ React.createElement("div", { key: ti, style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3 } }, /* @__PURE__ */ getTeamLogo(t.id, lg, 33), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: t.win ? 700 : 500, color: t.win ? "#111" : "#555" } }, t.id)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: t.win ? 800 : 600, color: t.win ? "#111" : "#666" } }, t.sc)))
   );
 }
 function NewsletterWidget() {
