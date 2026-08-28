@@ -2623,12 +2623,6 @@ const STATS_FULL = {
   }
 };
 function LB({ lg, sz = 18 }) {
-  const logos = { NHL: 'https://a.espncdn.com/i/teamlogos/leagues/500/nhl.png', NFL: 'https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png', NBA: 'https://a.espncdn.com/i/teamlogos/leagues/500/nba.png', MLB: 'https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png' };
-  const cfg = { NHL:{bg:"#000"}, NFL:{bg:"#013369"}, NBA:{bg:"#1D428A"}, MLB:{bg:"#041E42"} }[lg] || {bg:"#333"};
-  return React.createElement("div", { style: { width: sz, height: sz, borderRadius: "50%", background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" } },
-    logos[lg] ? React.createElement("img", { src: logos[lg], alt: lg, style: { width: sz*0.85, height: sz*0.85, objectFit: "contain" }, onError: function(e){e.target.style.display="none";} }) : null
-  );
-}) {
   const cfg = {
     NHL: { bg: "#000", fg: "#fff", stroke: "#fff" },
     NFL: { bg: "#013369", fg: "#D50A0A", stroke: "#D50A0A" },
@@ -4682,11 +4676,9 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
           height: 52,
           cursor: "pointer",
           whiteSpace: "nowrap",
-          transition: "color 0.15s",
-          display: "flex", alignItems: "center", gap: 6
+          transition: "color 0.15s"
         }
       },
-      React.createElement(LB, { lg: lg, sz: 26 }),
       lg
     ), /* @__PURE__ */ React.createElement("div", { className: "ndd", style: {
       position: "absolute",
