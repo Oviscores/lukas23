@@ -1915,7 +1915,7 @@ async function fetchCalendarData(lg) {
 
   if (lg === 'NFL') {
     try {
-      var dates = getDateRange(addDays(today,-3), 8);
+      var dates = getDateRange(addDays(today,-3), 35);
       var results = await Promise.all(dates.map(function(ds) {
         return (function(ds) {
           var dn = ds.replace(/-/g,'');
