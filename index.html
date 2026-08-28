@@ -3256,7 +3256,7 @@ function ScoreCard({ g, lg, onMatchClick }) {
         e.currentTarget.style.borderColor = "rgba(255,255,255,0.6)";
       }
     },
-    [{ id: g.away, sc: g.as, win: !hw }, { id: g.home, sc: g.hs, win: hw }].map((t, ti) => /* @__PURE__ */ React.createElement("div", { key: ti, style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3 } }, /* @__PURE__ */ getTeamLogo(t.id, lg, 11), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: t.win ? 700 : 500, color: t.win ? "#111" : "#555" } }, t.id)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: t.win ? 800 : 600, color: t.win ? "#111" : "#666" } }, t.sc)))
+    [{ id: g.away, sc: g.as, win: !hw }, { id: g.home, sc: g.hs, win: hw }].map((t, ti) => /* @__PURE__ */ React.createElement("div", { key: ti, style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3 } }, /* @__PURE__ */ getTeamLogo(t.id, lg, 22), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: t.win ? 700 : 500, color: t.win ? "#111" : "#555" } }, t.id)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: t.win ? 800 : 600, color: t.win ? "#111" : "#666" } }, t.sc)))
   );
 }
 function NewsletterWidget() {
@@ -3533,10 +3533,47 @@ function CalendarPage({ lg, onMatchClick }) {
   })));
 }
 function LeftCol({ onMatchClick, onStandingsClick }) {
-  return /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 8 } }, Object.entries(SCORES).map(([lg, games]) => /* @__PURE__ */ React.createElement("div", { key: lg }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#333" } }, lg)), games.map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
+  return /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 8 } }, Object.entries(
+    (function() {
+      var scores = {};
+      ['NHL', 'MLB', 'NBA', 'NFL'].forEach(function(l) {
+        var cache = window.__CAL_CACHE__ && window.__CAL_CACHE__[l];
+        if (cache && cache.days) {
+          var today = new Date().toISOString().split('T')[0];
+          var todayData = cache.days.find(function(d) { return d.date === today; });
+          if (todayData && todayData.matches && todayData.matches.length > 0) {
+            scores[l] = todayData.matches.map(function(m) {
+              return { away: m.away, home: m.home, as: m.as, hs: m.hs, st: m.st,
+                awayLogo: m.awayLogo, homeLogo: m.homeLogo };
+            });
+          }
+        }
+        if (!scores[l]) scores[l] = SCORES[l] || [];
+      });
+      return scores;
+    })()
+  ).filter(([l, g]) => g.length > 0).map(([lg, games]) => /* @__PURE__ */ React.createElement("div", { key: lg }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#333" } }, lg)), games.map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
     e.preventDefault();
     if (onStandingsClick) onStandingsClick(lg);
-  }, style: { display: "block", textAlign: "right", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, textDecoration: "none", marginBottom: 4 } }, "TOUS \u2192"))), Object.entries(STANDINGS).map(([lg, rows]) => /* @__PURE__ */ React.createElement("div", { key: lg + "s" }, /* @__PURE__ */ React.createElement("div", { onClick: () => onStandingsClick && onStandingsClick(lg), style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8, cursor: "pointer" } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: "#666" } }, "CLASS."), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, marginLeft: "auto" } }, "\u2192")), rows.slice(0, 3).map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+  }, style: { display: "block", textAlign: "right", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, textDecoration: "none", marginBottom: 4 } }, "TOUS \u2192"))), Object.entries(
+    (function() {
+      var st = {};
+      ['NHL', 'MLB', 'NBA', 'NFL'].forEach(function(l) {
+        var conf = window.CONF_STANDINGS && window.CONF_STANDINGS[l];
+        if (conf) {
+          var allRows = [];
+          Object.values(conf).forEach(function(rows) {
+            allRows = allRows.concat(rows);
+          });
+          allRows.sort(function(a, b) { return (b.pts || b.w || 0) - (a.pts || a.w || 0); });
+          st[l] = allRows.slice(0, 5);
+        } else {
+          st[l] = (STANDINGS[l] || []).slice(0, 5);
+        }
+      });
+      return st;
+    })()
+  ).map(([lg, rows]) => /* @__PURE__ */ React.createElement("div", { key: lg + "s" }, /* @__PURE__ */ React.createElement("div", { onClick: () => onStandingsClick && onStandingsClick(lg), style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8, cursor: "pointer" } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: "#666" } }, "CLASS."), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, marginLeft: "auto" } }, "\u2192")), rows.slice(0, 3).map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
