@@ -3532,17 +3532,7 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
   ).filter(function(e){return e[1].length>0;}).map(([lg, games]) => /* @__PURE__ */ React.createElement("div", { key: lg }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#333" } }, lg)), games.map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
     e.preventDefault();
     if (onStandingsClick) onStandingsClick(lg);
-  }, style: { display: "block", textAlign: "right", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, textDecoration: "none", marginBottom: 4 } }, "TOUS \u2192"))), Object.entries(STANDINGS).map(([lg, rows]) => /* @__PURE__ */ React.createElement("div", { key: lg + "s" }, /* @__PURE__ */ React.createElement("div", { onClick: () => onStandingsClick && onStandingsClick(lg), style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8, cursor: "pointer" } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: "#666" } }, "CLASS."), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, marginLeft: "auto" } }, "\u2192")), rows.slice(0, 3).map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "5px 8px",
-    marginBottom: 5,
-    background: "rgba(200,200,200,0.15)",
-    border: "1px solid rgba(255,255,255,0.5)",
-    borderRadius: 3,
-    gap: 3
-  } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: i === 0 ? LG[lg].color : "#555", width: 8 } }, s.r), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#333", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, s.t.split(" ").pop()), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: i === 0 ? LG[lg].color : "#555" } }, s.pts))))));
+  }, style: { display: "block", textAlign: "right", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, textDecoration: "none", marginBottom: 4 } }, "TOUS \u2192"))));
 }
 function RightCol({ feed, onGen, generating, genLg, onArticleClick, onMoreNews, onMorePlayers, onMoreStats, onPlayerClick }) {
   const [stab, setStab] = useState(0);
