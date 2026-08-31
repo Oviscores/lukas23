@@ -5304,27 +5304,19 @@ async function fetchLeagueStats(lg) {
         {cat:'receivingYards',label:'Yards réception'},
         {cat:'receivingTouchdowns',label:'TD réception'},
         {cat:'sacks',label:'Sacks'},
-        {cat:'interceptions',label:'Interceptions défensives'}
+        {cat:'interceptions',label:'Interceptions déf.'}
       ];
       var results = await Promise.all(nflCats.map(function(c) {
-        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2024').then(function(r){return r.json();}).catch(function(){return null;});
+        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2024')
+          .then(function(r){return r.json();}).catch(function(){return null;});
       }));
-      console.log('NFL sample:', JSON.stringify(results[0]).slice(0,300));
       var players = nflCats.map(function(c,i) {
         var d = results[i];
-        if (!d) return null;
-        // Format ESPN byathlete: d.athletes ou d.leaders ou autre
-        var rows = d.athletes || d.leaders || (d.statistics && d.statistics[0] && d.statistics[0].athletes) || [];
-        if (!rows.length && d.items) rows = d.items;
-        var data = rows.slice(0,5).map(function(e) {
-          var athlete = e.athlete || e.person || e || {};
-          var name = athlete.displayName || athlete.fullName || athlete.shortName || '';
-          var team = e.team || athlete.team || {};
-          var ab = team.abbreviation || team.shortDisplayName || '';
-          var val = e.displayValue || (e.statistics && e.statistics[0] && e.statistics[0].displayValue) || String(e.value || 0);
-          return {name:name, ab:ab, val:val};
-        }).filter(function(e){ return e.name; });
-        return data.length ? {label:c.label, data:data} : null;
+        if (!d || !d.leaders) return null;
+        var data = d.leaders.slice(0,5).map(function(e) {
+          return {name:e.name||'',ab:e.teamAb||'',val:e.displayValue||String(e.value||0)};
+        }).filter(function(e){return e.name;});
+        return data.length ? {label:c.label,data:data} : null;
       }).filter(Boolean);
       if (players.length > 0) {
         window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
