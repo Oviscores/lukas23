@@ -3096,23 +3096,26 @@ function LeaguePage({ lg, articles, onArticleClick, onMatchClick, onTeamClick = 
   };  return /* @__PURE__ */ React.createElement("div", { className: "col3", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "220px 1fr 220px", gap: 14, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 6 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 4, marginBottom: 4 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: "#333" } }, "R\xC9SULTATS")), (function() {
       var today = new Date().toISOString().split('T')[0];
       var cache = window.__CAL_CACHE__ && window.__CAL_CACHE__[lg];
+      function normalize(m, date) {
+        var st = m.st === 'Final' ? 'FINAL' : (m.st === 'Live' ? 'LIVE' : 'UPCOMING');
+        return Object.assign({}, m, { st: st, dateLabel: m.dateLabel || date || '' });
+      }
       if (cache && cache.days) {
-        // MLB : 5 derniers résultats (matchs terminés avant aujourd'hui)
         if (lg === 'MLB') {
           var past = [];
           cache.days.forEach(function(d) {
-            if (d.date <= today) d.matches.forEach(function(m) { if (m.st === 'Final') past.push(m); });
+            d.matches.forEach(function(m) { if (m.st === 'Final') past.push(normalize(m, d.label)); });
           });
           return past.slice(-5).reverse();
         }
-        // NHL/NBA/NFL : 5 prochains matchs
         var upcoming = [];
         cache.days.forEach(function(d) {
-          if (d.date >= today) d.matches.forEach(function(m) { upcoming.push(m); });
+          if (d.date >= today) d.matches.forEach(function(m) { upcoming.push(normalize(m, d.label)); });
         });
-        return upcoming.slice(0, 5);
+        if (upcoming.length > 0) return upcoming.slice(0, 5);
       }
-      return SCORES[lg] || [];
+      // Fallback statique (NBA sans cache, etc.)
+      return (SCORES[lg] || []).map(function(m) { return normalize(m, ''); });
     })().map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
     e.preventDefault();
     if (onStandingsClick) onStandingsClick(lg);
