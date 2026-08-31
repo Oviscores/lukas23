@@ -4409,27 +4409,31 @@ const TeamCard = ({ teamId, name, col, stand, players, isHome }) => {
 };
 
 function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
-  var _tick = React.useState(0);
-  var tick = _tick[0], setTick = _tick[1];
+  var _statsState = React.useState(null);
+  var statsData = _statsState[0], setStatsData = _statsState[1];
   React.useEffect(function() {
+    setStatsData(null);
     if (lg === 'NHL') {
-      if (window.__NHL_STATS_LOADED__ && window.STATS_PAGES && window.STATS_PAGES.NHL && window.STATS_PAGES.NHL.players && window.STATS_PAGES.NHL.players.length > 3) {
-        setTick(function(t){return t+1;});
-      } else if (window.fetchNHLStats) {
-        window.__NHL_STATS_LOADED__ = false;
-        window.fetchNHLStats().then(function() { setTick(function(t){return t+1;}); });
+      window.__NHL_STATS_LOADED__ = false;
+      if (window.fetchNHLStats) {
+        window.fetchNHLStats().then(function() {
+          setStatsData(window.STATS_PAGES[lg] || null);
+        });
       }
+      setStatsData(window.STATS_PAGES[lg] || null);
     } else if ((lg === 'MLB' || lg === 'NBA') && window.fetchLeagueStats) {
       window.__STATS_LOADED__ = window.__STATS_LOADED__ || {};
       window.__STATS_LOADED__[lg] = false;
-      window.__stats_setTick__ = setTick;
-      window.fetchLeagueStats(lg);
-    } else if (lg === 'NFL') {
-      setTick(function(t){return t+1;});
+      setStatsData(window.STATS_PAGES[lg] || null);
+      window.fetchLeagueStats(lg).then(function() {
+        setStatsData(Object.assign({}, window.STATS_PAGES[lg]) || null);
+      });
+    } else {
+      setStatsData(window.STATS_PAGES[lg] || null);
     }
   }, [lg]);
   var lc = LG[lg].color;
-  var data = window.STATS_PAGES[lg];
+  var data = statsData || window.STATS_PAGES[lg];
   if (!data) return null;
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
   return /* @__PURE__ */ React.createElement("div", { className: "stats-page", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 15 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement("div", { style: { width: 3, height: 16, background: lc, borderRadius: 2 } }), /* @__PURE__ */ React.createElement(LB, { lg, sz: 16 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 21, fontWeight: 900, color: "#111", letterSpacing: "0.06em" } }, lg + " \u2014 STATISTIQUES")), /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, (data.teams && data.teams.length > 0 ? data.teams : data.players.filter(function(_,i){return i%2===0;})).map(function(cat, ci) {
