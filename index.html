@@ -5316,6 +5316,7 @@ async function fetchLeagueStats(lg) {
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
         if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
+      syncGSTATS('MLB');
       console.log('MLB stats OK - '+players.length+' cats');
     } catch(e) { console.log('MLB stats error:',e); window.__STATS_LOADED__.MLB=false; }
     return;
@@ -5353,6 +5354,7 @@ async function fetchLeagueStats(lg) {
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
         if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
+      syncGSTATS('NBA');
       console.log('NBA stats OK - '+players.length+' cats');
     } catch(e) { console.log('NBA stats error:',e); window.__STATS_LOADED__.NBA=false; }
     return;
@@ -5393,6 +5395,145 @@ async function fetchLeagueStats(lg) {
   }
 }
 
+
+</script>
+<script>
+window.__NHL_STATS_LOADED__ = false;
+window.__STATS_LOADED__ = {};
+
+function syncGSTATS(lg) {
+  var sp = window.STATS_PAGES && window.STATS_PAGES[lg];
+  if (!sp || !sp.players || !sp.players.length) return;
+  GSTATS[lg] = sp.players.map(function(c) {
+    return { label: c.label, unit: '', players: c.data.map(function(p) { return { name: p.name, team: p.ab, val: p.val }; }) };
+  });
+}
+
+window.__NHL_STATS_LOADED__ = false;
+async function fetchNHLStats() {
+  if (window.__NHL_STATS_LOADED__) return;
+  window.__NHL_STATS_LOADED__ = true;
+  const P = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+  const S = '20252026';
+  function pp(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(p){var n=(p.firstName&&p.firstName.default||'')+' '+(p.lastName&&p.lastName.default||'');var ab=(p.teamAbbrevs&&p.teamAbbrevs.default)||p.teamAbbrev||'';return{name:n.trim(),ab:ab,val:p.value!==undefined?p.value:0};});}
+  function pg(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(g){var n=(g.firstName&&g.firstName.default||'')+' '+(g.lastName&&g.lastName.default||'');var ab=(g.teamAbbrevs&&g.teamAbbrevs.default)||(g.teamAbbrev&&g.teamAbbrev.default)||g.teamAbbrev||'';var v=g.value!==undefined?g.value:0;if(c==='savePctg')v=typeof v==='number'?v.toFixed(3):v;return{name:n.trim(),ab:ab,val:v};});}
+  function pt(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(t){return{ab:(t.teamAbbrevs&&t.teamAbbrevs.default)||t.teamAbbrev||'',val:t.value!==undefined?t.value:0};});}
+  try {
+    var pC=['goals','assists','points','plusMinus','penaltyMinutes','powerPlayPoints','gameWinningGoals','shots','hits','blockedShots','timeOnIcePerGame'];
+    var tC=['teamPowerPlayPct','teamPenaltyKillPct','hits'];
+    var gC=['savePctg','wins','goalsAgainstAverage','shutouts'];
+    var pL={goals:'Buts',assists:'Passes',points:'Points',plusMinus:'+/-',penaltyMinutes:'Min. pénalité',powerPlayPoints:'Points PP',gameWinningGoals:'Buts vainqueurs',shots:'Tirs',hits:'Mises en échec',blockedShots:'Tirs bloqués',timeOnIcePerGame:'Temps de glace'};
+    var tL={teamPowerPlayPct:'Efficacité PP',teamPenaltyKillPct:'Efficacité PK',hits:'Hits - Équipes'};
+    var gL={savePctg:'SV%',wins:'Victoires',goalsAgainstAverage:'Moy. buts enc.',shutouts:'Jeux blancs'};
+    var all=await Promise.all([
+      ...pC.map(function(c){return fetch(P+'?league=nhl_leaders&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});}),
+      ...tC.map(function(c){return fetch(P+'?league=nhl_leaders&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});}),
+      ...gC.map(function(c){return fetch(P+'?league=nhl_goalies&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});})
+    ]);
+    var players=pC.map(function(c,i){return{label:pL[c]||c,data:pp(all[i],c)};}).filter(function(x){return x.data.length>0;});
+    var teams=tC.map(function(c,i){return{label:tL[c]||c,data:pt(all[pC.length+i],c)};}).filter(function(x){return x.data.length>0;});
+    var goalies=gC.map(function(c,i){return{label:gL[c]||c,data:pg(all[pC.length+tC.length+i],c)};}).filter(function(x){return x.data.length>0;});
+    if(window.STATS_PAGES){window.STATS_PAGES.NHL={teams:teams.length>0?teams:window.STATS_PAGES.NHL.teams,players:players.length>0?players:window.STATS_PAGES.NHL.players,goalies:goalies};}
+    if(window.__zoneus_refresh__)window.__zoneus_refresh__();
+    syncGSTATS('NHL');
+    console.log('NHL stats OK');
+  } catch(e){console.log('NHL stats err',e);window.__NHL_STATS_LOADED__=false;}
+}
+async function fetchLeagueStats(lg) {
+  if (window.__STATS_LOADED__[lg]) return;
+  window.__STATS_LOADED__[lg] = true;
+  var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+
+  if (lg === 'MLB') {
+    try {
+      var mlbCats = [
+        {cat:'homeRuns',label:'Home Runs'},
+        {cat:'battingAverage',label:'Moyenne'},
+        {cat:'rbi',label:'Points produits'},
+        {cat:'stolenBases',label:'Buts volés'},
+        {cat:'hits',label:'Coups sûrs'},
+        {cat:'era',label:'ERA'},
+        {cat:'strikeouts',label:'Retraits sur 3 prises'},
+        {cat:'wins',label:'Victoires'},
+        {cat:'saves',label:'Sauvetages'}
+      ];
+      var results = await Promise.all(mlbCats.map(function(c) {
+        return fetch(PROXY+'?league=mlb_leaders&cat='+c.cat+'&season=2025').then(function(r){return r.json();}).catch(function(){return null;});
+      }));
+      var players = mlbCats.map(function(c,i) {
+        var d = results[i];
+        if (!d||!d.leagueLeaders||!d.leagueLeaders[0]) return null;
+        var data = (d.leagueLeaders[0].leaders||[]).slice(0,5).map(function(e) {
+          return {name:e.person&&e.person.fullName||'',ab:e.team&&e.team.abbreviation||'',val:e.value||0};
+        });
+        return data.length ? {label:c.label,data:data} : null;
+      }).filter(Boolean);
+      if (players.length>0) {
+        window.STATS_PAGES.MLB = window.STATS_PAGES.MLB||{teams:[],players:[]};
+        window.STATS_PAGES.MLB.players = players;
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
+      console.log('MLB stats OK - '+players.length+' cats');
+    } catch(e) { console.log('MLB stats error:',e); window.__STATS_LOADED__.MLB=false; }
+    return;
+  }
+
+  if (lg === 'NBA') {
+    try {
+      var nbaCats = [
+        {cat:'PTS',label:'Points'},
+        {cat:'REB',label:'Rebonds'},
+        {cat:'AST',label:'Passes'},
+        {cat:'STL',label:'Interceptions'},
+        {cat:'BLK',label:'Contres'},
+        {cat:'FG_PCT',label:'% Tirs'},
+        {cat:'FT_PCT',label:'% LF'},
+        {cat:'FG3_PCT',label:'% 3 pts'}
+      ];
+      var results = await Promise.all(nbaCats.map(function(c) {
+        return fetch(PROXY+'?league=nba_leaders&cat='+c.cat+'&season=2025-26').then(function(r){return r.json();}).catch(function(){return null;});
+      }));
+      var players = nbaCats.map(function(c,i) {
+        var d = results[i];
+        if (!d||!d.resultSet) return null;
+        var headers = d.resultSet.headers||[];
+        var rows = d.resultSet.rowSet||[];
+        var ni=headers.indexOf('PLAYER'), ti=headers.indexOf('TEAM'), vi=headers.indexOf(c.cat);
+        if (ni<0||vi<0) return null;
+        var data = rows.slice(0,5).map(function(r){return {name:r[ni]||'',ab:r[ti]||'',val:r[vi]||0};});
+        return data.length ? {label:c.label,data:data} : null;
+      }).filter(Boolean);
+      if (players.length>0) {
+        window.STATS_PAGES.NBA = window.STATS_PAGES.NBA||{teams:[],players:[]};
+        window.STATS_PAGES.NBA.players = players;
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
+      console.log('NBA stats OK - '+players.length+' cats');
+    } catch(e) { console.log('NBA stats error:',e); window.__STATS_LOADED__.NBA=false; }
+    return;
+  }
+
+  if (lg === 'NFL') {
+    try {
+      var d = await fetch(PROXY+'?league=nfl_leaders&season=2024').then(function(r){return r.json();});
+      if (!d||!d.categories) { window.__STATS_LOADED__.NFL=false; return; }
+      var players = [];
+      (d.categories||[]).forEach(function(cat) {
+        var data = (cat.leaders||[]).slice(0,5).map(function(e) {
+          return {name:e.athlete&&(e.athlete.displayName||e.athlete.shortName)||'',ab:e.team&&e.team.abbreviation||'',val:e.displayValue||e.value||0};
+        });
+        if (data.length) players.push({label:cat.displayName||cat.name||'',data:data});
+      });
+      if (players.length>0) {
+        window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
+        window.STATS_PAGES.NFL.players = players;
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
+      console.log('NFL stats OK - '+players.length+' cats');
+    } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
+    return;
+  }
+}
 
 </script>
 </body>
