@@ -1865,7 +1865,7 @@ async function fetchCalendarData(lg) {
             var timeStr = g.gameDate ? new Date(g.gameDate).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}) : '';
             var htId = ht.team&&ht.team.id, atId = at.team&&at.team.id;
             return {id:'mlb_'+g.gamePk, away:at.team?at.team.abbreviation:'', home:ht.team?ht.team.abbreviation:'',
-              as:at.score||0, hs:ht.score||0, st:g.status?g.status.abstractGameState:'Preview', time:timeStr,
+              as:isLive||isFinal ? (at.score||0) : null, hs:isLive||isFinal ? (ht.score||0) : null, st:g.status?g.status.abstractGameState:'Preview', time:timeStr,
               awayLogo:at.team&&at.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+at.team.abbreviation+'&lg=MLB':'', homeLogo:ht.team&&ht.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+ht.team.abbreviation+'&lg=MLB':''};
           })
         };
@@ -1903,7 +1903,7 @@ async function fetchCalendarData(lg) {
             var st = status==='STATUS_FINAL'?'Final':status==='STATUS_IN_PROGRESS'?'Live':'Preview';
             var timeStr = comp.date?new Date(comp.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
             return {id:ev.id||'', away:awayAbr, home:homeAbr,
-              as:away.score?parseInt(away.score):null, hs:home.score?parseInt(home.score):null,
+              as:st==='Final'||st==='Live' ? (away.score?parseInt(away.score):0) : null, hs:st==='Final'||st==='Live' ? (home.score?parseInt(home.score):0) : null,
               st:st, time:timeStr,
               awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+awayAbr+'&lg=NBA',
               homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+homeAbr+'&lg=NBA'};
@@ -1944,7 +1944,7 @@ async function fetchCalendarData(lg) {
             var st = status==='STATUS_FINAL'?'Final':status==='STATUS_IN_PROGRESS'?'Live':'Preview';
             var timeStr = comp.date?new Date(comp.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
             return {id:ev.id||'', away:awayAbr, home:homeAbr,
-              as:away.score?parseInt(away.score):null, hs:home.score?parseInt(home.score):null,
+              as:st==='Final'||st==='Live' ? (away.score?parseInt(away.score):0) : null, hs:st==='Final'||st==='Live' ? (home.score?parseInt(home.score):0) : null,
               st:st, time:timeStr, week:ev.week?'S'+ev.week.number:'',
               awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+awayAbr+'&lg=NFL',
               homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+homeAbr+'&lg=NFL'};
@@ -5112,17 +5112,19 @@ async function fetchStandings(lg) {
   window.__STANDINGS_LOADED__[lg] = true;
   try {
     if (lg === 'NHL') {
-      var r = await fetch('https://api-web.nhle.com/v1/standings/now');
+      var r = await fetch('https://site.api.espn.com/apis/v2/sports/hockey/nhl/standings?season=2025');
       var d = await r.json();
-      if (!d || !d.standings) return;
-      var west = [], east = [];
-      d.standings.forEach(function(t) {
-        var conf = t.conferenceName || '';
-        var obj = { r: t.conferenceSequence || 99, ab: t.teamAbbrev && t.teamAbbrev.default || '', w: t.wins || 0, l: t.losses || 0, pts: t.points || 0 };
-        if (conf === 'Western') west.push(obj); else east.push(obj);
+      if (!d || !d.children) return;
+      var confs = {};
+      d.children.forEach(function(conf) {
+        var rows = [];
+        (conf.standings && conf.standings.entries || []).forEach(function(e, i) {
+          var stats = {}; (e.stats || []).forEach(function(s){stats[s.name]=s.value;});
+          rows.push({ r: i+1, ab: e.team && e.team.abbreviation || '', w: stats.wins || 0, l: stats.losses || 0, pts: stats.points || 0 });
+        });
+        confs[conf.name || 'Conference'] = rows;
       });
-      west.sort(function(a,b){return a.r-b.r;}); east.sort(function(a,b){return a.r-b.r;});
-      if (west.length > 0 || east.length > 0) { CONF_STANDINGS.NHL = { 'Conf. Ouest': west, 'Conf. Est': east }; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
+      if (Object.keys(confs).length > 0) { CONF_STANDINGS.NHL = confs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
     }
     if (lg === 'MLB') {
       var r = await fetch('https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&season=2025&standingsTypes=regularSeason&hydrate=team');
