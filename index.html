@@ -4314,7 +4314,11 @@ function NewsletterBanner() {
 function StatFullPage({ lg, catIndex, type, onBack, onPlayerClick }) {
   var lc = LG[lg].color;
   var data = window.STATS_PAGES[lg];
-  if (!data) return null;
+  if (!data || (!data.players.length && !data.teams.length)) return /* @__PURE__ */ React.createElement("div", { style: { padding: 40, textAlign: "center", color: "#fff" } },
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "🏈"),
+    /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 900, letterSpacing: "0.1em" } }, "SAISON À VENIR"),
+    /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.6)", marginTop: 8 } }, "Les statistiques seront disponibles au lancement de la saison.")
+  );
   var cat = type === "teams" ? data.teams[catIndex] : data.players[catIndex];
   if (!cat) return null;
   var isTeams = type === "teams";
