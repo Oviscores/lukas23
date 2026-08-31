@@ -4409,28 +4409,29 @@ const TeamCard = ({ teamId, name, col, stand, players, isHome }) => {
 };
 
 function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
-  var _statsState = React.useState(null);
-  var statsData = _statsState[0], setStatsData = _statsState[1];
+  var _s = React.useState(window.STATS_PAGES[lg] || null);
+  var statsData = _s[0], setStatsData = _s[1];
   React.useEffect(function() {
-    setStatsData(null);
-    if (lg === 'NHL') {
-      window.__NHL_STATS_LOADED__ = false;
-      if (window.fetchNHLStats) {
-        window.fetchNHLStats().then(function() {
-          setStatsData(window.STATS_PAGES[lg] || null);
+    // Afficher immédiatement les données statiques
+    setStatsData(window.STATS_PAGES[lg] || null);
+    // Puis charger les données API
+    var mounted = true;
+    function loadStats() {
+      if (lg === 'NHL') {
+        window.__NHL_STATS_LOADED__ = false;
+        if (window.fetchNHLStats) window.fetchNHLStats().then(function() {
+          if (mounted) setStatsData(JSON.parse(JSON.stringify(window.STATS_PAGES[lg] || {})));
+        });
+      } else if (lg === 'MLB' || lg === 'NBA') {
+        window.__STATS_LOADED__ = window.__STATS_LOADED__ || {};
+        window.__STATS_LOADED__[lg] = false;
+        if (window.fetchLeagueStats) window.fetchLeagueStats(lg).then(function() {
+          if (mounted) setStatsData(JSON.parse(JSON.stringify(window.STATS_PAGES[lg] || {})));
         });
       }
-      setStatsData(window.STATS_PAGES[lg] || null);
-    } else if ((lg === 'MLB' || lg === 'NBA') && window.fetchLeagueStats) {
-      window.__STATS_LOADED__ = window.__STATS_LOADED__ || {};
-      window.__STATS_LOADED__[lg] = false;
-      setStatsData(window.STATS_PAGES[lg] || null);
-      window.fetchLeagueStats(lg).then(function() {
-        setStatsData(Object.assign({}, window.STATS_PAGES[lg]) || null);
-      });
-    } else {
-      setStatsData(window.STATS_PAGES[lg] || null);
     }
+    loadStats();
+    return function() { mounted = false; };
   }, [lg]);
   var lc = LG[lg].color;
   var data = statsData || window.STATS_PAGES[lg];
