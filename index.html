@@ -2614,7 +2614,7 @@ function HCard({ a, onClick }) {
   return /* @__PURE__ */ React.createElement(
     "div",
     {
-      onClick: () => onClick(a),
+      onClick: () => { if (a.isRSS && a.url) { window.open(a.url, '_blank'); } else { onClick(a); } },
       onMouseEnter: () => setHov(true),
       onMouseLeave: () => setHov(false),
       style: {
@@ -4617,6 +4617,38 @@ function ZoneUS() {
   React.useEffect(function() { window.__zoneus_refresh__ = forceUpdate; return function() { delete window.__zoneus_refresh__; }; }, []);
   const [arts, setArts] = useState(ARTICLES);
   const [feed, setFeed] = useState(NEWS_FEED);
+  React.useEffect(function() {
+    // Charger RSS au démarrage
+    if (window.__loadAllRSS__) window.__loadAllRSS__();
+    // Quand RSS arrive, fusionner avec articles statiques
+    var origRefresh = window.__zoneus_refresh__;
+    window.__zoneus_refresh__ = function() {
+      // Fusionner articles RSS dans ARTICLES
+      var rssArts = [];
+      ['NHL','NBA','NFL','MLB'].forEach(function(lg) {
+        var cache = window.__RSS_CACHE__ && window.__RSS_CACHE__[lg];
+        if (cache) rssArts = rssArts.concat(cache);
+      });
+      if (rssArts.length > 0) {
+        // Transformer les articles RSS au format ARTICLES
+        var formatted = rssArts.map(function(a, i) {
+          return {
+            id: a.id, league: a.league,
+            tag: 'ACTU', franchise: '', hot: false,
+            title: a.title, chapo: a.excerpt || '',
+            date: a.date, readTime: '2 min',
+            url: a.url, isRSS: true
+          };
+        });
+        setArts(function(prev) {
+          // Garder les articles statiques non-RSS + ajouter RSS en tête
+          var statics = prev.filter(function(a) { return !a.isRSS; });
+          return formatted.concat(statics);
+        });
+      }
+      if (origRefresh) origRefresh();
+    };
+  }, []);
   const [tick, setTick] = useState(0);
   const [page, setPage] = useState("home");
   const [prevPage, setPrevPage] = useState("home");
@@ -5394,6 +5426,73 @@ async function fetchLeagueStats(lg) {
 }
 
 
+</script>
+<script>
+window.__RSS_CACHE__ = {};
+window.__RSS_LOADED__ = {};
+
+async function fetchRSS(lg) {
+  if (window.__RSS_LOADED__[lg]) return;
+  window.__RSS_LOADED__[lg] = true;
+  
+  var topicMap = { NHL: 'LNH NHL hockey', NBA: 'NBA basketball', NFL: 'NFL football américain', MLB: 'MLB baseball' };
+  var topic = topicMap[lg] || lg;
+  
+  try {
+    var url = 'https://zoneus-proxy.vivienfrappier.workers.dev?league=rss&topic=' + encodeURIComponent(topic) + '&lang=fr';
+    var r = await fetch(url);
+    var xml = await r.text();
+    
+    // Parser le XML
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xml, 'application/xml');
+    var items = doc.querySelectorAll('item');
+    
+    var articles = [];
+    items.forEach(function(item, i) {
+      if (i >= 8) return;
+      var title = item.querySelector('title');
+      var link = item.querySelector('link');
+      var pubDate = item.querySelector('pubDate');
+      var source = item.querySelector('source');
+      var desc = item.querySelector('description');
+      
+      var titleText = title ? (title.textContent || title.innerHTML.replace(/<!\[CDATA\[|\]\]>/g, '').trim()) : '';
+      var linkText = link ? link.textContent : '';
+      var dateText = pubDate ? pubDate.textContent : '';
+      var sourceText = source ? source.textContent : '';
+      var descText = desc ? desc.textContent.replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, '').trim().slice(0, 120) : '';
+      
+      if (titleText && linkText) {
+        articles.push({
+          id: 'rss_' + lg + '_' + i,
+          title: titleText,
+          url: linkText,
+          date: dateText ? new Date(dateText).toLocaleDateString('fr-FR', {day:'numeric', month:'short'}) : '',
+          source: sourceText || 'Google News',
+          excerpt: descText,
+          league: lg,
+          isRSS: true
+        });
+      }
+    });
+    
+    window.__RSS_CACHE__[lg] = articles;
+    console.log(lg + ' RSS OK - ' + articles.length + ' articles');
+    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+    
+  } catch(e) {
+    console.log(lg + ' RSS error:', e);
+    window.__RSS_LOADED__[lg] = false;
+  }
+}
+
+// Charger le RSS pour toutes les ligues au démarrage
+window.__loadAllRSS__ = function() {
+  ['NHL', 'NBA', 'NFL', 'MLB'].forEach(function(lg) {
+    setTimeout(function() { fetchRSS(lg); }, 200);
+  });
+};
 </script>
 </body>
 </html>
