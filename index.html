@@ -4422,9 +4422,13 @@ function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
     } else if ((lg === 'MLB' || lg === 'NBA') && window.fetchLeagueStats) {
       window.__STATS_LOADED__ = window.__STATS_LOADED__ || {};
       window.__STATS_LOADED__[lg] = false;
-      window.fetchLeagueStats(lg).then(function() { setTick(function(t){return t+1;}); });
+      var prevRefresh = window.__zoneus_refresh__;
+      window.__zoneus_refresh__ = function() {
+        setTick(function(t){return t+1;});
+        if (prevRefresh) prevRefresh();
+      };
+      window.fetchLeagueStats(lg);
     } else if (lg === 'NFL') {
-      // NFL statique saison 2024 — pas de fetch API
       setTick(function(t){return t+1;});
     }
   }, [lg]);
