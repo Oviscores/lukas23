@@ -5223,55 +5223,99 @@ window.__STATS_LOADED__ = window.__STATS_LOADED__ || {};
 async function fetchLeagueStats(lg) {
   if (window.__STATS_LOADED__[lg]) return;
   window.__STATS_LOADED__[lg] = true;
+  var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
 
-  var leagueMap = { MLB: 'mlb_leaders', NBA: 'nba_leaders', NFL: 'nfl_leaders' };
-  var leagueKey = leagueMap[lg];
-  if (!leagueKey) return;
+  if (lg === 'MLB') {
+    try {
+      var mlbCats = [
+        {cat:'homeRuns',label:'Home Runs'},
+        {cat:'battingAverage',label:'Moyenne'},
+        {cat:'rbi',label:'Points produits'},
+        {cat:'stolenBases',label:'Buts volés'},
+        {cat:'hits',label:'Coups sûrs'},
+        {cat:'era',label:'ERA'},
+        {cat:'strikeouts',label:'Retraits sur 3 prises'},
+        {cat:'wins',label:'Victoires'},
+        {cat:'saves',label:'Sauvetages'}
+      ];
+      var results = await Promise.all(mlbCats.map(function(c) {
+        return fetch(PROXY+'?league=mlb_leaders&cat='+c.cat+'&season=2025').then(function(r){return r.json();}).catch(function(){return null;});
+      }));
+      var players = mlbCats.map(function(c,i) {
+        var d = results[i];
+        if (!d||!d.leagueLeaders||!d.leagueLeaders[0]) return null;
+        var data = (d.leagueLeaders[0].leaders||[]).slice(0,5).map(function(e) {
+          return {name:e.person&&e.person.fullName||'',ab:e.team&&e.team.abbreviation||'',val:e.value||0};
+        });
+        return data.length ? {label:c.label,data:data} : null;
+      }).filter(Boolean);
+      if (players.length>0) {
+        window.STATS_PAGES.MLB = window.STATS_PAGES.MLB||{teams:[],players:[]};
+        window.STATS_PAGES.MLB.players = players;
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
+      console.log('MLB stats OK - '+players.length+' cats');
+    } catch(e) { console.log('MLB stats error:',e); window.__STATS_LOADED__.MLB=false; }
+    return;
+  }
 
-  var seasonMap = { MLB: 2025, NBA: 2026, NFL: 2025 };
-  var season = seasonMap[lg];
+  if (lg === 'NBA') {
+    try {
+      var nbaCats = [
+        {cat:'PTS',label:'Points'},
+        {cat:'REB',label:'Rebonds'},
+        {cat:'AST',label:'Passes'},
+        {cat:'STL',label:'Interceptions'},
+        {cat:'BLK',label:'Contres'},
+        {cat:'FG_PCT',label:'% Tirs'},
+        {cat:'FT_PCT',label:'% LF'},
+        {cat:'FG3_PCT',label:'% 3 pts'}
+      ];
+      var results = await Promise.all(nbaCats.map(function(c) {
+        return fetch(PROXY+'?league=nba_leaders&cat='+c.cat+'&season=2025-26').then(function(r){return r.json();}).catch(function(){return null;});
+      }));
+      var players = nbaCats.map(function(c,i) {
+        var d = results[i];
+        if (!d||!d.resultSet) return null;
+        var headers = d.resultSet.headers||[];
+        var rows = d.resultSet.rowSet||[];
+        var ni=headers.indexOf('PLAYER'), ti=headers.indexOf('TEAM'), vi=headers.indexOf(c.cat);
+        if (ni<0||vi<0) return null;
+        var data = rows.slice(0,5).map(function(r){return {name:r[ni]||'',ab:r[ti]||'',val:r[vi]||0};});
+        return data.length ? {label:c.label,data:data} : null;
+      }).filter(Boolean);
+      if (players.length>0) {
+        window.STATS_PAGES.NBA = window.STATS_PAGES.NBA||{teams:[],players:[]};
+        window.STATS_PAGES.NBA.players = players;
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
+      console.log('NBA stats OK - '+players.length+' cats');
+    } catch(e) { console.log('NBA stats error:',e); window.__STATS_LOADED__.NBA=false; }
+    return;
+  }
 
-  try {
-    var url = 'https://zoneus-proxy.vivienfrappier.workers.dev?league=' + leagueKey + '&season=' + season;
-    var r = await fetch(url);
-    var d = await r.json();
-    if (!d || !d.leaders) { window.__STATS_LOADED__[lg] = false; return; }
-
-    var players = [];
-    var teams = [];
-
-    (d.leaders || []).forEach(function(cat) {
-      var label = cat.displayName || cat.name || '';
-      var isTeam = label.toLowerCase().includes('team') || label.toLowerCase().includes('équipe');
-      var rows = (cat.leaders || []).slice(0, 5).map(function(e) {
-        if (isTeam) {
-          var ab = e.team && e.team.abbreviation || '';
-          return { ab: ab, val: e.displayValue || e.value || 0 };
-        } else {
-          var name = e.athlete && (e.athlete.displayName || e.athlete.shortName) || '';
-          var ab = e.team && e.team.abbreviation || '';
-          return { name: name, ab: ab, val: e.displayValue || e.value || 0 };
-        }
+  if (lg === 'NFL') {
+    try {
+      var d = await fetch(PROXY+'?league=nfl_leaders&season=2024').then(function(r){return r.json();});
+      if (!d||!d.categories) { window.__STATS_LOADED__.NFL=false; return; }
+      var players = [];
+      (d.categories||[]).forEach(function(cat) {
+        var data = (cat.leaders||[]).slice(0,5).map(function(e) {
+          return {name:e.athlete&&(e.athlete.displayName||e.athlete.shortName)||'',ab:e.team&&e.team.abbreviation||'',val:e.displayValue||e.value||0};
+        });
+        if (data.length) players.push({label:cat.displayName||cat.name||'',data:data});
       });
-      if (rows.length === 0) return;
-      if (isTeam) teams.push({ label: label, data: rows });
-      else players.push({ label: label, data: rows });
-    });
-
-    console.log(lg + ' stats — joueurs:' + players.length + ' equipes:' + teams.length);
-
-    if (window.STATS_PAGES) {
-      window.STATS_PAGES[lg] = window.STATS_PAGES[lg] || { teams: [], players: [] };
-      if (players.length > 0) window.STATS_PAGES[lg].players = players;
-      if (teams.length > 0) window.STATS_PAGES[lg].teams = teams;
-    }
-    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-    console.log(lg + ' stats OK');
-  } catch(e) {
-    console.log(lg + ' stats error:', e);
-    window.__STATS_LOADED__[lg] = false;
+      if (players.length>0) {
+        window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
+        window.STATS_PAGES.NFL.players = players;
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
+      console.log('NFL stats OK - '+players.length+' cats');
+    } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
+    return;
   }
 }
+
 
 </script>
 </body>
