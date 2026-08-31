@@ -1671,8 +1671,8 @@ async function fetchLiveScores() {
               period: g.periodDescriptor ? 'P' + g.periodDescriptor.number : '',
               homeTeam: ht.abbrev || '',
               awayTeam: at.abbrev || '',
-              homeScore: ht.score || 0,
-              awayScore: at.score || 0,
+              homeScore: isLive || isFinal ? (ht.score || 0) : null,
+              awayScore: isLive || isFinal ? (at.score || 0) : null,
               time: g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
               homeLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (ht.abbrev||'NHL') + '_light.svg',
               awayLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (at.abbrev||'NHL') + '_light.svg'
@@ -1703,8 +1703,8 @@ async function fetchLiveScores() {
           period: g.linescore ? (g.linescore.currentInningOrdinal || '') : '',
           homeTeam: ht.team?.abbreviation || '',
           awayTeam: at.team?.abbreviation || '',
-          homeScore: ht.score || 0,
-          awayScore: at.score || 0,
+          homeScore: isLive || isFinal ? (ht.score || 0) : null,
+          awayScore: isLive || isFinal ? (at.score || 0) : null,
           time: g.gameDate ? new Date(g.gameDate).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
           homeLogo: htId ? 'https://www.mlbstatic.com/team-logos/' + htId + '.svg' : '',
           awayLogo: atId ? 'https://www.mlbstatic.com/team-logos/' + atId + '.svg' : ''
@@ -1731,8 +1731,8 @@ async function fetchLiveScores() {
           period: isLive ? 'Q' + (g.period || 1) : '',
           homeTeam: ht.teamTricode || '',
           awayTeam: at.teamTricode || '',
-          homeScore: ht.score || 0,
-          awayScore: at.score || 0,
+          homeScore: isLive || isFinal ? (ht.score || 0) : null,
+          awayScore: isLive || isFinal ? (at.score || 0) : null,
           time: g.gameTimeUTC ? new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
           homeLogo: ht.teamId ? 'https://cdn.nba.com/logos/nba/' + ht.teamId + '/primary/L/logo.svg' : '',
           awayLogo: at.teamId ? 'https://cdn.nba.com/logos/nba/' + at.teamId + '/primary/L/logo.svg' : ''
@@ -1838,7 +1838,7 @@ async function fetchCalendarData(lg) {
             var state = g.gameState||'';
             var st = (state==='LIVE'||state==='CRIT') ? 'Live' : (state==='OFF'||state==='FINAL') ? 'Final' : 'Preview';
             var timeStr = g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}) : '';
-            return {id:'nhl_'+g.id, away:at.abbrev||'', home:ht.abbrev||'', as:at.score||0, hs:ht.score||0, st:st, time:timeStr,
+            return {id:'nhl_'+g.id, away:at.abbrev||'', home:ht.abbrev||'', as:(st==='Final'||st==='LIVE'||at.score!==undefined&&at.score!==null) ? (at.score||0) : null, hs:(st==='Final'||st==='LIVE'||ht.score!==undefined&&ht.score!==null) ? (ht.score||0) : null, st:st, time:timeStr,
               awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(at.abbrev||'')+'&lg=NHL', homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(ht.abbrev||'')+'&lg=NHL'};
           })
         };
@@ -1860,6 +1860,8 @@ async function fetchCalendarData(lg) {
           date: res.date, label: formatDateFR(res.date),
           matches: games.map(function(g) {
             var ht=g.teams&&g.teams.home?g.teams.home:{}, at=g.teams&&g.teams.away?g.teams.away:{};
+            var isFinal = g.status && g.status.abstractGameState === 'Final';
+            var isLive = g.status && g.status.abstractGameState === 'Live';
             var timeStr = g.gameDate ? new Date(g.gameDate).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}) : '';
             var htId = ht.team&&ht.team.id, atId = at.team&&at.team.id;
             return {id:'mlb_'+g.gamePk, away:at.team?at.team.abbreviation:'', home:ht.team?ht.team.abbreviation:'',
@@ -1901,7 +1903,7 @@ async function fetchCalendarData(lg) {
             var st = status==='STATUS_FINAL'?'Final':status==='STATUS_IN_PROGRESS'?'Live':'Preview';
             var timeStr = comp.date?new Date(comp.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
             return {id:ev.id||'', away:awayAbr, home:homeAbr,
-              as:away.score?parseInt(away.score):0, hs:home.score?parseInt(home.score):0,
+              as:away.score?parseInt(away.score):null, hs:home.score?parseInt(home.score):null,
               st:st, time:timeStr,
               awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+awayAbr+'&lg=NBA',
               homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+homeAbr+'&lg=NBA'};
@@ -1942,7 +1944,7 @@ async function fetchCalendarData(lg) {
             var st = status==='STATUS_FINAL'?'Final':status==='STATUS_IN_PROGRESS'?'Live':'Preview';
             var timeStr = comp.date?new Date(comp.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
             return {id:ev.id||'', away:awayAbr, home:homeAbr,
-              as:away.score?parseInt(away.score):0, hs:home.score?parseInt(home.score):0,
+              as:away.score?parseInt(away.score):null, hs:home.score?parseInt(home.score):null,
               st:st, time:timeStr, week:ev.week?'S'+ev.week.number:'',
               awayLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+awayAbr+'&lg=NFL',
               homeLogo:'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+homeAbr+'&lg=NFL'};
