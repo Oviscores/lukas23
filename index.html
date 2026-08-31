@@ -5191,7 +5191,7 @@ async function fetchNHLStats() {
   function pg(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(g){var n=(g.firstName&&g.firstName.default||'')+' '+(g.lastName&&g.lastName.default||'');var ab=(g.teamAbbrevs&&g.teamAbbrevs.default)||(g.teamAbbrev&&g.teamAbbrev.default)||g.teamAbbrev||'';var v=g.value!==undefined?g.value:0;if(c==='savePctg')v=typeof v==='number'?v.toFixed(3):v;return{name:n.trim(),ab:ab,val:v};});}
   function pt(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(t){return{ab:(t.teamAbbrevs&&t.teamAbbrevs.default)||t.teamAbbrev||'',val:t.value!==undefined?t.value:0};});}
   try {
-    var pC=['goals','assists','points','plusMinus','penaltyMinutes','powerPlayPoints','gameWinningGoals','shots','hits','blockedShots','timeOnIcePerGame'];
+    var pC=['goals','assists','points','powerPlayPoints','hits','penaltyMinutes','plusMinus','gameWinningGoals','shots','blockedShots','timeOnIcePerGame'];
     var tC=['teamPowerPlayPct','teamPenaltyKillPct','hits'];
     var gC=['savePctg','wins','goalsAgainstAverage','shutouts'];
     var pL={goals:'Buts',assists:'Passes',points:'Points',plusMinus:'+/-',penaltyMinutes:'Min. pénalité',powerPlayPoints:'Points PP',gameWinningGoals:'Buts vainqueurs',shots:'Tirs',hits:'Mises en échec',blockedShots:'Tirs bloqués',timeOnIcePerGame:'Temps de glace'};
