@@ -5270,7 +5270,7 @@ async function fetchNHLStats() {
     if(window.STATS_PAGES){window.STATS_PAGES.NHL={teams:teams.length>0?teams:window.STATS_PAGES.NHL.teams,players:players.length>0?players:window.STATS_PAGES.NHL.players,goalies:goalies};}
     if(window.__zoneus_refresh__)window.__zoneus_refresh__();
     syncGSTATS('NHL');
-    console.log('NHL stats OK');
+    console.log('NHL stats OK - sample:', window.STATS_PAGES.NHL && window.STATS_PAGES.NHL.players[0]);
   } catch(e){console.log('NHL stats err',e);window.__NHL_STATS_LOADED__=false;}
 }
 </script>
