@@ -4400,7 +4400,14 @@ const TeamCard = ({ teamId, name, col, stand, players, isHome }) => {
 };
 
 function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
-  React.useEffect(function() { if (lg === 'NHL' && window.fetchNHLStats) window.fetchNHLStats(); }, [lg]);
+  var _tick = React.useState(0);
+  var tick = _tick[0], setTick = _tick[1];
+  React.useEffect(function() {
+    if (lg === 'NHL' && window.fetchNHLStats) {
+      var orig = window.__zoneus_refresh__;
+      window.fetchNHLStats().then(function() { setTick(function(t){return t+1;}); });
+    }
+  }, [lg]);
   var lc = LG[lg].color;
   var data = window.STATS_PAGES[lg];
   if (!data) return null;
