@@ -5232,6 +5232,17 @@ async function fetchStandings(lg) {
 }
 </script>
 <script>
+
+function syncGSTATS(lg) {
+  var sp = window.STATS_PAGES && window.STATS_PAGES[lg];
+  if (!sp || !sp.players || !sp.players.length) return;
+  GSTATS[lg] = sp.players.map(function(c) {
+    return {
+      label: c.label, unit: '',
+      players: c.data.map(function(p) { return { name: p.name, team: p.ab, val: p.val }; })
+    };
+  });
+}
 window.__NHL_STATS_LOADED__ = false;
 async function fetchNHLStats() {
   if (window.__NHL_STATS_LOADED__) return;
@@ -5258,6 +5269,7 @@ async function fetchNHLStats() {
     var goalies=gC.map(function(c,i){return{label:gL[c]||c,data:pg(all[pC.length+tC.length+i],c)};}).filter(function(x){return x.data.length>0;});
     if(window.STATS_PAGES){window.STATS_PAGES.NHL={teams:teams.length>0?teams:window.STATS_PAGES.NHL.teams,players:players.length>0?players:window.STATS_PAGES.NHL.players,goalies:goalies};}
     if(window.__zoneus_refresh__)window.__zoneus_refresh__();
+    syncGSTATS('NHL');
     console.log('NHL stats OK');
   } catch(e){console.log('NHL stats err',e);window.__NHL_STATS_LOADED__=false;}
 }
@@ -5300,6 +5312,7 @@ async function fetchLeagueStats(lg) {
       if (players.length>0) {
         window.STATS_PAGES.MLB = window.STATS_PAGES.MLB||{teams:[],players:[]};
         window.STATS_PAGES.MLB.players = players;
+        syncGSTATS('MLB');
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
         if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
@@ -5336,6 +5349,7 @@ async function fetchLeagueStats(lg) {
       if (players.length>0) {
         window.STATS_PAGES.NBA = window.STATS_PAGES.NBA||{teams:[],players:[]};
         window.STATS_PAGES.NBA.players = players;
+        syncGSTATS('NBA');
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
         if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
