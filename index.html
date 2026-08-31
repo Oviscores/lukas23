@@ -3114,8 +3114,9 @@ function LeaguePage({ lg, articles, onArticleClick, onMatchClick, onTeamClick = 
         });
         if (upcoming.length > 0) return upcoming.slice(0, 5);
       }
-      // Fallback statique (NBA sans cache, etc.)
-      return (SCORES[lg] || []).map(function(m) { return normalize(m, ''); });
+      // Fallback statique
+      var fallback = lg === 'NBA' && window.__NBA_STATIC__ ? window.__NBA_STATIC__ : (SCORES[lg] || []);
+      return fallback.map(function(m) { return normalize(m, m.dateLabel || ''); });
     })().map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
     e.preventDefault();
     if (onStandingsClick) onStandingsClick(lg);
