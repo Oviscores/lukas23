@@ -3552,35 +3552,7 @@ function RightCol({ feed, statsVersion, onGen, generating, genLg, onArticleClick
   const visibleFeed = showAllFeed ? feed : feed.slice(0, 5);
   const visiblePlayers = showAllPlayers ? PLAYERS : PLAYERS.slice(0, 5);
   const visibleStats = showAllStats ? stats[stab].players : stats[stab].players.slice(0, 5);
-  return /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 8 } }, /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "ACTUS" }), visibleFeed.map((n, i) => /* @__PURE__ */ React.createElement(
-    "a",
-    {
-      key: i,
-      href: "#",
-      onClick: (e) => {
-        e.preventDefault();
-        onArticleClick(__spreadProps(__spreadValues({}, n), { id: 100 + i, tag: "ACTU", chapo: n.text }));
-      },
-      style: {
-        display: "flex",
-        alignItems: "center",
-        gap: 5,
-        padding: "4px 7px",
-        borderBottom: "1px solid rgba(0,0,0,0.05)",
-        textDecoration: "none",
-        cursor: "pointer",
-        transition: "background 0.12s"
-      },
-      onMouseEnter: (e) => e.currentTarget.style.background = "rgba(213,10,10,0.05)",
-      onMouseLeave: (e) => e.currentTarget.style.background = "transparent"
-    },
-    /* @__PURE__ */ React.createElement("span", { style: { display: "inline-flex", flexShrink: 0 } }, /* @__PURE__ */ React.createElement(LB, { lg: n.league, sz: 14 })),
-    /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: "#D50A0A", flexShrink: 0, whiteSpace: "nowrap" } }, n.time),
-    /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#111", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 } }, n.text)
-  )), !showAllFeed && feed.length > 5 ? /* @__PURE__ */ React.createElement(MoreBtn, { label: "+ de news", onClick: () => {
-    console.log("AllNews click", typeof onNavigate);
-    if (onMoreNews) onMoreNews();
-  } }) : showAllFeed && /* @__PURE__ */ React.createElement(MoreBtn, { label: "R\xE9duire", onClick: () => setShowAllFeed(false) })), /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "STATUTS" }), visiblePlayers.map((p, i) => {
+  return /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 8 } }, /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "STATUTS" }), visiblePlayers.map((p, i) => {
     const pl = (PLAYERS_DB[p.lg] || []).find((x) => p.name.includes(x.name.split(" ").pop()));
     return /* @__PURE__ */ React.createElement(
       "div",
