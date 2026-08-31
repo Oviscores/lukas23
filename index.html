@@ -2771,7 +2771,7 @@ function PlayerPage({ playerId, lg, onBack, articles, onArticleClick }) {
   const lc = LG[lg].color;
   const dk = LG[lg].dark || "#111";
   const bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
-  const Hd = ({ label }) => /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(20,20,20,0.75)", padding: "4px 10px", backdropFilter: "blur(4px)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 12, letterSpacing: "0.08em", color: "#fff", whiteSpace: "nowrap" } }, label));
+  const Hd = ({ label }) => /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(20,20,20,0.75)", padding: "4px 10px", backdropFilter: "blur(4px)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 8, letterSpacing: "0.12em", color: "#fff", whiteSpace: "nowrap" } }, label));
   const nhlSns = (p.career || []).filter(function(s) {
     return s.lg === "NHL";
   });
@@ -2978,7 +2978,7 @@ function TeamNews({ relatedArts, team, lg, lc, onArticleClick }) {
   })));
 }
 function HdGlobal({ label, color }) {
-  return /* @__PURE__ */ React.createElement("div", { style: { background: color || "rgba(20,20,20,0.75)", padding: "4px 10px", backdropFilter: "blur(4px)", display: "flex", alignItems: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 12, letterSpacing: "0.08em", color: "#fff", whiteSpace: "nowrap" } }, label));
+  return /* @__PURE__ */ React.createElement("div", { style: { background: color || "rgba(20,20,20,0.75)", padding: "4px 10px", backdropFilter: "blur(4px)", display: "flex", alignItems: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 8, letterSpacing: "0.12em", color: "#fff", whiteSpace: "nowrap" } }, label));
 }
 function TeamAlignment({ rosterData, lg, lc, tc }) {
   if (!rosterData) return null;
@@ -4462,17 +4462,14 @@ const TeamCard = ({ teamId, name, col, stand, players, isHome }) => {
 };
 
 function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
-  React.useEffect(function() {
-    if (lg === 'NHL' && window.fetchNHLStats) window.fetchNHLStats();
-  }, [lg]);
   var lc = LG[lg].color;
   var data = window.STATS_PAGES[lg];
   if (!data) return null;
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
   return /* @__PURE__ */ React.createElement("div", { className: "stats-page", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 15 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement("div", { style: { width: 3, height: 16, background: lc, borderRadius: 2 } }), /* @__PURE__ */ React.createElement(LB, { lg, sz: 16 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 21, fontWeight: 900, color: "#111", letterSpacing: "0.06em" } }, lg + " \u2014 STATISTIQUES")), /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, data.teams.map(function(cat, ci) {
-    return /* @__PURE__ */ React.createElement("div", { key: ci, style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 \xC9QUIPES", color: lc }), cat.data.map(function(r, i) {
+    return /* @__PURE__ */ React.createElement("div", { key: ci, style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 \xC9QUIPES" }), cat.data.map(function(r, i) {
       var tc2 = TC[r.ab + "_" + lg] || { bg: lc, fg: "#fff" };
-      return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", background: i === 0 ? lc + "0a" : "transparent" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#999", width: 14, textAlign: "center", flexShrink: 0 } }, i + 1), /* @__PURE__ */ getTeamLogo(r.ab, lg, 22), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, TEAM_NAMES[r.ab + "_" + lg] || r.ab), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444", flexShrink: 0 } }, r.val));
+      return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", background: i === 0 ? lc + "0a" : "transparent" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#999", width: 14, textAlign: "center", flexShrink: 0 } }, i + 1), /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 18, borderRadius: 2, background: tc2.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: tc2.fg } }, r.ab)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, TEAM_NAMES[r.ab + "_" + lg] || r.ab), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444", flexShrink: 0 } }, r.val));
     }), /* @__PURE__ */ React.createElement("div", { onClick: function() {
       if (onStatFull) onStatFull(ci, "teams");
     }, style: { background: "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", cursor: "pointer", display: "flex", justifyContent: "center" }, onMouseEnter: function(e) {
@@ -4480,20 +4477,20 @@ function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
     }, onMouseLeave: function(e) {
       e.currentTarget.style.background = "rgba(20,20,20,0.75)";
     } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", letterSpacing: "0.12em" } }, "Suite \u2192")));
-  })), (data.goalies || []).map(function(cat, ci) {
+  }), ...(data.goalies || []).map(function(cat, ci) {
     return /* @__PURE__ */ React.createElement("div", { key: "g"+ci, style: bs },
       /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 GARDIENS", color: lc }),
       cat.data.map(function(r, i) {
         return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", background: i === 0 ? lc + "0a" : "transparent" } },
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#999", width: 14, textAlign: "center", flexShrink: 0 } }, i + 1),
-          /* @__PURE__ */ getTeamLogo(r.ab, lg, 22),
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, r.name),
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444", flexShrink: 0 } }, r.val)
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#999", width: 14, textAlign: "center", flexShrink: 0 } }, i + 1),
+          getTeamLogo(r.ab, lg, 22),
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, r.name),
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444", flexShrink: 0 } }, r.val)
         );
       })
     );
   })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, data.players.map(function(cat, ci) {
-    return /* @__PURE__ */ React.createElement("div", { key: ci, style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 JOUEURS", color: lc }), cat.data.map(function(r, i) {
+    return /* @__PURE__ */ React.createElement("div", { key: ci, style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 JOUEURS" }), cat.data.map(function(r, i) {
       var tc2 = TC[r.ab + "_" + lg] || { bg: lc, fg: "#fff" };
       var pl = (PLAYERS_DB[lg] || []).find(function(p) {
         return r.name.includes(p.name.split(" ").pop());
@@ -4514,7 +4511,7 @@ function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
           }
         },
         /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#999", width: 14, textAlign: "center", flexShrink: 0 } }, i + 1),
-        /* @__PURE__ */ getTeamLogo(r.ab, lg, 22),
+        /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 18, borderRadius: 2, background: tc2.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: tc2.fg } }, r.ab)),
         /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, r.name),
         /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444", flexShrink: 0 } }, r.val)
       );
@@ -5229,89 +5226,6 @@ async function fetchStandings(lg) {
       if (Object.keys(divs).length > 0) { CONF_STANDINGS.NFL = divs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
     }
   } catch(e) { console.log('fetchStandings error', lg, e); window.__STANDINGS_LOADED__[lg] = false; }
-}
-</script>
-<script>
-window.__NHL_STATS_LOADED__ = false;
-async function fetchNHLStats() {
-  if (window.__NHL_STATS_LOADED__) return;
-  window.__NHL_STATS_LOADED__ = true;
-  const PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-  const SEASON = '20252026';
-
-  function parsePlayers(d, cat) {
-    if (!d || !d[cat]) return [];
-    return d[cat].slice(0, 5).map(function(p) {
-      var name = (p.firstName && p.firstName.default || '') + ' ' + (p.lastName && p.lastName.default || '');
-      var ab = (p.teamAbbrevs && p.teamAbbrevs.default) || p.teamAbbrev || '';
-      var val = p.value !== undefined ? p.value : 0;
-      return { name: name.trim(), ab: ab, val: val };
-    });
-  }
-  function parseGoalies(d, cat) {
-    if (!d || !d[cat]) return [];
-    return d[cat].slice(0, 5).map(function(g) {
-      var name = (g.firstName && g.firstName.default || '') + ' ' + (g.lastName && g.lastName.default || '');
-      var ab = (g.teamAbbrevs && g.teamAbbrevs.default) || (g.teamAbbrev && g.teamAbbrev.default) || g.teamAbbrev || '';
-      var val = g.value !== undefined ? g.value : 0;
-      if (cat === 'savePctg') val = typeof val === 'number' ? val.toFixed(3) : val;
-      return { name: name.trim(), ab: ab, val: val };
-    });
-  }
-  function parseTeamLeaders(d, cat) {
-    if (!d || !d[cat]) return [];
-    return d[cat].slice(0, 5).map(function(t) {
-      var ab = (t.teamAbbrevs && t.teamAbbrevs.default) || t.teamAbbrev || '';
-      var val = t.value !== undefined ? t.value : 0;
-      return { ab: ab, val: val };
-    });
-  }
-
-  try {
-    const playerCats = ['goals','assists','points','plusMinus','penaltyMinutes','powerPlayPoints','gameWinningGoals','shots','hits','blockedShots','timeOnIcePerGame'];
-    const teamCats = ['teamPowerPlayPct','teamPenaltyKillPct','hits'];
-    const goalieCats = ['savePctg','wins','goalsAgainstAverage','shutouts'];
-    const playerLabels = { goals:'Buts', assists:'Passes', points:'Points', plusMinus:'+/-', penaltyMinutes:'Min. pénalité', powerPlayPoints:'Points PP', gameWinningGoals:'Buts vainqueurs', shots:'Tirs', hits:'Mises en échec', blockedShots:'Tirs bloqués', timeOnIcePerGame:'Temps de glace' };
-    const teamLabels = { teamPowerPlayPct:'Efficacité PP', teamPenaltyKillPct:'Efficacité PK', hits:'Hits - Équipes' };
-    const goalieLabels = { savePctg:'SV%', wins:'Victoires', goalsAgainstAverage:'Moy. buts enc.', shutouts:'Jeux blancs' };
-
-    const allFetches = [
-      ...playerCats.map(c => fetch(`${PROXY}?league=nhl_leaders&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
-      ...teamCats.map(c => fetch(`${PROXY}?league=nhl_leaders&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
-      ...goalieCats.map(c => fetch(`${PROXY}?league=nhl_goalies&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
-    ];
-    const results = await Promise.all(allFetches);
-    const playerResults = results.slice(0, playerCats.length);
-    const teamResults = results.slice(playerCats.length, playerCats.length + teamCats.length);
-    const goalieResults = results.slice(playerCats.length + teamCats.length);
-
-    var players = playerCats.map(function(c, i) {
-      return { label: playerLabels[c] || c, data: parsePlayers(playerResults[i], c) };
-    }).filter(function(x) { return x.data.length > 0; });
-
-    var teams = teamCats.map(function(c, i) {
-      return { label: teamLabels[c] || c, data: parseTeamLeaders(teamResults[i], c) };
-    }).filter(function(x) { return x.data.length > 0; });
-
-    var goalies = goalieCats.map(function(c, i) {
-      return { label: goalieLabels[c] || c, data: parseGoalies(goalieResults[i], c) };
-    }).filter(function(x) { return x.data.length > 0; });
-
-    console.log('NHL stats — joueurs:', players.length, 'equipes:', teams.length, 'gardiens:', goalies.length);
-
-    if (window.STATS_PAGES) {
-      window.STATS_PAGES.NHL = {
-        teams: teams.length > 0 ? teams : window.STATS_PAGES.NHL.teams,
-        players: players.length > 0 ? players : window.STATS_PAGES.NHL.players,
-        goalies: goalies,
-      };
-    }
-    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-    console.log('NHL stats loaded OK');
-  } catch(e) {
-    console.log('fetchNHLStats error:', e);
-    window.__NHL_STATS_LOADED__ = false;
-  }
 }
 </script>
 </body>
