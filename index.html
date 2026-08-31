@@ -4422,11 +4422,7 @@ function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
     } else if ((lg === 'MLB' || lg === 'NBA') && window.fetchLeagueStats) {
       window.__STATS_LOADED__ = window.__STATS_LOADED__ || {};
       window.__STATS_LOADED__[lg] = false;
-      var prevRefresh = window.__zoneus_refresh__;
-      window.__zoneus_refresh__ = function() {
-        setTick(function(t){return t+1;});
-        if (prevRefresh) prevRefresh();
-      };
+      window.__stats_setTick__ = setTick;
       window.fetchLeagueStats(lg);
     } else if (lg === 'NFL') {
       setTick(function(t){return t+1;});
@@ -5269,6 +5265,7 @@ async function fetchLeagueStats(lg) {
         window.STATS_PAGES.MLB = window.STATS_PAGES.MLB||{teams:[],players:[]};
         window.STATS_PAGES.MLB.players = players;
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
       console.log('MLB stats OK - '+players.length+' cats');
     } catch(e) { console.log('MLB stats error:',e); window.__STATS_LOADED__.MLB=false; }
@@ -5304,6 +5301,7 @@ async function fetchLeagueStats(lg) {
         window.STATS_PAGES.NBA = window.STATS_PAGES.NBA||{teams:[],players:[]};
         window.STATS_PAGES.NBA.players = players;
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
       console.log('NBA stats OK - '+players.length+' cats');
     } catch(e) { console.log('NBA stats error:',e); window.__STATS_LOADED__.NBA=false; }
