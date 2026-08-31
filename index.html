@@ -5458,7 +5458,7 @@ async function fetchLeagueStats(lg) {
         {cat:'saves',label:'Sauvetages'}
       ];
       var results = await Promise.all(mlbCats.map(function(c) {
-        return fetch(PROXY+'?league=mlb_leaders&cat='+c.cat+'&season=2025').then(function(r){return r.json();}).catch(function(){return null;});
+        return fetch(PROXY+'?league=mlb_leaders&cat='+c.cat+'&season=2026').then(function(r){return r.json();}).catch(function(){return null;});
       }));
       var players = mlbCats.map(function(c,i) {
         var d = results[i];
