@@ -3026,6 +3026,7 @@ function LeaguePage({ lg, articles, statsVersion, onArticleClick, onMatchClick, 
     if (!window.__CAL_CACHE__ || !window.__CAL_CACHE__[lg]) {
       if (window.fetchCalendarData) window.fetchCalendarData(lg);
     }
+    if (window.fetchStandings) window.fetchStandings(lg);
   }, [lg]);
   const hero = lgArts[0], rest = lgArts.slice(1);
   const confs = CONF_STANDINGS[lg] || {};
@@ -4626,6 +4627,13 @@ function ZoneUS() {
   const [selMatch, setSelMatch] = useState(null);
   const [calLg, setCalLg] = useState(null);
   const [statsVersion, setStatsVersion] = useState(0);
+  React.useEffect(function() {
+    var orig = window.__zoneus_refresh__;
+    window.__zoneus_refresh__ = function() {
+      setStatsVersion(function(v){ return v+1; });
+      if (orig) orig();
+    };
+  }, []);
   useEffect(() => {
     const id = setInterval(() => setTick((i) => (i + 1) % TICKER.length), 4200);
     return () => clearInterval(id);
@@ -5146,7 +5154,7 @@ async function fetchStandings(lg) {
   window.__STANDINGS_LOADED__[lg] = true;
   try {
     if (lg === 'NHL') {
-      var r = await fetch('https://site.api.espn.com/apis/v2/sports/hockey/nhl/standings?season=2025');
+      var r = await fetch('https://site.api.espn.com/apis/v2/sports/hockey/nhl/standings?season=2026');
       var d = await r.json();
       if (!d || !d.children) return;
       var confs = {};
