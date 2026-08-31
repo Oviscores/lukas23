@@ -4462,9 +4462,7 @@ const TeamCard = ({ teamId, name, col, stand, players, isHome }) => {
 };
 
 function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
-  React.useEffect(function() {
-    if (lg === 'NHL' && window.fetchNHLStats) window.fetchNHLStats();
-  }, [lg]);
+  React.useEffect(function() { if (lg === 'NHL' && window.fetchNHLStats) window.fetchNHLStats(); }, [lg]);
   var lc = LG[lg].color;
   var data = window.STATS_PAGES[lg];
   if (!data) return null;
@@ -4480,32 +4478,20 @@ function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
     }, onMouseLeave: function(e) {
       e.currentTarget.style.background = "rgba(20,20,20,0.75)";
     } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", letterSpacing: "0.12em" } }, "Suite \u2192")));
-  }), ...(data.goalies || []).map(function(cat, ci) {
-    return /* @__PURE__ */ React.createElement("div", { key: "g"+ci, style: bs },
+  }), /* gardiens */ (data.goalies || []).reduce(function(acc, cat, ci) {
+    acc.push(/* @__PURE__ */ React.createElement("div", { key: "g"+ci, style: bs },
       /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 GARDIENS", color: lc }),
       cat.data.map(function(r, i) {
-        return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", background: i === 0 ? lc + "0a" : "transparent" } },
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#999", width: 14, textAlign: "center", flexShrink: 0 } }, i + 1),
-          getTeamLogo(r.ab, lg, 22),
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, r.name),
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444", flexShrink: 0 } }, r.val)
-        );
-      })
-    );
-  ), (data.goalies || []).map(function(cat, ci) {
-    return /* @__PURE__ */ React.createElement("div", { key: "g"+ci, style: bs },
-      /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 GARDIENS", color: lc }),
-      cat.data.map(function(r, i) {
-        var tc3 = TC[r.ab + "_" + lg] || { bg: lc, fg: "#fff" };
         return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", background: i === 0 ? lc + "0a" : "transparent" } },
           /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#999", width: 14, textAlign: "center", flexShrink: 0 } }, i + 1),
           /* @__PURE__ */ getTeamLogo(r.ab, lg, 22),
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, r.name),
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444", flexShrink: 0 } }, r.val)
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1 } }, r.name),
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444" } }, r.val)
         );
       })
-    );
-  })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, data.players.map(function(cat, ci) {
+    ));
+    return acc;
+  }, [])), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, data.players.map(function(cat, ci) {
     return /* @__PURE__ */ React.createElement("div", { key: ci, style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 JOUEURS", color: lc }), cat.data.map(function(r, i) {
       var tc2 = TC[r.ab + "_" + lg] || { bg: lc, fg: "#fff" };
       var pl = (PLAYERS_DB[lg] || []).find(function(p) {
@@ -5249,82 +5235,30 @@ window.__NHL_STATS_LOADED__ = false;
 async function fetchNHLStats() {
   if (window.__NHL_STATS_LOADED__) return;
   window.__NHL_STATS_LOADED__ = true;
-  const PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-  const SEASON = '20252026';
-
-  function parsePlayers(d, cat) {
-    if (!d || !d[cat]) return [];
-    return d[cat].slice(0, 5).map(function(p) {
-      var name = (p.firstName && p.firstName.default || '') + ' ' + (p.lastName && p.lastName.default || '');
-      var ab = (p.teamAbbrevs && p.teamAbbrevs.default) || p.teamAbbrev || '';
-      var val = p.value !== undefined ? p.value : 0;
-      return { name: name.trim(), ab: ab, val: val };
-    });
-  }
-  function parseGoalies(d, cat) {
-    if (!d || !d[cat]) return [];
-    return d[cat].slice(0, 5).map(function(g) {
-      var name = (g.firstName && g.firstName.default || '') + ' ' + (g.lastName && g.lastName.default || '');
-      var ab = (g.teamAbbrevs && g.teamAbbrevs.default) || (g.teamAbbrev && g.teamAbbrev.default) || g.teamAbbrev || '';
-      var val = g.value !== undefined ? g.value : 0;
-      if (cat === 'savePctg') val = typeof val === 'number' ? val.toFixed(3) : val;
-      return { name: name.trim(), ab: ab, val: val };
-    });
-  }
-  function parseTeamLeaders(d, cat) {
-    if (!d || !d[cat]) return [];
-    return d[cat].slice(0, 5).map(function(t) {
-      var ab = (t.teamAbbrevs && t.teamAbbrevs.default) || t.teamAbbrev || '';
-      var val = t.value !== undefined ? t.value : 0;
-      return { ab: ab, val: val };
-    });
-  }
-
+  const P = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+  const S = '20252026';
+  function pp(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(p){var n=(p.firstName&&p.firstName.default||'')+' '+(p.lastName&&p.lastName.default||'');var ab=(p.teamAbbrevs&&p.teamAbbrevs.default)||p.teamAbbrev||'';return{name:n.trim(),ab:ab,val:p.value!==undefined?p.value:0};});}
+  function pg(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(g){var n=(g.firstName&&g.firstName.default||'')+' '+(g.lastName&&g.lastName.default||'');var ab=(g.teamAbbrevs&&g.teamAbbrevs.default)||(g.teamAbbrev&&g.teamAbbrev.default)||g.teamAbbrev||'';var v=g.value!==undefined?g.value:0;if(c==='savePctg')v=typeof v==='number'?v.toFixed(3):v;return{name:n.trim(),ab:ab,val:v};});}
+  function pt(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(t){return{ab:(t.teamAbbrevs&&t.teamAbbrevs.default)||t.teamAbbrev||'',val:t.value!==undefined?t.value:0};});}
   try {
-    const playerCats = ['goals','assists','points','plusMinus','penaltyMinutes','powerPlayPoints','gameWinningGoals','shots','hits','blockedShots','timeOnIcePerGame'];
-    const teamCats = ['teamPowerPlayPct','teamPenaltyKillPct','hits'];
-    const goalieCats = ['savePctg','wins','goalsAgainstAverage','shutouts'];
-    const playerLabels = { goals:'Buts', assists:'Passes', points:'Points', plusMinus:'+/-', penaltyMinutes:'Min. pénalité', powerPlayPoints:'Points PP', gameWinningGoals:'Buts vainqueurs', shots:'Tirs', hits:'Mises en échec', blockedShots:'Tirs bloqués', timeOnIcePerGame:'Temps de glace' };
-    const teamLabels = { teamPowerPlayPct:'Efficacité PP', teamPenaltyKillPct:'Efficacité PK', hits:'Hits - Équipes' };
-    const goalieLabels = { savePctg:'SV%', wins:'Victoires', goalsAgainstAverage:'Moy. buts enc.', shutouts:'Jeux blancs' };
-
-    const allFetches = [
-      ...playerCats.map(c => fetch(`${PROXY}?league=nhl_leaders&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
-      ...teamCats.map(c => fetch(`${PROXY}?league=nhl_leaders&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
-      ...goalieCats.map(c => fetch(`${PROXY}?league=nhl_goalies&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
-    ];
-    const results = await Promise.all(allFetches);
-    const playerResults = results.slice(0, playerCats.length);
-    const teamResults = results.slice(playerCats.length, playerCats.length + teamCats.length);
-    const goalieResults = results.slice(playerCats.length + teamCats.length);
-
-    var players = playerCats.map(function(c, i) {
-      return { label: playerLabels[c] || c, data: parsePlayers(playerResults[i], c) };
-    }).filter(function(x) { return x.data.length > 0; });
-
-    var teams = teamCats.map(function(c, i) {
-      return { label: teamLabels[c] || c, data: parseTeamLeaders(teamResults[i], c) };
-    }).filter(function(x) { return x.data.length > 0; });
-
-    var goalies = goalieCats.map(function(c, i) {
-      return { label: goalieLabels[c] || c, data: parseGoalies(goalieResults[i], c) };
-    }).filter(function(x) { return x.data.length > 0; });
-
-    console.log('NHL stats — joueurs:', players.length, 'equipes:', teams.length, 'gardiens:', goalies.length);
-
-    if (window.STATS_PAGES) {
-      window.STATS_PAGES.NHL = {
-        teams: teams.length > 0 ? teams : window.STATS_PAGES.NHL.teams,
-        players: players.length > 0 ? players : window.STATS_PAGES.NHL.players,
-        goalies: goalies,
-      };
-    }
-    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-    console.log('NHL stats loaded OK');
-  } catch(e) {
-    console.log('fetchNHLStats error:', e);
-    window.__NHL_STATS_LOADED__ = false;
-  }
+    var pC=['goals','assists','points','plusMinus','penaltyMinutes','powerPlayPoints','gameWinningGoals','shots','hits','blockedShots','timeOnIcePerGame'];
+    var tC=['teamPowerPlayPct','teamPenaltyKillPct','hits'];
+    var gC=['savePctg','wins','goalsAgainstAverage','shutouts'];
+    var pL={goals:'Buts',assists:'Passes',points:'Points',plusMinus:'+/-',penaltyMinutes:'Min. pénalité',powerPlayPoints:'Points PP',gameWinningGoals:'Buts vainqueurs',shots:'Tirs',hits:'Mises en échec',blockedShots:'Tirs bloqués',timeOnIcePerGame:'Temps de glace'};
+    var tL={teamPowerPlayPct:'Efficacité PP',teamPenaltyKillPct:'Efficacité PK',hits:'Hits - Équipes'};
+    var gL={savePctg:'SV%',wins:'Victoires',goalsAgainstAverage:'Moy. buts enc.',shutouts:'Jeux blancs'};
+    var all=await Promise.all([
+      ...pC.map(function(c){return fetch(P+'?league=nhl_leaders&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});}),
+      ...tC.map(function(c){return fetch(P+'?league=nhl_leaders&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});}),
+      ...gC.map(function(c){return fetch(P+'?league=nhl_goalies&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});})
+    ]);
+    var players=pC.map(function(c,i){return{label:pL[c]||c,data:pp(all[i],c)};}).filter(function(x){return x.data.length>0;});
+    var teams=tC.map(function(c,i){return{label:tL[c]||c,data:pt(all[pC.length+i],c)};}).filter(function(x){return x.data.length>0;});
+    var goalies=gC.map(function(c,i){return{label:gL[c]||c,data:pg(all[pC.length+tC.length+i],c)};}).filter(function(x){return x.data.length>0;});
+    if(window.STATS_PAGES){window.STATS_PAGES.NHL={teams:teams.length>0?teams:window.STATS_PAGES.NHL.teams,players:players.length>0?players:window.STATS_PAGES.NHL.players,goalies:goalies};}
+    if(window.__zoneus_refresh__)window.__zoneus_refresh__();
+    console.log('NHL stats OK');
+  } catch(e){console.log('NHL stats err',e);window.__NHL_STATS_LOADED__=false;}
 }
 </script>
 </body>
