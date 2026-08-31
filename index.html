@@ -3327,6 +3327,15 @@ function RosterSection({ match, hc, ac }) {
   return null;
 }
 function MatchPage({ match, onBack }) {
+  const [matchData, setMatchData] = React.useState(null);
+  React.useEffect(function() {
+    setMatchData(null);
+    if (window.__loadMatchData__) {
+      window.__loadMatchData__(match).then(function() {
+        setMatchData(window.__MATCH_DATA__ && window.__MATCH_DATA__[match.id] || null);
+      });
+    }
+  }, [match.id]);
   const lc = LG[match.lg].color;
   const dk = LG[match.lg].dark;
   const hk = match.homeTeam + "_" + match.lg;
@@ -5101,6 +5110,124 @@ window.__NBA_STATIC__ = [
   { away: 'SAS', home: 'NYK', as: 99,  hs: 103, st: 'Final', date: '2026-06-10', dateLabel: 'Mer 10 jun' },
   { away: 'NYK', home: 'SAS', as: 112, hs: 105, st: 'Final', date: '2026-06-12', dateLabel: 'Ven 12 jun' }
 ];
+</script>
+<script>
+// ============================================================
+// MATCH PAGE - Fetch real match data
+// ============================================================
+window.__MATCH_DATA__ = {};
+
+async function fetchMatchData(match) {
+  if (!match || !match.id) return null;
+  const lg = match.lg;
+  const id = match.id;
+  
+  try {
+    // NFL + NBA: ESPN summary API (depuis navigateur)
+    if (lg === 'NFL' || lg === 'NBA') {
+      const sport = lg === 'NFL' ? 'football/nfl' : 'basketball/nba';
+      const espnId = id; // déjà un ID ESPN
+      const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/' + sport + '/summary?event=' + espnId);
+      const d = await r.json();
+      return parseESPNSummary(d, lg, match);
+    }
+    
+    // NHL: API NHL officielle via proxy
+    if (lg === 'NHL') {
+      const nhlId = id.replace('nhl_', '');
+      const r = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl&game=' + nhlId);
+      const d = await r.json();
+      return parseNHLGame(d, match);
+    }
+    
+    // MLB: API MLB officielle via proxy
+    if (lg === 'MLB') {
+      const mlbId = id.replace('mlb_', '');
+      const r = await fetch('https://statsapi.mlb.com/api/v1.1/game/' + mlbId + '/feed/live');
+      const d = await r.json();
+      return parseMLBGame(d, match);
+    }
+  } catch(e) {
+    console.log('fetchMatchData error:', e);
+    return null;
+  }
+  return null;
+}
+
+function parseESPNSummary(d, lg, match) {
+  if (!d || !d.header) return null;
+  const comp = d.header.competitions && d.header.competitions[0];
+  if (!comp) return null;
+  
+  const home = comp.competitors.find(function(c) { return c.homeAway === 'home'; }) || {};
+  const away = comp.competitors.find(function(c) { return c.homeAway === 'away'; }) || {};
+  
+  // Boxscore
+  const boxscore = d.boxscore || {};
+  const players = boxscore.players || [];
+  
+  // Derniers matchs
+  const lastEvents = d.lastFiveGames || [];
+  
+  return {
+    homeScore: parseInt(home.score) || 0,
+    awayScore: parseInt(away.score) || 0,
+    status: comp.status && comp.status.type ? comp.status.type.description : '',
+    period: comp.status && comp.status.period ? comp.status.period : '',
+    clock: comp.status && comp.status.displayClock ? comp.status.displayClock : '',
+    homeRecord: home.records && home.records[0] ? home.records[0].summary : '',
+    awayRecord: away.records && away.records[0] ? away.records[0].summary : '',
+    venue: d.gameInfo && d.gameInfo.venue ? d.gameInfo.venue.fullName : '',
+    weather: d.gameInfo && d.gameInfo.weather ? d.gameInfo.weather.displayValue : '',
+    boxscore: boxscore,
+    lastFiveHome: (d.lastFiveGames || []).filter(function(g) { 
+      return g.team && g.team.abbreviation === match.homeTeam; 
+    }).slice(0, 5),
+    lastFiveAway: (d.lastFiveGames || []).filter(function(g) { 
+      return g.team && g.team.abbreviation === match.awayTeam; 
+    }).slice(0, 5),
+    leaders: d.leaders || [],
+    drives: d.drives || null,
+    scoring: d.scoringPlays || []
+  };
+}
+
+function parseNHLGame(d, match) {
+  if (!d) return null;
+  return {
+    homeScore: d.homeTeam && d.homeTeam.score || 0,
+    awayScore: d.awayTeam && d.awayTeam.score || 0,
+    status: d.gameState || '',
+    period: d.periodDescriptor ? 'P' + d.periodDescriptor.number : '',
+    clock: d.clock ? d.clock.timeRemaining : '',
+    venue: d.venue ? d.venue.default : ''
+  };
+}
+
+function parseMLBGame(d, match) {
+  if (!d || !d.liveData) return null;
+  const ls = d.liveData.linescore || {};
+  const box = d.liveData.boxscore || {};
+  return {
+    homeScore: ls.teams && ls.teams.home ? ls.teams.home.runs : 0,
+    awayScore: ls.teams && ls.teams.away ? ls.teams.away.runs : 0,
+    status: d.gameData && d.gameData.status ? d.gameData.status.abstractGameState : '',
+    period: ls.currentInningOrdinal || '',
+    homeHits: ls.teams && ls.teams.home ? ls.teams.home.hits : 0,
+    awayHits: ls.teams && ls.teams.away ? ls.teams.away.hits : 0,
+    homeErrors: ls.teams && ls.teams.home ? ls.teams.home.errors : 0,
+    awayErrors: ls.teams && ls.teams.away ? ls.teams.away.errors : 0,
+    boxscore: box
+  };
+}
+
+// Charger les données quand un match est ouvert
+window.__loadMatchData__ = async function(match) {
+  window.__MATCH_DATA__[match.id] = { loading: true };
+  const data = await fetchMatchData(match);
+  window.__MATCH_DATA__[match.id] = data || { error: true };
+  if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+};
 </script>
 </body>
 </html>
