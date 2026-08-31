@@ -5112,7 +5112,7 @@ async function fetchStandings(lg) {
   window.__STANDINGS_LOADED__[lg] = true;
   try {
     if (lg === 'NHL') {
-      var r = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_standings');
+      var r = await fetch('https://api-web.nhle.com/v1/standings/now');
       var d = await r.json();
       if (!d || !d.standings) return;
       var west = [], east = [];
@@ -5130,7 +5130,7 @@ async function fetchStandings(lg) {
       if (!d || !d.records) return;
       var divs = {};
       d.records.forEach(function(div) {
-        var divName = div.division && div.division.nameShort || 'Division';
+        var divName = div.division && div.division.name || 'Division';
         divs[divName] = (div.teamRecords || []).map(function(t, i) {
           return { r: i+1, ab: t.team && t.team.abbreviation || '', w: t.wins || 0, l: t.losses || 0, pct: t.winningPercentage || '.000' };
         });
