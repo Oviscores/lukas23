@@ -5120,21 +5120,29 @@ async function fetchStandings(lg) {
         var rows = [];
         (conf.standings && conf.standings.entries || []).forEach(function(e, i) {
           var stats = {}; (e.stats || []).forEach(function(s){stats[s.name]=s.value;});
-          rows.push({ r: i+1, ab: e.team && e.team.abbreviation || '', w: stats.wins || 0, l: stats.losses || 0, pts: stats.points || 0 });
+          var rawAb = e.team && e.team.abbreviation || '';
+          var nhlAbMap = {TB:'TBL',NJ:'NJD',LA:'LAK',SJ:'SJS',UTAH:'UTA',ARI:'UTA',PHX:'ARI'};
+          var ab = nhlAbMap[rawAb] || rawAb;
+          rows.push({ r: i+1, ab: ab, w: stats.wins || 0, l: stats.losses || 0, pts: stats.points || 0 });
         });
         confs[conf.name || 'Conference'] = rows;
       });
       if (Object.keys(confs).length > 0) { CONF_STANDINGS.NHL = confs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
     }
     if (lg === 'MLB') {
-      var r = await fetch('https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&season=2025&standingsTypes=regularSeason&hydrate=team');
+      var r = await fetch('https://site.api.espn.com/apis/v2/sports/baseball/mlb/standings?season=2025');
       var d = await r.json();
-      if (!d || !d.records) return;
+      if (!d || !d.children) return;
       var divs = {};
-      d.records.forEach(function(div) {
-        var divName = div.division && div.division.name || 'Division';
-        divs[divName] = (div.teamRecords || []).map(function(t, i) {
-          return { r: i+1, ab: t.team && t.team.abbreviation || '', w: t.wins || 0, l: t.losses || 0, pct: t.winningPercentage || '.000' };
+      (d.children || []).forEach(function(conf) {
+        (conf.children || []).forEach(function(div) {
+          var divName = div.name || 'Division';
+          var rows = [];
+          (div.standings && div.standings.entries || []).forEach(function(e, i) {
+            var stats = {}; (e.stats || []).forEach(function(s){stats[s.name]=s.value;});
+            rows.push({ r: i+1, ab: e.team && e.team.abbreviation || '', w: stats.wins || 0, l: stats.losses || 0, pct: e.stats && e.stats.find(function(s){return s.name==='winPercent';}) ? e.stats.find(function(s){return s.name==='winPercent';}).displayValue : '.000' });
+          });
+          if (rows.length > 0) divs[divName] = rows;
         });
       });
       if (Object.keys(divs).length > 0) { CONF_STANDINGS.MLB = divs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
