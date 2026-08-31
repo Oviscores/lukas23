@@ -4640,6 +4640,14 @@ function ZoneUS() {
       setStatsVersion(function(v){ return v+1; });
       if (orig) orig();
     };
+    // Précharger les stats au démarrage
+    setTimeout(function() {
+      if (window.fetchNHLStats) { window.__NHL_STATS_LOADED__ = false; window.fetchNHLStats(); }
+      if (window.fetchLeagueStats) {
+        if (!window.__STATS_LOADED__) window.__STATS_LOADED__ = {};
+        ['MLB','NBA'].forEach(function(lg) { window.__STATS_LOADED__[lg] = false; window.fetchLeagueStats(lg); });
+      }
+    }, 1000);
   }, []);
   useEffect(() => {
     const id = setInterval(() => setTick((i) => (i + 1) % TICKER.length), 4200);
