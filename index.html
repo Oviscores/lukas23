@@ -3541,7 +3541,10 @@ function RightCol({ feed, onGen, generating, genLg, onArticleClick, onMoreNews, 
   const [showAllPlayers, setShowAllPlayers] = useState(false);
   const [showAllStats, setShowAllStats] = useState(false);
   const lc = LG[slg].color;
-  const stats = GSTATS[slg];
+  const _spHome = window.STATS_PAGES && window.STATS_PAGES[slg];
+  const stats = (_spHome && _spHome.players && _spHome.players.length > 0)
+    ? _spHome.players.map(function(c){ return { label: c.label, unit: '', players: c.data.map(function(p){ return { name: p.name, team: p.ab, val: p.val }; }) }; })
+    : GSTATS[slg];
   const bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 12px rgba(0,0,0,0.12)" };
   const Hd = ({ label, color }) => /* @__PURE__ */ React.createElement("div", { style: { background: color || "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 14, letterSpacing: "0.1em", color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, label));
   const MoreBtn = ({ label, onClick }) => /* @__PURE__ */ React.createElement("div", { onClick, style: { background: "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", whiteSpace: "nowrap" }, onMouseEnter: (e) => e.currentTarget.style.background = "rgba(40,40,40,0.85)", onMouseLeave: (e) => e.currentTarget.style.background = "rgba(20,20,20,0.75)" }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.12em", color: "#fff", whiteSpace: "nowrap" } }, label));
@@ -3599,9 +3602,12 @@ function RightCol({ feed, onGen, generating, genLg, onArticleClick, onMoreNews, 
     if (onMorePlayers) onMorePlayers();
   } }) : showAllPlayers && /* @__PURE__ */ React.createElement(MoreBtn, { label: "R\xE9duire", onClick: () => setShowAllPlayers(false) })), Object.keys(LG).map((lg) => {
     const lc2 = LG[lg].color;
-    const lgStats = GSTATS[lg];
+    const _sp = window.STATS_PAGES && window.STATS_PAGES[lg];
+    const lgStats = (_sp && _sp.players && _sp.players.length > 0)
+      ? _sp.players.map(function(c){ return { label: c.label, unit: '', players: c.data.map(function(p){ return { name: p.name, team: p.ab, val: p.val }; }) }; })
+      : GSTATS[lg];
     const [tab, setTab] = useState(0);
-    const cat = lgStats[tab];
+    const cat = lgStats[tab] || lgStats[0];
     return /* @__PURE__ */ React.createElement("div", { key: lg, style: bs }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 14, letterSpacing: "0.12em", color: "#fff" } }, "LEADERS ", lg), /* @__PURE__ */ React.createElement(LB, { lg, sz: 12 })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", borderBottom: "1px solid rgba(0,0,0,0.06)", overflowX: "auto" } }, lgStats.map((s, i) => /* @__PURE__ */ React.createElement("button", { key: i, onClick: () => setTab(i), style: { flex: 1, background: "none", border: "none", borderBottom: tab === i ? "2px solid " + lc2 : "2px solid transparent", color: tab === i ? lc2 : "#888", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 800, padding: "3px 1px", cursor: "pointer", whiteSpace: "nowrap" } }, s.label))), cat.players.slice(0, 5).map((p, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 5, padding: "3px 7px", borderBottom: "1px solid rgba(0,0,0,0.04)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: i === 0 ? lc2 : "#999", width: 10, textAlign: "center" } }, i + 1), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, p.name), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, color: i === 0 ? lc2 : "#444" } }, p.val))), /* @__PURE__ */ React.createElement(MoreBtn, { label: "+ de stats", onClick: () => {
       if (onMoreStats) onMoreStats(lg);
     } }));
