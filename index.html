@@ -5233,81 +5233,89 @@ async function fetchNHLStats() {
   const PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
   const SEASON = '20252026';
 
+  function parsePlayers(d, cat) {
+    if (!d || !d[cat]) return [];
+    return d[cat].slice(0, 10).map(function(p) {
+      var name = (p.firstName && p.firstName.default || '') + ' ' + (p.lastName && p.lastName.default || '');
+      var ab = p.teamAbbrevs && p.teamAbbrevs.default || p.teamAbbrev || '';
+      var val = p.value !== undefined ? p.value : 0;
+      return { name: name.trim(), ab: ab, val: val };
+    });
+  }
+
+  function parseGoalies(d, cat) {
+    if (!d || !d[cat]) return [];
+    return d[cat].slice(0, 10).map(function(g) {
+      var name = (g.firstName && g.firstName.default || '') + ' ' + (g.lastName && g.lastName.default || '');
+      var ab = g.teamAbbrevs && g.teamAbbrevs.default || '';
+      var val = g.value !== undefined ? g.value : 0;
+      if (cat === 'savePctg') val = typeof val === 'number' ? val.toFixed(3) : val;
+      return { name: name.trim(), ab: ab, val: val };
+    });
+  }
+
+  function parseTeamLeaders(d, cat) {
+    if (!d || !d[cat]) return [];
+    return d[cat].slice(0, 10).map(function(t) {
+      var ab = t.teamAbbrevs && t.teamAbbrevs.default || t.teamAbbrev || '';
+      var val = t.value !== undefined ? t.value : 0;
+      return { ab: ab, val: val };
+    });
+  }
+
   try {
-    // Fetch en parallèle
-    const [goalsR, assistsR, pointsR, goalsTeamR, goaliesR, teamStatsR] = await Promise.all([
-      fetch(`${PROXY}?league=nhl_leaders&cat=goals&season=${SEASON}`).then(r => r.json()),
-      fetch(`${PROXY}?league=nhl_leaders&cat=assists&season=${SEASON}`).then(r => r.json()),
-      fetch(`${PROXY}?league=nhl_leaders&cat=points&season=${SEASON}`).then(r => r.json()),
-      fetch(`${PROXY}?league=nhl_leaders&cat=teamGoals&season=${SEASON}`).then(r => r.json()).catch(() => null),
-      fetch(`${PROXY}?league=nhl_goalies&cat=savePctg&season=${SEASON}`).then(r => r.json()).catch(() => null),
-      fetch(`${PROXY}?league=nhl_teamstats&season=${SEASON}`).then(r => r.json()).catch(() => null),
-    ]);
+    const cats = ['goals','assists','points','plusMinus','penaltyMinutes','powerPlayPoints','gameWinningGoals','shots','hits','blockedShots','timeOnIcePerGame'];
+    const teamCats = ['teamGoals','teamGoalsAgainst','teamPowerPlayPct','teamPenaltyKillPct','teamShots'];
+    const goalieCats = ['savePctg','wins','goalsAgainstAverage','shutouts'];
 
-    // Parser joueurs — format NHL API: { goals: [{firstName:{default}, lastName:{default}, teamAbbrevs:{default}, value}] }
-    function parsePlayers(d, cat) {
-      if (!d || !d[cat]) return [];
-      return d[cat].slice(0, 10).map(function(p) {
-        var name = (p.firstName && p.firstName.default || '') + ' ' + (p.lastName && p.lastName.default || '');
-        var ab = p.teamAbbrevs && p.teamAbbrevs.default || p.teamAbbrev || '';
-        var val = p.value !== undefined ? p.value : (p.goals || p.assists || p.points || 0);
-        return { name: name.trim(), ab: ab, val: val };
-      });
-    }
+    const allFetches = [
+      ...cats.map(c => fetch(`${PROXY}?league=nhl_leaders&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
+      ...teamCats.map(c => fetch(`${PROXY}?league=nhl_leaders&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
+      ...goalieCats.map(c => fetch(`${PROXY}?league=nhl_goalies&cat=${c}&season=${SEASON}`).then(r=>r.json()).catch(()=>null)),
+    ];
 
-    // Parser stats équipes
-    function parseTeamStats(d, statName) {
-      if (!d || !d.data) return [];
-      return d.data
-        .sort(function(a, b) { return (b[statName] || 0) - (a[statName] || 0); })
-        .slice(0, 10)
-        .map(function(t) {
-          return { ab: t.teamAbbrev && t.teamAbbrev.default || t.teamId || '', val: t[statName] || 0 };
-        });
-    }
+    const results = await Promise.all(allFetches);
+    const playerResults = results.slice(0, cats.length);
+    const teamResults = results.slice(cats.length, cats.length + teamCats.length);
+    const goalieResults = results.slice(cats.length + teamCats.length);
 
-    // Parser gardiens
-    function parseGoalies(d, cat) {
-      if (!d || !d[cat]) return [];
-      return d[cat].slice(0, 5).map(function(g) {
-        var name = (g.firstName && g.firstName.default || '') + ' ' + (g.lastName && g.lastName.default || '');
-        var ab = g.teamAbbrevs && g.teamAbbrevs.default || '';
-        var val = g.value !== undefined ? g.value : 0;
-        if (cat === 'savePctg') val = val.toFixed ? (val * 100).toFixed(1) + '%' : val;
-        return { name: name.trim(), ab: ab, val: val };
-      });
-    }
-
-    window.__NHL_STATS__ = {
-      players: [
-        { label: 'Buts', data: parsePlayers(goalsR, 'goals') },
-        { label: 'Passes', data: parsePlayers(assistsR, 'assists') },
-        { label: 'Points', data: parsePlayers(pointsR, 'points') },
-      ],
-      goalies: goaliesR ? [
-        { label: 'SV%', data: parseGoalies(goaliesR, 'savePctg') },
-      ] : [],
-      teams: teamStatsR ? [
-        { label: 'Buts marqués', data: parseTeamStats(teamStatsR, 'goalsFor') },
-        { label: 'Buts encaissés', data: parseTeamStats(teamStatsR, 'goalsAgainst').map(function(t){ return Object.assign({}, t, {val: t.val}); }) },
-        { label: 'Tirs au but', data: parseTeamStats(teamStatsR, 'shotsForPerGame') },
-        { label: 'Efficacité PP', data: parseTeamStats(teamStatsR, 'powerPlayPct') },
-        { label: 'Efficacité PK', data: parseTeamStats(teamStatsR, 'penaltyKillPct') },
-      ] : [],
+    const labels = {
+      goals:'Buts', assists:'Passes', points:'Points', plusMinus:'+/-',
+      penaltyMinutes:'Minutes pénalité', powerPlayPoints:'Points PP',
+      gameWinningGoals:'Buts vainqueurs', shots:'Tirs', hits:'Mises en échec',
+      blockedShots:'Tirs bloqués', timeOnIcePerGame:'Temps de glace/match'
+    };
+    const teamLabels = {
+      teamGoals:'Buts marqués', teamGoalsAgainst:'Buts encaissés',
+      teamPowerPlayPct:'Efficacité PP', teamPenaltyKillPct:'Efficacité PK', teamShots:'Tirs'
+    };
+    const goalieLabels = {
+      savePctg:'SV%', wins:'Victoires', goalsAgainstAverage:'MOY. buts encaissés', shutouts:'Jeux blancs'
     };
 
-    // Mettre à jour STATS_PAGES.NHL
-    if (window.STATS_PAGES && window.__NHL_STATS__) {
-      var s = window.__NHL_STATS__;
+    var players = cats.map(function(c, i) {
+      return { label: labels[c] || c, data: parsePlayers(playerResults[i], c) };
+    }).filter(function(x) { return x.data.length > 0; });
+
+    var teams = teamCats.map(function(c, i) {
+      return { label: teamLabels[c] || c, data: parseTeamLeaders(teamResults[i], c) };
+    }).filter(function(x) { return x.data.length > 0; });
+
+    var goalies = goalieCats.map(function(c, i) {
+      return { label: goalieLabels[c] || c, data: parseGoalies(goalieResults[i], c) };
+    }).filter(function(x) { return x.data.length > 0; });
+
+    console.log('NHL stats — joueurs:', players.length, 'equipes:', teams.length, 'gardiens:', goalies.length);
+    if (teams.length === 0 && teamResults[0]) console.log('Team sample:', JSON.stringify(teamResults[0]).slice(0,200));
+
+    if (window.STATS_PAGES) {
       window.STATS_PAGES.NHL = {
-        teams: s.teams.length > 0 ? s.teams : window.STATS_PAGES.NHL.teams,
-        players: s.players.length > 0 ? s.players : window.STATS_PAGES.NHL.players,
+        teams: teams.length > 0 ? teams : window.STATS_PAGES.NHL.teams,
+        players: players.length > 0 ? [...players, ...goalies] : window.STATS_PAGES.NHL.players,
       };
     }
-
     if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-    console.log('NHL stats loaded ✓');
-
+    console.log('NHL stats loaded OK');
   } catch(e) {
     console.log('fetchNHLStats error:', e);
     window.__NHL_STATS_LOADED__ = false;
