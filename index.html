@@ -4586,7 +4586,9 @@ function ZoneUS() {
   const [page, setPage] = useState("home");
   const [prevPage, setPrevPage] = useState("home");
   const [statFull, setStatFull] = useState(null);
+  const [navHistory, setNavHistory] = useState([]);
   const navigate = (p) => {
+    setNavHistory(function(h) { return [...h, page]; });
     setPrevPage(page);
     setPage(p);
   };
@@ -4666,12 +4668,21 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     setPlayersList(null);
   }
   function goBack() {
-    setSelArticle(null);
-    setSelPlayer(null);
-    setSelTeam(null);
-    setPlayersList(null);
-    setSelMatch(null);
-    setCalLg(null);
+    // Si on est sur une sous-page (article, joueur, match...) revenir à la page courante
+    if (selArticle) { setSelArticle(null); return; }
+    if (selPlayer) { setSelPlayer(null); return; }
+    if (selTeam) { setSelTeam(null); return; }
+    if (playersList) { setPlayersList(null); return; }
+    if (selMatch) { setSelMatch(null); return; }
+    if (calLg) { setCalLg(null); return; }
+    // Sinon revenir à la page précédente via navHistory
+    if (navHistory.length > 0) {
+      const prev = navHistory[navHistory.length - 1];
+      setNavHistory(function(h) { return h.slice(0, -1); });
+      setPage(prev);
+      return;
+    }
+    if (page !== 'home') { setPage('home'); }
   }
   function goScore(g, lg) {
     goMatch({
