@@ -4408,8 +4408,26 @@ const TeamCard = ({ teamId, name, col, stand, players, isHome }) => {
   ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "#bbb" } }, s.l), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: i === 0 ? col.bg : "#111" } }, s.v)))), players.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 800, letterSpacing: "0.1em", color: "#aaa", marginBottom: 8 } }, "JOUEURS CL\xC9S"), players.slice(0, 2).map((p, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 28, height: 28, borderRadius: "50%", background: col.bg + "22", border: "1.5px solid " + col.bg + "44", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 900, color: col.bg } }, "#", p.jersey)), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#111", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, p.name), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "#bbb" } }, p.pos, " \xB7 ", p.contract.aav))))));
 };
 
-function StatsPage({ lg, onPlayerClick, onBack, onStatFull, statsVersion }) {
+function StatsPage({ lg, onPlayerClick, onBack, onStatFull, statsVersion, onStatsLoaded }) {
+  var _v = React.useState(0);
+  var localV = _v[0], setLocalV = _v[1];
+  React.useEffect(function() {
+    var mounted = true;
+    (async function() {
+      if (lg === 'NHL') {
+        window.__NHL_STATS_LOADED__ = false;
+        if (window.fetchNHLStats) await window.fetchNHLStats();
+      } else if (lg === 'MLB' || lg === 'NBA') {
+        if (!window.__STATS_LOADED__) window.__STATS_LOADED__ = {};
+        window.__STATS_LOADED__[lg] = false;
+        if (window.fetchLeagueStats) await window.fetchLeagueStats(lg);
+      }
+      if (mounted) setLocalV(function(v) { return v + 1; });
+    })();
+    return function() { mounted = false; };
+  }, [lg]);
   var lc = LG[lg].color;
+  void localV;
   var data = window.STATS_PAGES[lg];
   if (!data) return null;
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
@@ -4587,12 +4605,6 @@ function ZoneUS() {
   const [selMatch, setSelMatch] = useState(null);
   const [calLg, setCalLg] = useState(null);
   const [statsVersion, setStatsVersion] = useState(0);
-  React.useEffect(function() {
-    setTimeout(function() {
-      if (window.fetchNHLStats) { window.__NHL_STATS_LOADED__=false; window.fetchNHLStats().then(function(){ setStatsVersion(function(v){return v+1;}); }); }
-      ['MLB','NBA'].forEach(function(lg) { if (window.fetchLeagueStats) { if(!window.__STATS_LOADED__) window.__STATS_LOADED__={}; window.__STATS_LOADED__[lg]=false; window.fetchLeagueStats(lg).then(function(){ setStatsVersion(function(v){return v+1;}); }); } });
-    }, 800);
-  }, []);
   useEffect(() => {
     const id = setInterval(() => setTick((i) => (i + 1) % TICKER.length), 4200);
     return () => clearInterval(id);
@@ -5239,7 +5251,7 @@ async function fetchLeagueStats(lg) {
         {cat:'saves',label:'Sauvetages'}
       ];
       var results = await Promise.all(mlbCats.map(function(c) {
-        return fetch(PROXY+'?league=mlb_leaders&cat='+c.cat+'&season=2025').then(function(r){return r.json();}).catch(function(){return null;});
+        return fetch(PROXY+'?league=mlb_leaders&cat='+c.cat+'&season=2026').then(function(r){return r.json();}).catch(function(){return null;});
       }));
       var players = mlbCats.map(function(c,i) {
         var d = results[i];
