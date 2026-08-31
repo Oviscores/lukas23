@@ -3074,6 +3074,11 @@ function LeaguePage({ lg, articles, onArticleClick, onMatchClick, onTeamClick = 
   const [showAllPlayers, setShowAllPlayers] = useState(false);
   const [statExpanded, setStatExpanded] = useState({});
   const lgArts = articles.filter((a) => a.league === lg);
+  React.useEffect(function() {
+    if (!window.__CAL_CACHE__ || !window.__CAL_CACHE__[lg]) {
+      if (window.fetchCalendarData) window.fetchCalendarData(lg);
+    }
+  }, [lg]);
   const hero = lgArts[0], rest = lgArts.slice(1);
   const confs = CONF_STANDINGS[lg] || {};
   const confKeys = Object.keys(confs);
@@ -3113,7 +3118,19 @@ function LeaguePage({ lg, articles, onArticleClick, onMatchClick, onTeamClick = 
       },
       getTeamLogo(tid, lg, 28), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: abbr.length > 2 ? 14 : 18, fontWeight: 900, color: col.fg, textAlign: "center", lineHeight: 1, userSelect: "none" } }, abbr)
     );
-  }))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 14, letterSpacing: "0.12em", color: "#fff", whiteSpace: "nowrap" } }, "MATCHS DU JOUR")), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 0 } }, (CAL_SCHEDULE[lg] && CAL_SCHEDULE[lg].days[CAL_SCHEDULE[lg].todayIdx] ? CAL_SCHEDULE[lg].days[CAL_SCHEDULE[lg].todayIdx].matches : []).map(function(m, i) {
+  }))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 14, letterSpacing: "0.12em", color: "#fff", whiteSpace: "nowrap" } }, "MATCHS DU JOUR")), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 0 } }, (function() {
+      var today = new Date().toISOString().split('T')[0];
+      var cache = window.__CAL_CACHE__ && window.__CAL_CACHE__[lg];
+      if (cache && cache.days) {
+        var todayDay = cache.days.find(function(d) { return d.date === today; });
+        if (todayDay && todayDay.matches && todayDay.matches.length > 0) return todayDay.matches;
+        // Pas de matchs aujourd'hui
+        return [];
+      }
+      // Fallback données statiques
+      var cs = CAL_SCHEDULE[lg];
+      return cs && cs.days && cs.days[cs.todayIdx] ? cs.days[cs.todayIdx].matches : [];
+    })().map(function(m, i) {
     var hcol = TC[m.home + "_" + lg] || { bg: lc, fg: "#fff" };
     var acol = TC[m.away + "_" + lg] || { bg: "#555", fg: "#fff" };
     var isFinal = m.as !== null;
