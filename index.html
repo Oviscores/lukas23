@@ -5224,19 +5224,15 @@ async function fetchLeagueStats(lg) {
   if (window.__STATS_LOADED__[lg]) return;
   window.__STATS_LOADED__[lg] = true;
 
-  var sportMap = {
-    MLB: 'baseball/mlb',
-    NBA: 'basketball/nba',
-    NFL: 'football/nfl'
-  };
-  var sport = sportMap[lg];
-  if (!sport) return;
+  var leagueMap = { MLB: 'mlb_leaders', NBA: 'nba_leaders', NFL: 'nfl_leaders' };
+  var leagueKey = leagueMap[lg];
+  if (!leagueKey) return;
 
   var seasonMap = { MLB: 2025, NBA: 2026, NFL: 2025 };
   var season = seasonMap[lg];
 
   try {
-    var url = 'https://site.api.espn.com/apis/site/v2/sports/' + sport + '/leaders?season=' + season;
+    var url = 'https://zoneus-proxy.vivienfrappier.workers.dev?league=' + leagueKey + '&season=' + season;
     var r = await fetch(url);
     var d = await r.json();
     if (!d || !d.leaders) { window.__STATS_LOADED__[lg] = false; return; }
