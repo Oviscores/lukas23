@@ -4480,6 +4480,10 @@ function StatsPage({ lg, onPlayerClick, onBack, onStatFull }) {
     }, onMouseLeave: function(e) {
       e.currentTarget.style.background = "rgba(20,20,20,0.75)";
     } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", letterSpacing: "0.12em" } }, "Suite \u2192")));
+  })), data.goalies && data.goalies.map(function(cat, ci) {
+    return /* @__PURE__ */ React.createElement("div", { key: "g"+ci, style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 GARDIENS", color: lc }), cat.data.map(function(r, i) {
+      return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 6, padding: "5px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", background: i === 0 ? lc + "0a" : "transparent" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#999", width: 14, textAlign: "center", flexShrink: 0 } }, i + 1), /* @__PURE__ */ getTeamLogo(r.ab, lg, 22), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 600, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, r.name), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: i === 0 ? 13 : 10, fontWeight: i === 0 ? 900 : 700, color: i === 0 ? lc : "#444", flexShrink: 0 } }, r.val));
+    }));
   })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, data.players.map(function(cat, ci) {
     return /* @__PURE__ */ React.createElement("div", { key: ci, style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: cat.label.toUpperCase() + " \u2014 JOUEURS", color: lc }), cat.data.map(function(r, i) {
       var tc2 = TC[r.ab + "_" + lg] || { bg: lc, fg: "#fff" };
@@ -5235,7 +5239,7 @@ async function fetchNHLStats() {
 
   function parsePlayers(d, cat) {
     if (!d || !d[cat]) return [];
-    return d[cat].slice(0, 10).map(function(p) {
+    return d[cat].slice(0, 5).map(function(p) {
       var name = (p.firstName && p.firstName.default || '') + ' ' + (p.lastName && p.lastName.default || '');
       var ab = p.teamAbbrevs && p.teamAbbrevs.default || p.teamAbbrev || '';
       var val = p.value !== undefined ? p.value : 0;
@@ -5245,7 +5249,7 @@ async function fetchNHLStats() {
 
   function parseGoalies(d, cat) {
     if (!d || !d[cat]) return [];
-    return d[cat].slice(0, 10).map(function(g) {
+    return d[cat].slice(0, 5).map(function(g) {
       var name = (g.firstName && g.firstName.default || '') + ' ' + (g.lastName && g.lastName.default || '');
       var ab = (g.teamAbbrevs && g.teamAbbrevs.default) || (g.teamAbbrev && g.teamAbbrev.default) || g.teamAbbrev || '';
       var val = g.value !== undefined ? g.value : 0;
@@ -5308,10 +5312,16 @@ async function fetchNHLStats() {
     console.log('NHL stats — joueurs:', players.length, 'equipes:', teams.length, 'gardiens:', goalies.length);
     if (teams.length === 0 && teamResults[0]) console.log('Team sample:', JSON.stringify(teamResults[0]).slice(0,200));
 
+    // Filtrer équipes : uniquement PP, PK, Hits
+    var teamFiltered = teams.filter(function(t) {
+      return t.label === 'Efficacité PP' || t.label === 'Efficacité PK' || t.label === 'Hits';
+    });
+
     if (window.STATS_PAGES) {
       window.STATS_PAGES.NHL = {
-        teams: teams.length > 0 ? teams : window.STATS_PAGES.NHL.teams,
-        players: players.length > 0 ? [...players, ...goalies] : window.STATS_PAGES.NHL.players,
+        teams: teamFiltered.length > 0 ? teamFiltered : window.STATS_PAGES.NHL.teams,
+        players: players.length > 0 ? players : window.STATS_PAGES.NHL.players,
+        goalies: goalies.length > 0 ? goalies : [],
       };
     }
     if (window.__zoneus_refresh__) window.__zoneus_refresh__();
