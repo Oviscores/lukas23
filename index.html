@@ -3841,6 +3841,15 @@ const FANTASY_DATA = {
   }
 };
 function FantasyPageNHL({ lg, onPlayerClick, onBack }) {
+  var _fv = React.useState(0);
+  var fTick = _fv[0], setFTick = _fv[1];
+  React.useEffect(function() {
+    if (window.fetchFantasyData) {
+      window.__FANTASY_LOADED__[lg] = false;
+      window.fetchFantasyData(lg).then(function() { setFTick(function(t){return t+1;}); });
+    }
+  }, [lg]);
+  void fTick;
   var lc = LG[lg].color;
   var dk = LG[lg].dark || "#111";
   var fd = FANTASY_DATA[lg];
@@ -3945,6 +3954,15 @@ function FantasyPageNHL({ lg, onPlayerClick, onBack }) {
   })))));
 }
 function FantasyPageNFL({ lg, onPlayerClick, onBack }) {
+  var _fv = React.useState(0);
+  var fTick = _fv[0], setFTick = _fv[1];
+  React.useEffect(function() {
+    if (window.fetchFantasyData) {
+      window.__FANTASY_LOADED__[lg] = false;
+      window.fetchFantasyData(lg).then(function() { setFTick(function(t){return t+1;}); });
+    }
+  }, [lg]);
+  void fTick;
   var lc = LG[lg].color;
   var dk = LG[lg].dark || "#111";
   var fd = FANTASY_DATA[lg];
@@ -4042,6 +4060,15 @@ function FantasyPageNFL({ lg, onPlayerClick, onBack }) {
   })))));
 }
 function FantasyPageNBA({ lg, onPlayerClick, onBack }) {
+  var _fv = React.useState(0);
+  var fTick = _fv[0], setFTick = _fv[1];
+  React.useEffect(function() {
+    if (window.fetchFantasyData) {
+      window.__FANTASY_LOADED__[lg] = false;
+      window.fetchFantasyData(lg).then(function() { setFTick(function(t){return t+1;}); });
+    }
+  }, [lg]);
+  void fTick;
   var lc = LG[lg].color;
   var dk = LG[lg].dark || "#111";
   var fd = FANTASY_DATA[lg];
@@ -4135,6 +4162,15 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack }) {
   })))));
 }
 function FantasyPageMLB({ lg, onPlayerClick, onBack }) {
+  var _fv = React.useState(0);
+  var fTick = _fv[0], setFTick = _fv[1];
+  React.useEffect(function() {
+    if (window.fetchFantasyData) {
+      window.__FANTASY_LOADED__[lg] = false;
+      window.fetchFantasyData(lg).then(function() { setFTick(function(t){return t+1;}); });
+    }
+  }, [lg]);
+  void fTick;
   var lc = LG[lg].color;
   var dk = LG[lg].dark || "#111";
   var fd = FANTASY_DATA[lg];
@@ -5495,6 +5531,102 @@ async function fetchLeagueStats(lg) {
       console.log('NFL stats OK - '+players.length+' cats');
     } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
     return;
+  }
+}
+
+</script>
+<script>
+// ============================================================
+// FANTASY DATA — Fetch real injuries & news for all leagues
+// ============================================================
+window.__FANTASY_LOADED__ = {};
+
+async function fetchFantasyData(lg) {
+  if (window.__FANTASY_LOADED__[lg]) return;
+  window.__FANTASY_LOADED__[lg] = true;
+
+  const PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+
+  try {
+    var sportMap = { NHL: 'hockey/nhl', NFL: 'football/nfl', NBA: 'basketball/nba', MLB: 'baseball/mlb' };
+    var sport = sportMap[lg];
+    if (!sport) return;
+
+    // Fetch injuries from ESPN
+    var r = await fetch('https://site.api.espn.com/apis/site/v2/sports/' + sport + '/injuries');
+    var d = await r.json();
+
+    if (!d || !d.injuries) { window.__FANTASY_LOADED__[lg] = false; return; }
+
+    var injuries = [];
+    var playerNews = [];
+
+    d.injuries.forEach(function(team) {
+      var teamAb = team.abbreviation || team.displayName || '';
+      // Mapping nom complet → abréviation
+      (team.injuries || []).forEach(function(inj) {
+        var athlete = inj.athlete || {};
+        var status = inj.status || '';
+        var detail = inj.details && inj.details.detail || inj.longComment || '';
+        var returnDate = inj.details && inj.details.returnDate || '';
+        var pos = athlete.position && athlete.position.abbreviation || '';
+        var name = athlete.displayName || athlete.fullName || '';
+        var teamAbr = athlete.team && athlete.team.abbreviation || teamAb;
+
+        // Status mapping
+        var statusLabel = 'OUT';
+        var statusColor = '#ef4444';
+        if (status.toLowerCase().includes('day') || status.toLowerCase().includes('dtd')) {
+          statusLabel = 'DTD'; statusColor = '#f59e0b';
+        } else if (status.toLowerCase().includes('questionable') || status.toLowerCase().includes('ques')) {
+          statusLabel = 'QST'; statusColor = '#f59e0b';
+        } else if (status.toLowerCase().includes('probable') || status.toLowerCase().includes('prob')) {
+          statusLabel = 'PROB'; statusColor = '#16a34a';
+        } else if (status.toLowerCase().includes('active') || status.toLowerCase().includes('actif')) {
+          statusLabel = 'ACTIF'; statusColor = '#16a34a';
+        }
+
+        if (name) {
+          injuries.push({
+            player: name,
+            team: teamAbr,
+            pos: pos,
+            status: statusLabel,
+            detail: detail.slice(0, 80) || status,
+            retour: returnDate || '—',
+            sc: statusColor
+          });
+
+          // Aussi dans playerNews
+          if (detail) {
+            playerNews.push({
+              time: new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
+              player: name,
+              team: teamAbr,
+              news: detail.slice(0, 120),
+              status: statusLabel,
+              sc: statusColor
+            });
+          }
+        }
+      });
+    });
+
+    // Limiter
+    injuries = injuries.slice(0, 20);
+    playerNews = playerNews.slice(0, 10);
+
+    console.log(lg + ' fantasy OK — injuries:', injuries.length, 'news:', playerNews.length);
+
+    if (injuries.length > 0 && window.FANTASY_DATA && window.FANTASY_DATA[lg]) {
+      window.FANTASY_DATA[lg].injuries = injuries;
+      window.FANTASY_DATA[lg].playerNews = playerNews;
+      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+    }
+
+  } catch(e) {
+    console.log(lg + ' fantasy error:', e);
+    window.__FANTASY_LOADED__[lg] = false;
   }
 }
 
