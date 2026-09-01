@@ -5610,7 +5610,14 @@ async function fetchFantasyData(lg) {
           statusLabel = 'ACTIF'; statusColor = '#16a34a';
         }
 
-        if (name) {
+        var validTeams = {
+          NHL: ['ANA','BOS','BUF','CAR','CBJ','CGY','CHI','COL','DAL','DET','EDM','FLA','LAK','MIN','MTL','NJD','NSH','NYI','NYR','OTT','PHI','PIT','SEA','SJS','STL','TBL','TOR','UTA','VAN','VGK','WPG','WSH'],
+          MLB: ['ARI','ATL','BAL','BOS','CHC','CIN','CLE','COL','CWS','DET','HOU','KC','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SD','SEA','SF','STL','TB','TEX','TOR','WSH'],
+          NBA: ['ATL','BKN','BOS','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS'],
+          NFL: ['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LAC','LAR','LV','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WSH']
+        };
+        var lgTeams = validTeams[lg] || [];
+        if (name && (lgTeams.length === 0 || lgTeams.indexOf(teamAbr) >= 0)) {
           injuries.push({
             player: name,
             team: teamAbr,
@@ -5620,8 +5627,6 @@ async function fetchFantasyData(lg) {
             retour: returnDate || '—',
             sc: statusColor
           });
-
-          // Aussi dans playerNews
           if (detail) {
             playerNews.push({
               time: new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
