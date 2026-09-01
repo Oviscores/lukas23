@@ -3844,10 +3844,16 @@ function FantasyPageNHL({ lg, onPlayerClick, onBack }) {
   var _fv = React.useState(0);
   var fTick = _fv[0], setFTick = _fv[1];
   React.useEffect(function() {
-    if (window.fetchFantasyData) {
-      window.__FANTASY_LOADED__[lg] = false;
-      window.fetchFantasyData(lg).then(function() { setFTick(function(t){return t+1;}); });
-    }
+    var mounted = true;
+    (async function() {
+      if (window.fetchFantasyData) {
+        window.__FANTASY_LOADED__ = window.__FANTASY_LOADED__ || {};
+        window.__FANTASY_LOADED__[lg] = false;
+        await window.fetchFantasyData(lg);
+      }
+      if (mounted) setFTick(function(t){return t+1;});
+    })();
+    return function() { mounted = false; };
   }, [lg]);
   void fTick;
   var lc = LG[lg].color;
@@ -3957,10 +3963,16 @@ function FantasyPageNFL({ lg, onPlayerClick, onBack }) {
   var _fv = React.useState(0);
   var fTick = _fv[0], setFTick = _fv[1];
   React.useEffect(function() {
-    if (window.fetchFantasyData) {
-      window.__FANTASY_LOADED__[lg] = false;
-      window.fetchFantasyData(lg).then(function() { setFTick(function(t){return t+1;}); });
-    }
+    var mounted = true;
+    (async function() {
+      if (window.fetchFantasyData) {
+        window.__FANTASY_LOADED__ = window.__FANTASY_LOADED__ || {};
+        window.__FANTASY_LOADED__[lg] = false;
+        await window.fetchFantasyData(lg);
+      }
+      if (mounted) setFTick(function(t){return t+1;});
+    })();
+    return function() { mounted = false; };
   }, [lg]);
   void fTick;
   var lc = LG[lg].color;
@@ -4063,10 +4075,16 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack }) {
   var _fv = React.useState(0);
   var fTick = _fv[0], setFTick = _fv[1];
   React.useEffect(function() {
-    if (window.fetchFantasyData) {
-      window.__FANTASY_LOADED__[lg] = false;
-      window.fetchFantasyData(lg).then(function() { setFTick(function(t){return t+1;}); });
-    }
+    var mounted = true;
+    (async function() {
+      if (window.fetchFantasyData) {
+        window.__FANTASY_LOADED__ = window.__FANTASY_LOADED__ || {};
+        window.__FANTASY_LOADED__[lg] = false;
+        await window.fetchFantasyData(lg);
+      }
+      if (mounted) setFTick(function(t){return t+1;});
+    })();
+    return function() { mounted = false; };
   }, [lg]);
   void fTick;
   var lc = LG[lg].color;
@@ -4165,10 +4183,16 @@ function FantasyPageMLB({ lg, onPlayerClick, onBack }) {
   var _fv = React.useState(0);
   var fTick = _fv[0], setFTick = _fv[1];
   React.useEffect(function() {
-    if (window.fetchFantasyData) {
-      window.__FANTASY_LOADED__[lg] = false;
-      window.fetchFantasyData(lg).then(function() { setFTick(function(t){return t+1;}); });
-    }
+    var mounted = true;
+    (async function() {
+      if (window.fetchFantasyData) {
+        window.__FANTASY_LOADED__ = window.__FANTASY_LOADED__ || {};
+        window.__FANTASY_LOADED__[lg] = false;
+        await window.fetchFantasyData(lg);
+      }
+      if (mounted) setFTick(function(t){return t+1;});
+    })();
+    return function() { mounted = false; };
   }, [lg]);
   void fTick;
   var lc = LG[lg].color;
