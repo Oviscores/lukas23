@@ -3569,7 +3569,7 @@ function RightCol({ feed, statsVersion, onGen, generating, genLg, onArticleClick
     } }));
   }), /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "NEWSLETTER", color: "#111" }), /* @__PURE__ */ React.createElement(NewsletterWidget, null)));
 }
-const FANTASY_DATA = {
+const FANTASY_DATA = window.FANTASY_DATA = {
   NHL: {
     playerNews: [
       { time: "14h32", player: "Auston Matthews", team: "TOR", news: "Participera \xE0 l'entra\xEEnement ce matin. Statut incertain pour ce soir.", status: "DTD", sc: "#f59e0b" },
@@ -5642,9 +5642,9 @@ async function fetchFantasyData(lg) {
 
     console.log(lg + ' fantasy OK — injuries:', injuries.length, 'news:', playerNews.length);
 
-    if (injuries.length > 0 && window.FANTASY_DATA && window.FANTASY_DATA[lg]) {
-      window.FANTASY_DATA[lg].injuries = injuries;
-      window.FANTASY_DATA[lg].playerNews = playerNews;
+    if (injuries.length > 0 && typeof FANTASY_DATA !== "undefined" && FANTASY_DATA[lg]) {
+      FANTASY_DATA[lg].injuries = injuries;
+      FANTASY_DATA[lg].playerNews = playerNews;
       if (window.__zoneus_refresh__) window.__zoneus_refresh__();
     }
 
