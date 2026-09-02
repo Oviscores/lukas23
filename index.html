@@ -5672,6 +5672,35 @@ async function fetchFantasyData(lg) {
       if (window.__zoneus_refresh__) window.__zoneus_refresh__();
     }
 
+    // MLB : lanceurs partants + lineups
+    if (lg === 'MLB') {
+      try {
+        var today = new Date().toISOString().split('T')[0];
+        var mlbR = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_lineups&date=' + today);
+        var mlbD = await mlbR.json();
+        var games = (mlbD.dates && mlbD.dates[0] && mlbD.dates[0].games) || [];
+        var pitchers = [], lineups = [];
+        games.forEach(function(g) {
+          var homeTeam = (g.teams && g.teams.home && g.teams.home.team && g.teams.home.team.abbreviation) || '';
+          var awayTeam = (g.teams && g.teams.away && g.teams.away.team && g.teams.away.team.abbreviation) || '';
+          var homePitcher = (g.teams && g.teams.home && g.teams.home.probablePitcher && g.teams.home.probablePitcher.fullName) || '—';
+          var awayPitcher = (g.teams && g.teams.away && g.teams.away.probablePitcher && g.teams.away.probablePitcher.fullName) || '—';
+          pitchers.push({ team: awayTeam, name: awayPitcher, opp: '@ ' + homeTeam, status: 'PROBABLE', sc: '#f59e0b', pos: 'SP' });
+          pitchers.push({ team: homeTeam, name: homePitcher, opp: 'vs ' + awayTeam, status: 'PROBABLE', sc: '#f59e0b', pos: 'SP' });
+          var homeLineup = (g.lineups && g.lineups.homePlayers) || [];
+          var awayLineup = (g.lineups && g.lineups.awayPlayers) || [];
+          if (homeLineup.length > 0) lineups.push({ team: homeTeam, players: homeLineup.slice(0,9).map(function(p){ return { name: p.fullName||'', pos: (p.primaryPosition && p.primaryPosition.abbreviation)||'' }; }) });
+          if (awayLineup.length > 0) lineups.push({ team: awayTeam, players: awayLineup.slice(0,9).map(function(p){ return { name: p.fullName||'', pos: (p.primaryPosition && p.primaryPosition.abbreviation)||'' }; }) });
+        });
+        if (typeof FANTASY_DATA !== 'undefined' && FANTASY_DATA['MLB']) {
+          if (pitchers.length > 0) FANTASY_DATA['MLB'].startingGoalies = pitchers;
+          if (lineups.length > 0) FANTASY_DATA['MLB'].lineups = lineups;
+          if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+        }
+        console.log('MLB pitchers:', pitchers.length, 'lineups:', lineups.length);
+      } catch(e2) { console.log('MLB lineups error:', e2); }
+    }
+
   } catch(e) {
     console.log(lg + ' fantasy error:', e);
     window.__FANTASY_LOADED__[lg] = false;
