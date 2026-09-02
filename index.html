@@ -5679,5 +5679,177 @@ async function fetchFantasyData(lg) {
 }
 
 </script>
+<script>
+window.__FANTASY_LOADED__ = {};
+async function fetchFantasyData(lg) {
+  if (window.__FANTASY_LOADED__[lg]) return;
+  window.__FANTASY_LOADED__[lg] = true;
+
+  var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+  var sportMap = { NHL: 'hockey/nhl', NFL: 'football/nfl', NBA: 'basketball/nba', MLB: 'baseball/mlb' };
+  var sport = sportMap[lg];
+  if (!sport) return;
+
+  try {
+    var r = await fetch('https://site.api.espn.com/apis/site/v2/sports/' + sport + '/injuries');
+    var d = await r.json();
+    var injuries = [], playerNews = [];
+
+    if (d && d.injuries) {
+      d.injuries.forEach(function(team) {
+        (team.injuries || []).forEach(function(inj) {
+          var athlete = inj.athlete || {};
+          var status = inj.status || '';
+          var detail = (inj.details && inj.details.detail) || inj.longComment || '';
+          var returnDate = (inj.details && inj.details.returnDate) || '';
+          var pos = (athlete.position && athlete.position.abbreviation) || '';
+          var name = athlete.displayName || athlete.fullName || '';
+          var teamAbr = (athlete.team && athlete.team.abbreviation) || team.abbreviation || '';
+          var statusLabel = 'OUT', statusColor = '#ef4444';
+          var sl = status.toLowerCase();
+          if (sl.includes('day') || sl.includes('dtd')) { statusLabel = 'DTD'; statusColor = '#f59e0b'; }
+          else if (sl.includes('questionable')) { statusLabel = 'QST'; statusColor = '#f59e0b'; }
+          else if (sl.includes('probable')) { statusLabel = 'PROB'; statusColor = '#16a34a'; }
+          else if (sl.includes('active')) { statusLabel = 'ACTIF'; statusColor = '#16a34a'; }
+          if (name) {
+            injuries.push({ player: name, team: teamAbr, pos: pos, status: statusLabel, detail: detail.slice(0, 80) || status, retour: returnDate || '—', sc: statusColor });
+            if (detail) playerNews.push({ time: new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}), player: name, team: teamAbr, news: detail.slice(0, 120), status: statusLabel, sc: statusColor });
+          }
+        });
+      });
+    }
+
+    injuries = injuries.slice(0, 20);
+    playerNews = playerNews.slice(0, 10);
+
+    // MLB : lanceurs partants + lineups
+    if (lg === 'MLB') {
+      try {
+        var today = new Date().toISOString().split('T')[0];
+        var mlbR = await fetch(PROXY + '?league=mlb_lineups&date=' + today);
+        var mlbD = await mlbR.json();
+        var games = (mlbD.dates && mlbD.dates[0] && mlbD.dates[0].games) || [];
+        var pitchers = [], lineups = [];
+
+        games.forEach(function(g) {
+          var homeTeam = (g.teams && g.teams.home && g.teams.home.team && g.teams.home.team.abbreviation) || '';
+          var awayTeam = (g.teams && g.teams.away && g.teams.away.team && g.teams.away.team.abbreviation) || '';
+          var homePitcher = (g.teams && g.teams.home && g.teams.home.probablePitcher && g.teams.home.probablePitcher.fullName) || '—';
+          var awayPitcher = (g.teams && g.teams.away && g.teams.away.probablePitcher && g.teams.away.probablePitcher.fullName) || '—';
+          pitchers.push({ team: awayTeam, pitcher: awayPitcher, opp: '@ ' + homeTeam });
+          pitchers.push({ team: homeTeam, pitcher: homePitcher, opp: 'vs ' + awayTeam });
+          var homeLineup = (g.lineups && g.lineups.homePlayers) || [];
+          var awayLineup = (g.lineups && g.lineups.awayPlayers) || [];
+          if (homeLineup.length > 0) lineups.push({ team: homeTeam, players: homeLineup.slice(0,9).map(function(p){ return { name: p.fullName||'', pos: (p.primaryPosition && p.primaryPosition.abbreviation)||'' }; }) });
+          if (awayLineup.length > 0) lineups.push({ team: awayTeam, players: awayLineup.slice(0,9).map(function(p){ return { name: p.fullName||'', pos: (p.primaryPosition && p.primaryPosition.abbreviation)||'' }; }) });
+        });
+
+        if (typeof FANTASY_DATA !== 'undefined' && FANTASY_DATA['MLB']) {
+          if (pitchers.length > 0) FANTASY_DATA['MLB'].startingGoalies = pitchers;
+          if (lineups.length > 0) FANTASY_DATA['MLB'].lineups = lineups;
+        }
+        console.log('MLB pitchers:', pitchers.length, 'lineups:', lineups.length);
+      } catch(e2) { console.log('MLB lineups error:', e2); }
+    }
+
+    console.log(lg + ' fantasy OK — injuries:', injuries.length);
+    if (typeof FANTASY_DATA !== 'undefined' && FANTASY_DATA[lg]) {
+      FANTASY_DATA[lg].injuries = injuries;
+      FANTASY_DATA[lg].playerNews = playerNews;
+      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+    }
+  } catch(e) {
+    console.log(lg + ' fantasy error:', e);
+    window.__FANTASY_LOADED__[lg] = false;
+  }
+}
+
+</script>
+<script>
+window.__FANTASY_LOADED__ = {};
+async function fetchFantasyData(lg) {
+  if (window.__FANTASY_LOADED__[lg]) return;
+  window.__FANTASY_LOADED__[lg] = true;
+
+  var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+  var sportMap = { NHL: 'hockey/nhl', NFL: 'football/nfl', NBA: 'basketball/nba', MLB: 'baseball/mlb' };
+  var sport = sportMap[lg];
+  if (!sport) return;
+
+  try {
+    var r = await fetch('https://site.api.espn.com/apis/site/v2/sports/' + sport + '/injuries');
+    var d = await r.json();
+    var injuries = [], playerNews = [];
+
+    if (d && d.injuries) {
+      d.injuries.forEach(function(team) {
+        (team.injuries || []).forEach(function(inj) {
+          var athlete = inj.athlete || {};
+          var status = inj.status || '';
+          var detail = (inj.details && inj.details.detail) || inj.longComment || '';
+          var returnDate = (inj.details && inj.details.returnDate) || '';
+          var pos = (athlete.position && athlete.position.abbreviation) || '';
+          var name = athlete.displayName || athlete.fullName || '';
+          var teamAbr = (athlete.team && athlete.team.abbreviation) || team.abbreviation || '';
+          var statusLabel = 'OUT', statusColor = '#ef4444';
+          var sl = status.toLowerCase();
+          if (sl.includes('day') || sl.includes('dtd')) { statusLabel = 'DTD'; statusColor = '#f59e0b'; }
+          else if (sl.includes('questionable')) { statusLabel = 'QST'; statusColor = '#f59e0b'; }
+          else if (sl.includes('probable')) { statusLabel = 'PROB'; statusColor = '#16a34a'; }
+          else if (sl.includes('active')) { statusLabel = 'ACTIF'; statusColor = '#16a34a'; }
+          if (name) {
+            injuries.push({ player: name, team: teamAbr, pos: pos, status: statusLabel, detail: detail.slice(0, 80) || status, retour: returnDate || '—', sc: statusColor });
+            if (detail) playerNews.push({ time: new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}), player: name, team: teamAbr, news: detail.slice(0, 120), status: statusLabel, sc: statusColor });
+          }
+        });
+      });
+    }
+
+    injuries = injuries.slice(0, 20);
+    playerNews = playerNews.slice(0, 10);
+
+    // MLB : lanceurs partants + lineups
+    if (lg === 'MLB') {
+      try {
+        var today = new Date().toISOString().split('T')[0];
+        var mlbR = await fetch(PROXY + '?league=mlb_lineups&date=' + today);
+        var mlbD = await mlbR.json();
+        var games = (mlbD.dates && mlbD.dates[0] && mlbD.dates[0].games) || [];
+        var pitchers = [], lineups = [];
+
+        games.forEach(function(g) {
+          var homeTeam = (g.teams && g.teams.home && g.teams.home.team && g.teams.home.team.abbreviation) || '';
+          var awayTeam = (g.teams && g.teams.away && g.teams.away.team && g.teams.away.team.abbreviation) || '';
+          var homePitcher = (g.teams && g.teams.home && g.teams.home.probablePitcher && g.teams.home.probablePitcher.fullName) || '—';
+          var awayPitcher = (g.teams && g.teams.away && g.teams.away.probablePitcher && g.teams.away.probablePitcher.fullName) || '—';
+          pitchers.push({ team: awayTeam, pitcher: awayPitcher, opp: '@ ' + homeTeam });
+          pitchers.push({ team: homeTeam, pitcher: homePitcher, opp: 'vs ' + awayTeam });
+          var homeLineup = (g.lineups && g.lineups.homePlayers) || [];
+          var awayLineup = (g.lineups && g.lineups.awayPlayers) || [];
+          if (homeLineup.length > 0) lineups.push({ team: homeTeam, players: homeLineup.slice(0,9).map(function(p){ return { name: p.fullName||'', pos: (p.primaryPosition && p.primaryPosition.abbreviation)||'' }; }) });
+          if (awayLineup.length > 0) lineups.push({ team: awayTeam, players: awayLineup.slice(0,9).map(function(p){ return { name: p.fullName||'', pos: (p.primaryPosition && p.primaryPosition.abbreviation)||'' }; }) });
+        });
+
+        if (typeof FANTASY_DATA !== 'undefined' && FANTASY_DATA['MLB']) {
+          if (pitchers.length > 0) FANTASY_DATA['MLB'].startingGoalies = pitchers;
+          if (lineups.length > 0) FANTASY_DATA['MLB'].lineups = lineups;
+        }
+        console.log('MLB pitchers:', pitchers.length, 'lineups:', lineups.length);
+      } catch(e2) { console.log('MLB lineups error:', e2); }
+    }
+
+    console.log(lg + ' fantasy OK — injuries:', injuries.length);
+    if (typeof FANTASY_DATA !== 'undefined' && FANTASY_DATA[lg]) {
+      FANTASY_DATA[lg].injuries = injuries;
+      FANTASY_DATA[lg].playerNews = playerNews;
+      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+    }
+  } catch(e) {
+    console.log(lg + ' fantasy error:', e);
+    window.__FANTASY_LOADED__[lg] = false;
+  }
+}
+
+</script>
 </body>
 </html>
