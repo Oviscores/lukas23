@@ -4133,7 +4133,10 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack }) {
             /* @__PURE__ */ React.createElement("div", { style: { width: 16, height: 16, borderRadius: 2, background: tc2.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } },
               /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 900, color: tc2.fg } }, p.team)
             ),
-            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 700, color: "#111" } }, p.player)
+            /* @__PURE__ */ React.createElement("div", null,
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 700, color: "#111" } }, p.player),
+              p.detail && /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#666" } }, p.detail)
+            )
           ),
           /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: p.sc, background: p.sc + "18", padding: "1px 4px", borderRadius: 2, textAlign: "center" } }, p.status),
           /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888", textAlign: "right" } }, p.retour)
