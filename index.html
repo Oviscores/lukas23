@@ -4268,7 +4268,7 @@ function FantasyPageMLB({ lg, onPlayerClick, onBack }) {
     }).map(function(p, pi) {
       return /* @__PURE__ */ React.createElement("div", { key: pi, style: { display: "flex", gap: 6, marginBottom: 3, padding: "3px 0", borderBottom: "1px solid rgba(0,0,0,0.03)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: lc, padding: "1px 5px", borderRadius: 2, flexShrink: 0 } }, p.label), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 12, color: "#333" } }, p.val));
     }));
-  })), fd.milestones && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: "MILESTONE \u2014 \xC0 SUIVRE CE SOIR" }), fd.milestones.map(function(m, i) {
+  })), false && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: "MILESTONE \u2014 \xC0 SUIVRE CE SOIR" }), fd.milestones.map(function(m, i) {
     var tc2 = TC[m.team + "_" + lg] || { bg: lc, fg: "#fff" };
     var pct = Math.round(m.current / m.target * 100);
     var pl = (PLAYERS_DB[lg] || []).find(function(p) {
