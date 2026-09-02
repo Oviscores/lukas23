@@ -5685,8 +5685,8 @@ async function fetchFantasyData(lg) {
           var awayTeam = (g.teams && g.teams.away && g.teams.away.team && g.teams.away.team.abbreviation) || '';
           var homePitcher = (g.teams && g.teams.home && g.teams.home.probablePitcher && g.teams.home.probablePitcher.fullName) || '—';
           var awayPitcher = (g.teams && g.teams.away && g.teams.away.probablePitcher && g.teams.away.probablePitcher.fullName) || '—';
-          pitchers.push({ team: awayTeam, name: awayPitcher, opp: '@ ' + homeTeam, status: 'PROBABLE', sc: '#f59e0b', pos: 'SP' });
-          pitchers.push({ team: homeTeam, name: homePitcher, opp: 'vs ' + awayTeam, status: 'PROBABLE', sc: '#f59e0b', pos: 'SP' });
+          pitchers.push({ team: awayTeam, name: awayPitcher, opp: homeTeam, ha: 'V', conf: 'PROBABLE', sc: '#f59e0b', pos: 'SP', record: '', gaa: null, svp: null });
+          pitchers.push({ team: homeTeam, name: homePitcher, opp: awayTeam, ha: 'D', conf: 'PROBABLE', sc: '#f59e0b', pos: 'SP', record: '', gaa: null, svp: null });
           var homeLineup = (g.lineups && g.lineups.homePlayers) || [];
           var awayLineup = (g.lineups && g.lineups.awayPlayers) || [];
           if (homeLineup.length > 0) lineups.push({ team: homeTeam, players: homeLineup.slice(0,9).map(function(p){ return { name: p.fullName||'', pos: (p.primaryPosition && p.primaryPosition.abbreviation)||'' }; }) });
