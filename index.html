@@ -5691,8 +5691,8 @@ async function fetchFantasyData(lg) {
     });
 
     // Limiter
-    injuries = injuries.slice(0, 20);
-    playerNews = playerNews.slice(0, 10);
+    injuries = injuries.slice(0, 200);
+    playerNews = playerNews.slice(0, 30);
 
     console.log(lg + ' fantasy OK — injuries:', injuries.length, 'news:', playerNews.length);
 
