@@ -123,6 +123,9 @@ const NBA_IDS = {"ATL":1610612737,"BOS":1610612738,"BKN":1610612751,"CHA":161061
 function getTeamLogo(abbr, lg, sz) {
   sz = sz || 28;
   if (!abbr || !lg) return React.createElement('div', { style: { width: sz, height: sz } });
+  // Fix ESPN abbreviations
+  var abbrMap = { AZ: 'ARI', WSH: 'WSH', SD: 'SD', KC: 'KC', SF: 'SF' };
+  if (lg === 'MLB' && abbrMap[abbr]) abbr = abbrMap[abbr];
   var src = 'https://zoneus-proxy.vivienfrappier.workers.dev?logo=' + abbr + '&lg=' + lg;
   var actualSz = lg === 'NHL' ? Math.round(sz * 1.35) : sz;
   var s = { width: actualSz, height: actualSz, objectFit: 'contain', flexShrink: 0, display: 'block' };
