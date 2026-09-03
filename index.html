@@ -4913,9 +4913,9 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   }
   function goScore(g, lg) {
     goMatch({
-      id: g.away + "-" + g.home,
+      id: g.id || (g.away + "-" + g.home),
       lg,
-      status: "FINAL",
+      status: g.st === "Final" ? "FINAL" : g.st === "Live" ? "LIVE" : (g.st || "FINAL"),
       period: "Final",
       homeTeam: g.home,
       awayTeam: g.away,
