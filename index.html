@@ -4687,12 +4687,19 @@ function ZoneUS() {
   const [arts, setArts] = useState(ARTICLES);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
-  const [page, setPage] = useState("home");
+  const _pageState = useState(window.location.hash ? window.location.hash.slice(1) : "home");
+  const page = _pageState[0];
+  const _setPage = _pageState[1];
+  const setPage = function(p) {
+    _setPage(p);
+    window.location.hash = p === "home" ? "" : p;
+  };
   const [prevPage, setPrevPage] = useState("home");
   const [statFull, setStatFull] = useState(null);
   const navigate = (p) => {
     setPrevPage(page);
     setPage(p);
+    window.location.hash = p === "home" ? "" : p;
   };
   const [selArticle, setSelArticle] = useState(null);
   const [selPlayer, setSelPlayer] = useState(null);
