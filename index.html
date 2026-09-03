@@ -3415,6 +3415,53 @@ function MatchPage({ match, onBack }) {
               )
             )
           ),
+          /* Diamant coureurs en base */
+          boxscore.data.linescore && boxscore.data.linescore.offense !== undefined && /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 16px 0 16px" } },
+            /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#999", letterSpacing: "0.1em", marginBottom: 8 } }, "COUREURS EN BASE"),
+            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 16 } },
+              /* Diamant SVG */
+              /* @__PURE__ */ React.createElement("svg", { width: 80, height: 80, viewBox: "0 0 80 80" },
+                /* Base du bas (home) */
+                /* @__PURE__ */ React.createElement("polygon", { points: "40,70 50,60 40,50 30,60", fill: "#fff", stroke: "#ccc", strokeWidth: 1.5 }),
+                /* 1ère base (droite) */
+                /* @__PURE__ */ React.createElement("polygon", { points: "65,45 75,35 65,25 55,35",
+                  fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.first ? lc : "#fff",
+                  stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.first ? lc : "#ccc",
+                  strokeWidth: 1.5 }),
+                /* 2ème base (haut) */
+                /* @__PURE__ */ React.createElement("polygon", { points: "40,20 50,10 40,0 30,10",
+                  fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.second ? lc : "#fff",
+                  stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.second ? lc : "#ccc",
+                  strokeWidth: 1.5 }),
+                /* 3ème base (gauche) */
+                /* @__PURE__ */ React.createElement("polygon", { points: "15,45 25,35 15,25 5,35",
+                  fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.third ? lc : "#fff",
+                  stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.third ? lc : "#ccc",
+                  strokeWidth: 1.5 }),
+                /* Lignes du diamant */
+                /* @__PURE__ */ React.createElement("line", { x1: 40, y1: 55, x2: 60, y2: 35, stroke: "#ddd", strokeWidth: 1 }),
+                /* @__PURE__ */ React.createElement("line", { x1: 60, y1: 35, x2: 40, y2: 15, stroke: "#ddd", strokeWidth: 1 }),
+                /* @__PURE__ */ React.createElement("line", { x1: 40, y1: 15, x2: 20, y2: 35, stroke: "#ddd", strokeWidth: 1 }),
+                /* @__PURE__ */ React.createElement("line", { x1: 20, y1: 35, x2: 40, y2: 55, stroke: "#ddd", strokeWidth: 1 })
+              ),
+              /* Info frappeur */
+              /* @__PURE__ */ React.createElement("div", null,
+                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#999", marginBottom: 2 } }, "AU BÂTON"),
+                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800 } },
+                  boxscore.data.linescore.offense && boxscore.data.linescore.offense.batter ? boxscore.data.linescore.offense.batter.fullName : '—'
+                ),
+                boxscore.data.linescore.offense && boxscore.data.linescore.offense.first && /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: lc, marginTop: 4 } },
+                  "1B: " + boxscore.data.linescore.offense.first.fullName
+                ),
+                boxscore.data.linescore.offense && boxscore.data.linescore.offense.second && /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: lc, marginTop: 2 } },
+                  "2B: " + boxscore.data.linescore.offense.second.fullName
+                ),
+                boxscore.data.linescore.offense && boxscore.data.linescore.offense.third && /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: lc, marginTop: 2 } },
+                  "3B: " + boxscore.data.linescore.offense.third.fullName
+                )
+              )
+            )
+          ),
           /* Scoreurs complets */
           boxscore.data.boxscore && boxscore.data.boxscore.teams && /* @__PURE__ */ React.createElement("div", null,
             [['home', match.homeTeam], ['away', match.awayTeam]].map(function(teamInfo) {
