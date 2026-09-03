@@ -3577,7 +3577,7 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
               if (d.date <= today) {
                 (d.matches||[]).forEach(function(m) {
                   if (m.st==='Final'||m.st==='Live') {
-                    all.push({away:m.away,home:m.home,as:m.as,hs:m.hs,st:m.st,date:d.date});
+                    all.push({id:m.id,away:m.away,home:m.home,as:m.as,hs:m.hs,st:m.st,date:d.date});
                   }
                 });
               }
