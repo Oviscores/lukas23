@@ -3193,63 +3193,7 @@ function ScoreCard({ g, lg, onMatchClick }) {
     [{ id: g.away, sc: g.as, win: !hw }, { id: g.home, sc: g.hs, win: hw }].map((t, ti) => /* @__PURE__ */ React.createElement("div", { key: ti, style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3 } }, /* @__PURE__ */ getTeamLogo(t.id, lg, 33), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: t.win ? 700 : 500, color: t.win ? "#111" : "#555" } }, t.id)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: t.win ? 800 : 600, color: t.win ? "#111" : "#666" } }, g.st === "UPCOMING" ? (ti === 0 ? (g.dateLabel || g.date || "") : (g.time || "")) : (t.sc !== null && t.sc !== undefined ? t.sc : "-"))))
   );
 }
-function NewsletterWidget() {
-  const [email, setEmail] = useState("");
-  const [st, setSt] = useState(null);
-  function sub() {
-    return __async(this, null, function* () {
-      if (!email.includes("@")) {
-        setSt("err");
-        return;
-      }
-      setSt("load");
-      yield new Promise((r) => setTimeout(r, 800));
-      setSt("ok");
-    });
-  }
-  if (st === "ok") return /* @__PURE__ */ React.createElement("div", { style: { padding: "5px 10px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 16, marginBottom: 4 } }, "\u2705"), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#16a34a" } }, "Inscrit !"));
-  return /* @__PURE__ */ React.createElement("div", { style: { padding: "10px" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "#666", marginBottom: 8, lineHeight: 1.4 } }, "Brief quotidien : scores, actus, fantasy."), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "email",
-      placeholder: "votre@email.com",
-      value: email,
-      onChange: (e) => setEmail(e.target.value),
-      onKeyDown: (e) => e.key === "Enter" && sub(),
-      style: {
-        width: "100%",
-        padding: "5px 8px",
-        fontFamily: "'Barlow',sans-serif",
-        fontSize: 8,
-        border: "1px solid " + (st === "err" ? "#dc2626" : "#ddd"),
-        borderRadius: 3,
-        outline: "none",
-        marginBottom: 6,
-        boxSizing: "border-box"
-      }
-    }
-  ), /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      onClick: sub,
-      disabled: st === "load",
-      style: {
-        width: "100%",
-        background: "#D50A0A",
-        color: "#fff",
-        border: "none",
-        borderRadius: 3,
-        padding: "6px 0",
-        fontFamily: "'Barlow Condensed',sans-serif",
-        fontSize: 9,
-        fontWeight: 900,
-        cursor: "pointer",
-        opacity: st === "load" ? 0.7 : 1
-      }
-    },
-    st === "load" ? "..." : "S'INSCRIRE"
-  ), st === "err" && /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "#dc2626", marginTop: 4 } }, "Email invalide"));
-}
+
 function RosterSection({ match, hc, ac }) {
   const lg = match.lg;
   const key = match.awayTeam + "-" + match.homeTeam;
@@ -3833,7 +3777,7 @@ function RightCol({ feed, statsVersion, onGen, generating, genLg, onArticleClick
     return /* @__PURE__ */ React.createElement("div", { key: lg, style: bs }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 14, letterSpacing: "0.12em", color: "#fff" } }, "LEADERS ", lg), /* @__PURE__ */ React.createElement(LB, { lg, sz: 12 })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", borderBottom: "1px solid rgba(0,0,0,0.06)", overflowX: "auto" } }, lgStats.map((s, i) => /* @__PURE__ */ React.createElement("button", { key: i, onClick: () => setTab(i), style: { flex: 1, background: "none", border: "none", borderBottom: tab === i ? "2px solid " + lc2 : "2px solid transparent", color: tab === i ? lc2 : "#888", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 800, padding: "3px 1px", cursor: "pointer", whiteSpace: "nowrap" } }, s.label))), cat.players.slice(0, 5).map((p, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 5, padding: "3px 7px", borderBottom: "1px solid rgba(0,0,0,0.04)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: i === 0 ? lc2 : "#999", width: 10, textAlign: "center" } }, i + 1), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, p.name), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, color: i === 0 ? lc2 : "#444" } }, p.val))), /* @__PURE__ */ React.createElement(MoreBtn, { label: "+ de stats", onClick: () => {
       if (onMoreStats) onMoreStats(lg);
     } }));
-  }), /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "NEWSLETTER", color: "#111" }), /* @__PURE__ */ React.createElement(NewsletterWidget, null)));
+  }));
 }
 const FANTASY_DATA = window.FANTASY_DATA = {
   NHL: {
