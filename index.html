@@ -3412,21 +3412,42 @@ function MatchPage({ match, onBack }) {
               )
             )
           ),
-          /* Top Performers */
-          boxscore.data.boxscore && boxscore.data.boxscore.topPerformers && /* @__PURE__ */ React.createElement("div", null,
-            /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#999", letterSpacing: "0.1em", marginBottom: 6 } }, "TOP PERFORMERS"),
-            boxscore.data.boxscore.topPerformers.slice(0, 6).map(function(perf, i) {
-              var p = perf.player || {};
-              var stats = p.stats || {};
-              var batting = stats.batting || {};
-              var pitching = stats.pitching || {};
-              var summary = batting.summary || pitching.summary || '';
-              return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
-                React.createElement("div", null,
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800 } }, p.person && p.person.fullName || ''),
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888", marginLeft: 6 } }, p.position && p.position.abbreviation || '')
-                ),
-                React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: lc } }, summary)
+          /* Scoreurs complets */
+          boxscore.data.boxscore && boxscore.data.boxscore.teams && /* @__PURE__ */ React.createElement("div", null,
+            [['home', match.homeTeam], ['away', match.awayTeam]].map(function(teamInfo) {
+              var side = teamInfo[0], teamAb = teamInfo[1];
+              var teamData = boxscore.data.boxscore.teams[side];
+              if (!teamData) return null;
+              var players = teamData.players || {};
+              var batters = (teamData.batters || []).map(function(id) {
+                var p = players['ID' + id];
+                if (!p) return null;
+                var bat = p.stats && p.stats.batting || {};
+                if (!bat.atBats && !bat.baseOnBalls) return null;
+                return { name: p.person && p.person.fullName || '', pos: p.position && p.position.abbreviation || '', summary: bat.summary || '' };
+              }).filter(Boolean);
+              var pitchers = (teamData.pitchers || []).map(function(id) {
+                var p = players['ID' + id];
+                if (!p) return null;
+                var pit = p.stats && p.stats.pitching || {};
+                if (!pit.inningsPitched) return null;
+                return { name: p.person && p.person.fullName || '', pos: 'P', summary: pit.summary || '' };
+              }).filter(Boolean);
+              return React.createElement("div", { key: side, style: { marginBottom: 12 } },
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#fff", background: side === 'home' ? hc.bg : ac.bg, padding: "3px 8px", marginBottom: 4 } }, teamAb + " — FRAPPEURS"),
+                batters.map(function(p, i) {
+                  return React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", padding: "3px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", fontSize: 11 } },
+                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700 } }, p.pos + " " + p.name),
+                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", color: lc, fontWeight: 800 } }, p.summary)
+                  );
+                }),
+                pitchers.length > 0 && React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#fff", background: side === 'home' ? hc.bg : ac.bg, padding: "3px 8px", marginTop: 6, marginBottom: 4 } }, teamAb + " — LANCEURS"),
+                pitchers.map(function(p, i) {
+                  return React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", padding: "3px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", fontSize: 11 } },
+                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700 } }, p.name),
+                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", color: lc, fontWeight: 800 } }, p.summary)
+                  );
+                })
               );
             })
           )
