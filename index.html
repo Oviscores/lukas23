@@ -3415,49 +3415,78 @@ function MatchPage({ match, onBack }) {
               )
             )
           ),
-          /* Diamant coureurs en base */
-          boxscore.data.linescore && boxscore.data.linescore.offense !== undefined && /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 16px 0 16px" } },
-            /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#999", letterSpacing: "0.1em", marginBottom: 8 } }, "COUREURS EN BASE"),
-            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 16 } },
-              /* Diamant SVG */
-              /* @__PURE__ */ React.createElement("svg", { width: 80, height: 80, viewBox: "0 0 80 80" },
-                /* Base du bas (home) */
-                /* @__PURE__ */ React.createElement("polygon", { points: "40,70 50,60 40,50 30,60", fill: "#fff", stroke: "#ccc", strokeWidth: 1.5 }),
-                /* 1ère base (droite) */
-                /* @__PURE__ */ React.createElement("polygon", { points: "65,45 75,35 65,25 55,35",
-                  fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.first ? lc : "#fff",
-                  stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.first ? lc : "#ccc",
-                  strokeWidth: 1.5 }),
-                /* 2ème base (haut) */
-                /* @__PURE__ */ React.createElement("polygon", { points: "40,20 50,10 40,0 30,10",
-                  fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.second ? lc : "#fff",
-                  stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.second ? lc : "#ccc",
-                  strokeWidth: 1.5 }),
-                /* 3ème base (gauche) */
-                /* @__PURE__ */ React.createElement("polygon", { points: "15,45 25,35 15,25 5,35",
-                  fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.third ? lc : "#fff",
-                  stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.third ? lc : "#ccc",
-                  strokeWidth: 1.5 }),
-                /* Lignes du diamant */
-                /* @__PURE__ */ React.createElement("line", { x1: 40, y1: 55, x2: 60, y2: 35, stroke: "#ddd", strokeWidth: 1 }),
-                /* @__PURE__ */ React.createElement("line", { x1: 60, y1: 35, x2: 40, y2: 15, stroke: "#ddd", strokeWidth: 1 }),
-                /* @__PURE__ */ React.createElement("line", { x1: 40, y1: 15, x2: 20, y2: 35, stroke: "#ddd", strokeWidth: 1 }),
-                /* @__PURE__ */ React.createElement("line", { x1: 20, y1: 35, x2: 40, y2: 55, stroke: "#ddd", strokeWidth: 1 })
+          /* Diamant coureurs en base - design soigné */
+          boxscore.data.linescore && boxscore.data.linescore.offense !== undefined && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } },
+            /* Header */
+            /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "SITUATION DU MATCH")
+            ),
+            /* Contenu centré */
+            /* @__PURE__ */ React.createElement("div", { style: { padding: "20px 16px 16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 20 } },
+              /* Diamant SVG grand */
+              /* @__PURE__ */ React.createElement("div", { style: { position: "relative", width: 160, height: 160 } },
+                /* @__PURE__ */ React.createElement("svg", { width: 160, height: 160, viewBox: "0 0 160 160", style: { display: "block" } },
+                  /* Fond herbe */
+                  /* @__PURE__ */ React.createElement("rect", { x: 0, y: 0, width: 160, height: 160, fill: "#e8f5e9", rx: 6 }),
+                  /* Lignes du diamant (foul lines) */
+                  /* @__PURE__ */ React.createElement("line", { x1: 80, y1: 140, x2: 130, y2: 80, stroke: "#c8e6c9", strokeWidth: 1 }),
+                  /* @__PURE__ */ React.createElement("line", { x1: 80, y1: 140, x2: 30, y2: 80, stroke: "#c8e6c9", strokeWidth: 1 }),
+                  /* Montant du lanceur */
+                  /* @__PURE__ */ React.createElement("circle", { cx: 80, cy: 80, r: 10, fill: "#a5d6a7", stroke: "#81c784", strokeWidth: 1.5 }),
+                  /* Home plate */
+                  /* @__PURE__ */ React.createElement("polygon", { points: "80,148 90,138 90,128 70,128 70,138", fill: "#fff", stroke: "#999", strokeWidth: 1.5 }),
+                  /* 1ère base (droite) */
+                  /* @__PURE__ */ React.createElement("rect", { x: 115, y: 68, width: 20, height: 20, rx: 2, transform: "rotate(45 125 78)",
+                    fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.first ? lc : "#fff",
+                    stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.first ? lc : "#aaa",
+                    strokeWidth: 2, opacity: boxscore.data.linescore.offense && boxscore.data.linescore.offense.first ? 1 : 0.5 }),
+                  /* 2ème base (haut) */
+                  /* @__PURE__ */ React.createElement("rect", { x: 68, y: 18, width: 20, height: 20, rx: 2, transform: "rotate(45 78 28)",
+                    fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.second ? lc : "#fff",
+                    stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.second ? lc : "#aaa",
+                    strokeWidth: 2, opacity: boxscore.data.linescore.offense && boxscore.data.linescore.offense.second ? 1 : 0.5 }),
+                  /* 3ème base (gauche) */
+                  /* @__PURE__ */ React.createElement("rect", { x: 18, y: 68, width: 20, height: 20, rx: 2, transform: "rotate(45 28 78)",
+                    fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.third ? lc : "#fff",
+                    stroke: boxscore.data.linescore.offense && boxscore.data.linescore.offense.third ? lc : "#aaa",
+                    strokeWidth: 2, opacity: boxscore.data.linescore.offense && boxscore.data.linescore.offense.third ? 1 : 0.5 }),
+                  /* Labels bases */
+                  /* @__PURE__ */ React.createElement("text", { x: 125, y: 82, textAnchor: "middle", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.first ? "#fff" : "#888" }, "1"),
+                  /* @__PURE__ */ React.createElement("text", { x: 80, y: 32, textAnchor: "middle", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.second ? "#fff" : "#888" }, "2"),
+                  /* @__PURE__ */ React.createElement("text", { x: 35, y: 82, textAnchor: "middle", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, fill: boxscore.data.linescore.offense && boxscore.data.linescore.offense.third ? "#fff" : "#888" }, "3")
+                )
               ),
-              /* Info frappeur */
-              /* @__PURE__ */ React.createElement("div", null,
-                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#999", marginBottom: 2 } }, "AU BÂTON"),
-                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800 } },
-                  boxscore.data.linescore.offense && boxscore.data.linescore.offense.batter ? boxscore.data.linescore.offense.batter.fullName : '—'
+              /* Infos joueurs */
+              /* @__PURE__ */ React.createElement("div", { style: { width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } },
+                /* Frappeur */
+                /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.04)", borderRadius: 6, padding: "8px 12px", borderLeft: "3px solid " + lc } },
+                  /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#999", letterSpacing: "0.08em", marginBottom: 2 } }, "⚾ AU BÂTON"),
+                  /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111" } },
+                    boxscore.data.linescore.offense && boxscore.data.linescore.offense.batter ? boxscore.data.linescore.offense.batter.fullName : '—'
+                  )
                 ),
-                boxscore.data.linescore.offense && boxscore.data.linescore.offense.first && /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: lc, marginTop: 4 } },
-                  "1B: " + boxscore.data.linescore.offense.first.fullName
+                /* Lanceur */
+                /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.04)", borderRadius: 6, padding: "8px 12px", borderLeft: "3px solid #666" } },
+                  /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#999", letterSpacing: "0.08em", marginBottom: 2 } }, "🔥 LANCEUR"),
+                  /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111" } },
+                    boxscore.data.linescore.offense && boxscore.data.linescore.offense.pitcher ? boxscore.data.linescore.offense.pitcher.fullName : '—'
+                  )
+                )
+              ),
+              /* Coureurs en base si présents */
+              (boxscore.data.linescore.offense && (boxscore.data.linescore.offense.first || boxscore.data.linescore.offense.second || boxscore.data.linescore.offense.third)) && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", display: "flex", flexDirection: "column", gap: 4 } },
+                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#999", letterSpacing: "0.08em", marginBottom: 2 } }, "COUREURS"),
+                boxscore.data.linescore.offense.first && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+                  /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: lc, borderRadius: 3, padding: "1px 5px" } }, "1B"),
+                  /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#111" } }, boxscore.data.linescore.offense.first.fullName)
                 ),
-                boxscore.data.linescore.offense && boxscore.data.linescore.offense.second && /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: lc, marginTop: 2 } },
-                  "2B: " + boxscore.data.linescore.offense.second.fullName
+                boxscore.data.linescore.offense.second && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+                  /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: lc, borderRadius: 3, padding: "1px 5px" } }, "2B"),
+                  /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#111" } }, boxscore.data.linescore.offense.second.fullName)
                 ),
-                boxscore.data.linescore.offense && boxscore.data.linescore.offense.third && /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: lc, marginTop: 2 } },
-                  "3B: " + boxscore.data.linescore.offense.third.fullName
+                boxscore.data.linescore.offense.third && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+                  /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: lc, borderRadius: 3, padding: "1px 5px" } }, "3B"),
+                  /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#111" } }, boxscore.data.linescore.offense.third.fullName)
                 )
               )
             )
