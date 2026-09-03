@@ -5797,8 +5797,16 @@ async function fetchAllStatuts() {
     } catch(e) {}
   }
   if (allPlayers.length > 0 && window.PLAYERS) {
+    // Interleaver les 4 ligues pour avoir un mix dans "TOUS"
+    var byLg = { NHL: [], NFL: [], NBA: [], MLB: [] };
+    allPlayers.forEach(function(p) { if (byLg[p.lg]) byLg[p.lg].push(p); });
+    var mixed = [];
+    var max = Math.max(byLg.NHL.length, byLg.NFL.length, byLg.NBA.length, byLg.MLB.length);
+    for (var i = 0; i < max; i++) {
+      ['NHL','NFL','NBA','MLB'].forEach(function(lg) { if (byLg[lg][i]) mixed.push(byLg[lg][i]); });
+    }
     window.PLAYERS.length = 0;
-    allPlayers.forEach(function(p) { window.PLAYERS.push(p); });
+    mixed.forEach(function(p) { window.PLAYERS.push(p); });
     if (window.__zoneus_refresh__) window.__zoneus_refresh__();
     console.log('Statuts OK:', allPlayers.length);
   }
