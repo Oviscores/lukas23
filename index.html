@@ -684,7 +684,7 @@ const NEWS_FEED = [
   { league: "NFL", time: "09h10", text: "Draft : Raiders misent sur QB texan" },
   { league: "MLB", time: "08h45", text: "Judge : 500 HR en carriere a 34 ans" }
 ];
-const PLAYERS = [
+const PLAYERS = window.PLAYERS = [
   { name: "Connor McDavid", team: "EDM", pos: "C", lg: "NHL", st: "ABSENT", sc: "#dc2626" },
   { name: "Patrick Mahomes", team: "KC", pos: "QB", lg: "NFL", st: "INCERTAIN", sc: "#d97706" },
   { name: "LeBron James", team: "LAL", pos: "SF", lg: "NBA", st: "ACTIF", sc: "#16a34a" },
@@ -5762,6 +5762,42 @@ window.__FANTASY_LOADED__ = {};
 window.__FANTASY_LOADED__ = {};
 
 
+</script>
+<script>
+async function fetchAllStatuts() {
+  var sports = { NHL: 'hockey/nhl', NFL: 'football/nfl', NBA: 'basketball/nba', MLB: 'baseball/mlb' };
+  var allPlayers = [];
+  for (var lg in sports) {
+    try {
+      var r = await fetch('https://site.api.espn.com/apis/site/v2/sports/' + sports[lg] + '/injuries');
+      var d = await r.json();
+      if (!d || !d.injuries) continue;
+      d.injuries.forEach(function(team) {
+        (team.injuries || []).slice(0, 3).forEach(function(inj) {
+          var athlete = inj.athlete || {};
+          var name = athlete.displayName || athlete.fullName || '';
+          var teamAbr = (athlete.team && athlete.team.abbreviation) || team.abbreviation || '';
+          var pos = (athlete.position && athlete.position.abbreviation) || '';
+          var status = inj.status || '';
+          var sl = status.toLowerCase();
+          var st = 'ABSENT', sc = '#ef4444';
+          if (sl.includes('day') || sl.includes('dtd')) { st = 'INCERTAIN'; sc = '#f59e0b'; }
+          else if (sl.includes('questionable')) { st = 'INCERTAIN'; sc = '#f59e0b'; }
+          else if (sl.includes('probable')) { st = 'PROBABLE'; sc = '#84cc16'; }
+          else if (sl.includes('active')) { st = 'ACTIF'; sc = '#16a34a'; }
+          if (name) allPlayers.push({ name: name, team: teamAbr, pos: pos, lg: lg, st: st, sc: sc });
+        });
+      });
+    } catch(e) {}
+  }
+  if (allPlayers.length > 0 && window.PLAYERS) {
+    window.PLAYERS.length = 0;
+    allPlayers.forEach(function(p) { window.PLAYERS.push(p); });
+    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+    console.log('Statuts OK:', allPlayers.length);
+  }
+}
+setTimeout(fetchAllStatuts, 2000);
 </script>
 </body>
 </html>
