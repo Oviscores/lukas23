@@ -3316,6 +3316,7 @@ function MatchPage({ match, onBack }) {
   var _bl = React.useState(false); var bxLoading = _bl[0], setBxLoading = _bl[1];
   React.useEffect(function() {
     setBoxscore(null);
+    console.log('boxscore fetch:', match.lg, match.status, match.id);
     if (match.status !== 'FINAL' && match.status !== 'LIVE') return;
     setBxLoading(true);
     (async function() {
@@ -3334,7 +3335,7 @@ function MatchPage({ match, onBack }) {
       } catch(e) { console.log('boxscore error:', e); }
       setBxLoading(false);
     })();
-  }, [match.id || match.eventId]);
+  }, [match.id, match.eventId, match.status]);
   const lc = LG[match.lg].color;
   const dk = LG[match.lg].dark;
   const hk = match.homeTeam + "_" + match.lg;
