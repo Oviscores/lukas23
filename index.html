@@ -3518,6 +3518,8 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
   }, style: { display: "block", textAlign: "right", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, textDecoration: "none", marginBottom: 4 } }, "TOUS \u2192"))));
 }
 function RightCol({ feed, statsVersion, onGen, generating, genLg, onArticleClick, onMoreNews, onMorePlayers, onMoreStats, onPlayerClick }) {
+  var _slg = React.useState('ALL');
+  var selLgStatuts = _slg[0], setSelLgStatuts = _slg[1];
   const [stab, setStab] = useState(0);
   const [slg, setSlg] = useState("NHL");
   const [showAllFeed, setShowAllFeed] = useState(false);
@@ -3533,9 +3535,13 @@ function RightCol({ feed, statsVersion, onGen, generating, genLg, onArticleClick
   const Hd = ({ label, color }) => /* @__PURE__ */ React.createElement("div", { style: { background: color || "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 14, letterSpacing: "0.1em", color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, label));
   const MoreBtn = ({ label, onClick }) => /* @__PURE__ */ React.createElement("div", { onClick, style: { background: "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", whiteSpace: "nowrap" }, onMouseEnter: (e) => e.currentTarget.style.background = "rgba(40,40,40,0.85)", onMouseLeave: (e) => e.currentTarget.style.background = "rgba(20,20,20,0.75)" }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.12em", color: "#fff", whiteSpace: "nowrap" } }, label));
   const visibleFeed = showAllFeed ? feed : feed.slice(0, 5);
-  const visiblePlayers = showAllPlayers ? PLAYERS : PLAYERS.slice(0, 5);
+  var filteredPlayers = selLgStatuts === 'ALL' ? PLAYERS : PLAYERS.filter(function(p){ return p.lg === selLgStatuts; });
+  const visiblePlayers = showAllPlayers ? filteredPlayers : filteredPlayers.slice(0, 5);
   const visibleStats = showAllStats ? stats[stab].players : stats[stab].players.slice(0, 5);
-  return /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 8 } }, /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "STATUTS" }), visiblePlayers.map((p, i) => {
+  return /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 8 } }, /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "STATUTS" }), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, padding: "4px 8px", flexWrap: "wrap" } },
+      ["ALL","NHL","NFL","NBA","MLB"].map(function(lg, i) {
+        return /* @__PURE__ */ React.createElement("button", { key: i, onClick: function(){ setSelLgStatuts(lg); }, style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 3, border: "none", cursor: "pointer", background: selLgStatuts === lg ? "#222" : "rgba(0,0,0,0.06)", color: selLgStatuts === lg ? "#fff" : "#555" } }, lg === "ALL" ? "TOUS" : lg);
+      })), visiblePlayers.map((p, i) => {
     const pl = (PLAYERS_DB[p.lg] || []).find((x) => p.name.includes(x.name.split(" ").pop()));
     return /* @__PURE__ */ React.createElement(
       "div",
