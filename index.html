@@ -3078,14 +3078,14 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
   }
 
   function PlayerCard(props) {
-    var p = props.player, idx = props.idx, isCenter = props.isCenter;
-    var bg = isCenter ? "linear-gradient(135deg," + jerseyBg + " 0%,rgba(0,0,0,0.3) 100%)" : "rgba(255,255,255,0.06)";
-    var border = isCenter ? "1px solid " + jerseyBg : "1px solid rgba(255,255,255,0.1)";
+    var p = props.player, idx = props.idx, isCenter = props.isCenter, jBg = props.jBg || lc, jFg = props.jFg || "#fff";
+    var bg = isCenter ? "linear-gradient(135deg," + jBg + " 0%,rgba(0,0,0,0.3) 100%)" : "rgba(255,255,255,0.06)";
+    var border = isCenter ? "1px solid " + jBg : "1px solid rgba(255,255,255,0.1)";
     return /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: bg, border: border, borderRadius: 6, padding: "6px 4px 5px", textAlign: "center", minWidth: 0 } },
       React.createElement("svg", { width: 26, height: 30, viewBox: "0 0 36 42", style: { display: "block", margin: "0 auto 3px" } },
-        React.createElement("path", { d: "M9,8 L2,15 L8,19 L8,40 L28,40 L28,19 L34,15 L27,8 L22,4 C21,7 15,7 14,4 Z", fill: jerseyBg, stroke: "rgba(255,255,255,0.2)", strokeWidth: 0.8 }),
+        React.createElement("path", { d: "M9,8 L2,15 L8,19 L8,40 L28,40 L28,19 L34,15 L27,8 L22,4 C21,7 15,7 14,4 Z", fill: jBg, stroke: "rgba(255,255,255,0.2)", strokeWidth: 0.8 }),
         React.createElement("path", { d: "M14,4 C15,7 21,7 22,4 L20,3 C19,5 17,5 16,3 Z", fill: "rgba(255,255,255,0.2)" }),
-        React.createElement("text", { x: 18, y: 28, textAnchor: "middle", fontFamily: "'Barlow Condensed',Arial Narrow,sans-serif", fontSize: 13, fontWeight: 900, fill: jerseyFg }, p.num || '')
+        React.createElement("text", { x: 18, y: 28, textAnchor: "middle", fontFamily: "'Barlow Condensed',Arial Narrow,sans-serif", fontSize: 13, fontWeight: 900, fill: jFg }, p.num || '')
       ),
       React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: isCenter ? "#fff" : "rgba(255,255,255,0.85)", lineHeight: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, p.name || '—'),
       React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", marginTop: 1 } }, p.pos)
@@ -3098,9 +3098,9 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
       React.createElement("div", { style: { width: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.06)", borderRadius: 6, flexShrink: 0 } },
         React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: lc, writingMode: "vertical-lr", transform: "rotate(180deg)", letterSpacing: "0.1em" } }, "L" + num)
       ),
-      React.createElement(PlayerCard, { player: line[0], idx: 0, isCenter: false }),
-      React.createElement(PlayerCard, { player: line[1], idx: 1, isCenter: true }),
-      React.createElement(PlayerCard, { player: line[2], idx: 2, isCenter: false })
+      React.createElement(PlayerCard, { player: line[0], idx: 0, isCenter: false, jBg: jerseyBg, jFg: jerseyFg }),
+      React.createElement(PlayerCard, { player: line[1], idx: 1, isCenter: true, jBg: jerseyBg, jFg: jerseyFg }),
+      React.createElement(PlayerCard, { player: line[2], idx: 2, isCenter: false, jBg: jerseyBg, jFg: jerseyFg })
     );
   }
 
@@ -3110,8 +3110,8 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
       React.createElement("div", { style: { width: 26, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", borderRadius: 6, flexShrink: 0 } },
         React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "rgba(255,255,255,0.4)", writingMode: "vertical-lr", transform: "rotate(180deg)", letterSpacing: "0.1em" } }, "P" + num)
       ),
-      React.createElement(PlayerCard, { player: pair[0], idx: 0, isCenter: false }),
-      React.createElement(PlayerCard, { player: pair[1], idx: 1, isCenter: false })
+      React.createElement(PlayerCard, { player: pair[0], idx: 0, isCenter: false, jBg: jerseyBg, jFg: jerseyFg }),
+      React.createElement(PlayerCard, { player: pair[1], idx: 1, isCenter: false, jBg: jerseyBg, jFg: jerseyFg })
     );
   }
 
