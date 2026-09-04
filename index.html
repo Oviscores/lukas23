@@ -3035,14 +3035,14 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
     var defs = liveRoster.roster.defensemen || [];
     var gols = liveRoster.roster.goalies || [];
     function pShort(p) { return p ? (p.firstName && p.firstName.default ? p.firstName.default[0]+'. ' : '') + (p.lastName && p.lastName.default || '') : ''; }
-    // Trier par points décroissants via statsMap
-    function sortByPts(arr) {
-      return arr.slice().sort(function(a,b){ return ((statsMap[b.playerId]||{}).points||0) - ((statsMap[a.playerId]||{}).points||0); });
-    }
-    var statsFwds = (liveRoster.stats && liveRoster.stats.skaters || []);
+    // Trier par points décroissants via stats
     var statsMapFwd = {};
+    var statsFwds = (liveRoster.stats && liveRoster.stats.skaters) || [];
     statsFwds.forEach(function(s){ statsMapFwd[s.playerId] = s; });
-    var centres  = sortByPts(fwds.filter(function(p){ return p.positionCode === 'C'; }));
+    function sortByPts(arr) {
+      return arr.slice().sort(function(a,b){ return ((statsMapFwd[b.playerId]||{}).points||0) - ((statsMapFwd[a.playerId]||{}).points||0); });
+    }
+    var centres    = sortByPts(fwds.filter(function(p){ return p.positionCode === 'C'; }));
     var leftWings  = sortByPts(fwds.filter(function(p){ return p.positionCode === 'L'; }));
     var rightWings = sortByPts(fwds.filter(function(p){ return p.positionCode === 'R'; }));
     // Les centres non-C (souvent joués AG/AD) vont en ailier si manque
