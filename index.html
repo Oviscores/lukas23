@@ -3716,6 +3716,101 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
       )
     );
   }
+  // ─── MLB ROSTER ─────────────────────────────────────────
+  if (liveRoster && liveRoster.roster && lg === 'MLB') {
+    var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
+    var mlbRoster = liveRoster.roster.roster || [];
+    // Construire statsMap hitting
+    var hittingMap = {};
+    ((liveRoster.hitting && liveRoster.hitting.stats && liveRoster.hitting.stats[0] && liveRoster.hitting.stats[0].splits) || []).forEach(function(s) {
+      if (s.player) hittingMap[s.player.id] = s.stat;
+    });
+    // Construire statsMap pitching
+    var pitchingMap = {};
+    ((liveRoster.pitching && liveRoster.pitching.stats && liveRoster.pitching.stats[0] && liveRoster.pitching.stats[0].splits) || []).forEach(function(s) {
+      if (s.player) pitchingMap[s.player.id] = s.stat;
+    });
+    var batters = mlbRoster.filter(function(p){ return p.position && p.position.type !== 'Pitcher'; });
+    var pitchers = mlbRoster.filter(function(p){ return p.position && p.position.type === 'Pitcher'; });
+    var bs2 = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" };
+    return /* @__PURE__ */ React.createElement("div", { style: bs2 },
+      React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "ROSTER COMPLET")
+      ),
+      React.createElement("div", { style: { display: "flex", borderBottom: "1px solid rgba(0,0,0,0.08)" } },
+        [['batters','FRAPPEURS'],['pitchers','LANCEURS']].map(function(tab) {
+          return React.createElement("button", { key: tab[0], onClick: function(){ setActiveTab2(tab[0]); },
+            style: { flex: 1, padding: "8px", border: "none", background: activeTab2===tab[0] ? lc : "transparent",
+              color: activeTab2===tab[0] ? "#fff" : "#666", fontFamily: "'Barlow Condensed',sans-serif",
+              fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.08em",
+              borderBottom: activeTab2===tab[0] ? "3px solid " + lc : "3px solid transparent" } }, tab[1]);
+        })
+      ),
+      React.createElement("div", { style: { overflowX: "auto" } },
+        React.createElement("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 11 } },
+          React.createElement("thead", null,
+            React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
+              activeTab2 === 'batters' ? [
+                React.createElement("th", { key:"num", style: { padding:"6px 10px", textAlign:"left", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "#"),
+                React.createElement("th", { key:"nom", style: { padding:"6px 10px", textAlign:"left", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "JOUEUR"),
+                React.createElement("th", { key:"pos", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "POS"),
+                React.createElement("th", { key:"avg", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:lc } }, "MOY"),
+                React.createElement("th", { key:"hr", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "HR"),
+                React.createElement("th", { key:"rbi", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "RBI"),
+                React.createElement("th", { key:"r", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "R"),
+                React.createElement("th", { key:"sb", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "BV"),
+                React.createElement("th", { key:"ops", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "OPS"),
+              ] : [
+                React.createElement("th", { key:"num", style: { padding:"6px 10px", textAlign:"left", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "#"),
+                React.createElement("th", { key:"nom", style: { padding:"6px 10px", textAlign:"left", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "LANCEUR"),
+                React.createElement("th", { key:"pos", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "RÔLE"),
+                React.createElement("th", { key:"era", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:lc } }, "MPM"),
+                React.createElement("th", { key:"w", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "V"),
+                React.createElement("th", { key:"l", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "D"),
+                React.createElement("th", { key:"so", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "RS"),
+                React.createElement("th", { key:"ip", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "MP"),
+                React.createElement("th", { key:"whip", style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "WHIP"),
+              ]
+            )
+          ),
+          React.createElement("tbody", null,
+            (activeTab2 === 'batters' ? batters : pitchers).map(function(p, i) {
+              var pid = p.person && p.person.id;
+              var s = activeTab2 === 'batters' ? (hittingMap[pid] || {}) : (pitchingMap[pid] || {});
+              var bg = i%2===0 ? "transparent" : "rgba(0,0,0,0.025)";
+              var nom = p.person && p.person.fullName || '';
+              var num = p.person && p.person.primaryNumber || p.jerseyNumber || '';
+              var pos = p.position && p.position.abbreviation || '';
+              if (activeTab2 === 'batters') {
+                return React.createElement("tr", { key: pid, style: { borderBottom:"1px solid rgba(0,0,0,0.05)", background: bg } },
+                  React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", color:"#999" } }, num),
+                  React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800 } }, nom),
+                  React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", color:"#666" } }, pos),
+                  React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, color:lc, fontSize:13 } }, s.avg || '—'),
+                  React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.homeRuns !== undefined ? s.homeRuns : '—'),
+                  React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.rbi !== undefined ? s.rbi : '—'),
+                  React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.runs !== undefined ? s.runs : '—'),
+                  React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.stolenBases !== undefined ? s.stolenBases : '—'),
+                  React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.ops || '—')
+                );
+              }
+              return React.createElement("tr", { key: pid, style: { borderBottom:"1px solid rgba(0,0,0,0.05)", background: bg } },
+                React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", color:"#999" } }, num),
+                React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800 } }, nom),
+                React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", color:"#666" } }, pos),
+                React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, color:lc, fontSize:13 } }, s.era || '—'),
+                React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", color:"#16a34a", fontWeight:800 } }, s.wins !== undefined ? s.wins : '—'),
+                React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", color:"#dc2626", fontWeight:800 } }, s.losses !== undefined ? s.losses : '—'),
+                React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.strikeOuts !== undefined ? s.strikeOuts : '—'),
+                React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.inningsPitched || '—'),
+                React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.whip || '—')
+              );
+            })
+          )
+        )
+      )
+    );
+  }
   if (!rosterData) return null;
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" };
   return /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: "EFFECTIF \u2014 " + (team ? team.name.toUpperCase() : "") }), /* @__PURE__ */ React.createElement("div", { style: { overflowX: "auto" } }, /* @__PURE__ */ React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } }, (lg === "NHL" ? ["POS", "NOM / NAISSANCE \xB7 NATIONALIT\xC9", "LIGNE", "B", "A", "PTS", "STATUT"] : lg === "NFL" ? ["POS", "NOM", "STATUT", "NOTE"] : lg === "NBA" ? ["POS", "NOM", "STATUT"] : ["#", "NOM", "POSITION", "STATUT"]).map(function(h, i) {
