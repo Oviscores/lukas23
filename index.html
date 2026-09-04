@@ -3042,19 +3042,33 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
     function sortByPts(arr) {
       return arr.slice().sort(function(a,b){ return ((statsMapFwd[b.playerId]||{}).points||0) - ((statsMapFwd[a.playerId]||{}).points||0); });
     }
-    var centres    = sortByPts(fwds.filter(function(p){ return p.positionCode === 'C'; }));
-    var leftWings  = sortByPts(fwds.filter(function(p){ return p.positionCode === 'L'; }));
-    var rightWings = sortByPts(fwds.filter(function(p){ return p.positionCode === 'R'; }));
-    // Les centres non-C (souvent joués AG/AD) vont en ailier si manque
-    var extras = sortByPts(fwds.filter(function(p){ return p.positionCode !== 'C' && p.positionCode !== 'L' && p.positionCode !== 'R'; }));
-    while (leftWings.length < 4 && extras.length) leftWings.push(extras.shift());
-    while (rightWings.length < 4 && extras.length) rightWings.push(extras.shift());
-    while (centres.length < 4 && extras.length) centres.push(extras.shift());
-    var nLines = Math.min(4, Math.max(centres.length, leftWings.length, rightWings.length, 1));
+    var allFwdsSorted = sortByPts(fwds);
+    var centres    = allFwdsSorted.filter(function(p){ return p.positionCode === 'C'; });
+    var leftWings  = allFwdsSorted.filter(function(p){ return p.positionCode === 'L'; });
+    var rightWings = allFwdsSorted.filter(function(p){ return p.positionCode === 'R'; });
+    // Remplir les cases vides AG/AD avec les centres restants (par points)
+    var centresPool = centres.slice();
+    var usedIds = {};
+    leftWings.forEach(function(p){ usedIds[p.playerId]=true; });
+    rightWings.forEach(function(p){ usedIds[p.playerId]=true; });
+    var nLines = 4;
     for (var li = 0; li < nLines; li++) {
       var c = centres[li] || null;
+      if (c) usedIds[c.playerId] = true;
+      // Trouver un AG non utilisé
       var l = leftWings[li] || null;
+      if (!l) {
+        for (var ci = 0; ci < centresPool.length; ci++) {
+          if (!usedIds[centresPool[ci].playerId]) { l = centresPool[ci]; usedIds[l.playerId]=true; break; }
+        }
+      }
+      // Trouver un AD non utilisé
       var r = rightWings[li] || null;
+      if (!r) {
+        for (var ci2 = 0; ci2 < centresPool.length; ci2++) {
+          if (!usedIds[centresPool[ci2].playerId]) { r = centresPool[ci2]; usedIds[r.playerId]=true; break; }
+        }
+      }
       lines.push([
         { pos:'AG', name: pShort(l), num: l ? l.sweaterNumber : '' },
         { pos:'C',  name: pShort(c), num: c ? c.sweaterNumber : '' },
