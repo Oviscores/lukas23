@@ -4304,8 +4304,10 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
   }
   var fkO = ["BOS", "NYR", "PIT", "WSH", "PHI", "CBJ", "NJD", "NYI", "CAR", "FLA"];
   var fkT = ["19h00", "19h30", "20h00", "21h00", "22h00"];
-  while (upcomingMatches.length < 5) {
-    var fo = fkO[upcomingMatches.length % fkO.length];
+  var _safeCount = 0;
+  while (upcomingMatches.length < 5 && _safeCount < 50) {
+    _safeCount++;
+    var fo = fkO[_safeCount % fkO.length];
     if (fo !== teamId) upcomingMatches.push({ id: "fu-" + upcomingMatches.length, home: teamId, away: fo, hs: null, as: null, st: "\xC0 venir", time: fkT[upcomingMatches.length % fkT.length], dayLabel: "J+" + (upcomingMatches.length + 1) });
   }
   for (var j = schedule.todayIdx - 1; j >= 0; j--) {
