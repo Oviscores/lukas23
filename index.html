@@ -3625,6 +3625,7 @@ function TeamHero({ team, lg, lc, dk, tc }) {
 }
 function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team }) {
   var _tab = React.useState('forwards'); var activeTab = _tab[0], setActiveTab = _tab[1];
+  var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
   if (rosterLoading) return null;
   // Utiliser liveRoster NHL si dispo
   if (liveRoster && liveRoster.roster && lg === 'NHL') {
@@ -3717,7 +3718,6 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
     );
   }
   // ─── MLB ROSTER ─────────────────────────────────────────
-  var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
   if (liveRoster && liveRoster.roster && lg === 'MLB') {
     var mlbRoster = liveRoster.roster.roster || [];
     // Construire statsMap hitting
