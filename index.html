@@ -3717,8 +3717,8 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
     );
   }
   // ─── MLB ROSTER ─────────────────────────────────────────
+  var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
   if (liveRoster && liveRoster.roster && lg === 'MLB') {
-    var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
     var mlbRoster = liveRoster.roster.roster || [];
     // Construire statsMap hitting
     var hittingMap = {};
