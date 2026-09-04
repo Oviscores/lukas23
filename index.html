@@ -4007,6 +4007,47 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
       ]);
     }
     goalies = gols.slice(0,2).map(function(g){ return { name: pShort(g), num: g.sweaterNumber || '' }; });
+  } else if (liveRoster && liveRoster.roster && lg === 'MLB') {
+    // MLB : ordre de frappeurs par position + rotation lanceurs
+    var mlbPlayers = liveRoster.roster.roster || [];
+    var pitchingMap2 = {};
+    ((liveRoster.pitching && liveRoster.pitching.stats && liveRoster.pitching.stats[0] && liveRoster.pitching.stats[0].splits) || []).forEach(function(s) {
+      if (s.player) pitchingMap2[s.player.id] = s.stat;
+    });
+    // Frappeurs triés par position standard
+    var posOrder = { C:1, '1B':2, '2B':3, '3B':4, SS:5, LF:6, CF:7, RF:8, DH:9, OF:6 };
+    var batters2 = mlbPlayers.filter(function(p){ return p.position && p.position.type !== 'Pitcher'; });
+    batters2.sort(function(a,b){
+      var pa = posOrder[a.position && a.position.abbreviation] || 10;
+      var pb = posOrder[b.position && b.position.abbreviation] || 10;
+      return pa - pb;
+    });
+    // Lanceurs triés par départs (rotation)
+    var starters = mlbPlayers.filter(function(p){ return p.position && p.position.abbreviation === 'SP'; });
+    var relievers = mlbPlayers.filter(function(p){ return p.position && (p.position.abbreviation === 'RP' || p.position.type === 'Pitcher') && p.position.abbreviation !== 'SP'; });
+    starters.sort(function(a,b){
+      var sa = pitchingMap2[a.person && a.person.id] || {};
+      var sb = pitchingMap2[b.person && b.person.id] || {};
+      return (sb.gamesStarted||0) - (sa.gamesStarted||0);
+    });
+    // Construire les lignes (frappeurs par 3 pour l'affichage)
+    for (var bi = 0; bi < Math.min(3, Math.ceil(batters2.length/3)); bi++) {
+      var row = [];
+      for (var bj = 0; bj < 3; bj++) {
+        var bp = batters2[bi*3+bj];
+        if (bp) row.push({ pos: bp.position && bp.position.abbreviation || '', name: bp.person && bp.person.lastName || '', num: bp.person && bp.person.primaryNumber || '' });
+      }
+      if (row.length === 3) lines.push(row);
+    }
+    // Paires de lanceurs titulaires
+    for (var si = 0; si < Math.min(4, Math.ceil(starters.length/2)); si++) {
+      var sp1 = starters[si*2], sp2 = starters[si*2+1];
+      if (sp1) defense.push([
+        { pos:'SP', name: sp1.person && sp1.person.lastName || '', num: sp1.person && sp1.person.primaryNumber || '' },
+        { pos: sp2 ? 'SP' : 'RP', name: sp2 ? (sp2.person && sp2.person.lastName || '') : (relievers[0] ? (relievers[0].person && relievers[0].person.lastName || '') : ''), num: sp2 ? (sp2.person && sp2.person.primaryNumber || '') : (relievers[0] ? (relievers[0].person && relievers[0].person.primaryNumber || '') : '') }
+      ]);
+    }
+    goalies = [];
   } else if (rosterData) {
     lines = rosterData.lines || [];
     defense = rosterData.defense || [];
@@ -4068,7 +4109,7 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
       React.createElement("div", null,
         React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, letterSpacing: "0.16em", color: lc, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 } },
           React.createElement("span", { style: { display: "inline-block", width: 16, height: 2, background: lc } }),
-          "LIGNES D'ATTAQUE"
+          lg === 'MLB' ? "ORDRE DE FRAPPEURS" : "LIGNES D'ATTAQUE"
         ),
         React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 3 } },
           lines.map(function(line, i) { return React.createElement(LineRow, { key: i, line: line, num: i+1 }); })
