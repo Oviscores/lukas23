@@ -3035,17 +3035,30 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
     var defs = liveRoster.roster.defensemen || [];
     var gols = liveRoster.roster.goalies || [];
     function pShort(p) { return p ? (p.firstName && p.firstName.default ? p.firstName.default[0]+'. ' : '') + (p.lastName && p.lastName.default || '') : ''; }
-    var posLabels = { C: 'C', L: 'AG', R: 'AD' };
-    // Grouper par 3 en respectant l'ordre API
-    var nLines = Math.min(4, Math.ceil(fwds.length / 3));
+    // Trier par points décroissants via statsMap
+    function sortByPts(arr) {
+      return arr.slice().sort(function(a,b){ return ((statsMap[b.playerId]||{}).points||0) - ((statsMap[a.playerId]||{}).points||0); });
+    }
+    var statsFwds = (liveRoster.stats && liveRoster.stats.skaters || []);
+    var statsMapFwd = {};
+    statsFwds.forEach(function(s){ statsMapFwd[s.playerId] = s; });
+    var centres  = sortByPts(fwds.filter(function(p){ return p.positionCode === 'C'; }));
+    var leftWings  = sortByPts(fwds.filter(function(p){ return p.positionCode === 'L'; }));
+    var rightWings = sortByPts(fwds.filter(function(p){ return p.positionCode === 'R'; }));
+    // Les centres non-C (souvent joués AG/AD) vont en ailier si manque
+    var extras = sortByPts(fwds.filter(function(p){ return p.positionCode !== 'C' && p.positionCode !== 'L' && p.positionCode !== 'R'; }));
+    while (leftWings.length < 4 && extras.length) leftWings.push(extras.shift());
+    while (rightWings.length < 4 && extras.length) rightWings.push(extras.shift());
+    while (centres.length < 4 && extras.length) centres.push(extras.shift());
+    var nLines = Math.min(4, Math.max(centres.length, leftWings.length, rightWings.length, 1));
     for (var li = 0; li < nLines; li++) {
-      var p0 = fwds[li*3] || null;
-      var p1 = fwds[li*3+1] || null;
-      var p2 = fwds[li*3+2] || null;
+      var c = centres[li] || null;
+      var l = leftWings[li] || null;
+      var r = rightWings[li] || null;
       lines.push([
-        { pos: p0 ? (posLabels[p0.positionCode] || p0.positionCode) : 'AG', name: pShort(p0), num: p0 ? p0.sweaterNumber : '' },
-        { pos: p1 ? (posLabels[p1.positionCode] || p1.positionCode) : 'C',  name: pShort(p1), num: p1 ? p1.sweaterNumber : '' },
-        { pos: p2 ? (posLabels[p2.positionCode] || p2.positionCode) : 'AD', name: pShort(p2), num: p2 ? p2.sweaterNumber : '' },
+        { pos:'AG', name: pShort(l), num: l ? l.sweaterNumber : '' },
+        { pos:'C',  name: pShort(c), num: c ? c.sweaterNumber : '' },
+        { pos:'AD', name: pShort(r), num: r ? r.sweaterNumber : '' },
       ]);
     }
     for (var di = 0; di < Math.min(4, Math.floor(defs.length/2)); di++) {
