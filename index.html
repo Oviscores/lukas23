@@ -4017,7 +4017,8 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
 }
 
 function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick, onMatchClick, onStandingsClick }) {
-  var team = (TEAMS_DB[lg] || []).find(function(t) {
+  var _db = window.TEAMS_DB || TEAMS_DB;
+  var team = (_db[lg] || []).find(function(t) {
     return t.id === teamId;
   });
   var _rd = React.useState(null); var liveRoster = _rd[0], setLiveRoster = _rd[1];
