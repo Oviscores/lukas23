@@ -4317,9 +4317,11 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
   }
   var fkS = [[3, 1], [2, 4], [5, 2], [1, 3], [4, 2]];
   var fkO2 = ["MTL", "OTT", "BUF", "DET", "PIT"];
-  while (recentMatches.length < 5) {
-    var fs = fkS[recentMatches.length % fkS.length];
-    var fo2 = fkO2[recentMatches.length % fkO2.length];
+  var _safeCount2 = 0;
+  while (recentMatches.length < 5 && _safeCount2 < 50) {
+    _safeCount2++;
+    var fs = fkS[_safeCount2 % fkS.length];
+    var fo2 = fkO2[_safeCount2 % fkO2.length];
     if (fo2 !== teamId) recentMatches.push({ id: "fr-" + recentMatches.length, home: teamId, away: fo2, hs: fs[0], as: fs[1], st: "Final", time: "", dayLabel: "J-" + (recentMatches.length + 1) });
   }
   var rosterData = team ? team.alignment : null;
