@@ -3626,6 +3626,7 @@ function TeamHero({ team, lg, lc, dk, tc }) {
 function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team }) {
   var _tab = React.useState('forwards'); var activeTab = _tab[0], setActiveTab = _tab[1];
   var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
+  var _tab3 = React.useState('offense'); var activeTab3 = _tab3[0], setActiveTab3 = _tab3[1];
   if (rosterLoading) return null;
   // Utiliser liveRoster NHL si dispo
   if (liveRoster && liveRoster.roster && lg === 'NHL') {
@@ -3804,6 +3805,70 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
                 React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.strikeOuts !== undefined ? s.strikeOuts : '—'),
                 React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.inningsPitched || '—'),
                 React.createElement("td", { style: { padding:"6px 6px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, s.whip || '—')
+              );
+            })
+          )
+        )
+      )
+    );
+  }
+  // ─── NFL ROSTER ─────────────────────────────────────────
+  if (liveRoster && liveRoster.athletes && lg === 'NFL') {
+    var nflGroups = {
+      offense: (liveRoster.athletes.find(function(g){ return g.position === 'offense'; }) || {}).items || [],
+      defense: (liveRoster.athletes.find(function(g){ return g.position === 'defense'; }) || {}).items || [],
+      specialTeam: (liveRoster.athletes.find(function(g){ return g.position === 'specialTeam'; }) || {}).items || [],
+      injured: (liveRoster.athletes.find(function(g){ return g.position === 'injuredReserveOrOut'; }) || {}).items || [],
+    };
+    var bs3 = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" };
+    var tabs3 = [
+      { key: 'offense', label: 'ATTAQUE' },
+      { key: 'defense', label: 'DÉFENSE' },
+      { key: 'specialTeam', label: 'SPEC.' },
+      { key: 'injured', label: '🤕 IR' },
+    ];
+    return /* @__PURE__ */ React.createElement("div", { style: bs3 },
+      React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "ROSTER NFL")
+      ),
+      React.createElement("div", { style: { display: "flex", borderBottom: "1px solid rgba(0,0,0,0.08)" } },
+        tabs3.map(function(tab) {
+          return React.createElement("button", { key: tab.key, onClick: function(){ setActiveTab3(tab.key); },
+            style: { flex: 1, padding: "7px 4px", border: "none", background: activeTab3===tab.key ? lc : "transparent",
+              color: activeTab3===tab.key ? "#fff" : "#666", fontFamily: "'Barlow Condensed',sans-serif",
+              fontSize: 10, fontWeight: 800, cursor: "pointer", letterSpacing: "0.06em",
+              borderBottom: activeTab3===tab.key ? "3px solid " + lc : "3px solid transparent" } }, tab.label);
+        })
+      ),
+      React.createElement("div", { style: { overflowX: "auto" } },
+        React.createElement("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 11 } },
+          React.createElement("thead", null,
+            React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
+              React.createElement("th", { style: { padding:"6px 10px", textAlign:"left", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "#"),
+              React.createElement("th", { style: { padding:"6px 10px", textAlign:"left", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "JOUEUR"),
+              React.createElement("th", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:lc } }, "POS"),
+              React.createElement("th", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "ÂGE"),
+              React.createElement("th", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "EXP."),
+              React.createElement("th", { style: { padding:"6px 8px", textAlign:"left", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "UNIVERSITÉ"),
+              React.createElement("th", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:"#999" } }, "STATUT")
+            )
+          ),
+          React.createElement("tbody", null,
+            (nflGroups[activeTab3] || []).map(function(p, i) {
+              var bg = i%2===0 ? "transparent" : "rgba(0,0,0,0.025)";
+              var inj = p.injuries && p.injuries[0];
+              var injStatus = inj ? inj.status : '';
+              var injColor = injStatus === 'Out' ? '#dc2626' : injStatus === 'Doubtful' ? '#ea580c' : injStatus === 'Questionable' ? '#d97706' : '#999';
+              return React.createElement("tr", { key: p.id, style: { borderBottom:"1px solid rgba(0,0,0,0.05)", background: bg } },
+                React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", color:"#999" } }, p.jersey || ''),
+                React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800 } }, p.fullName || ''),
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, color:lc } }, p.position && p.position.abbreviation || ''),
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", color:"#666" } }, p.age || ''),
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", color:"#666" } }, p.experience && p.experience.years !== undefined ? p.experience.years + ' ans' : 'R'),
+                React.createElement("td", { style: { padding:"6px 8px", fontFamily:"'Barlow Condensed',sans-serif", color:"#888", fontSize:10 } }, p.college && p.college.name || ''),
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center" } },
+                  injStatus ? React.createElement("span", { style: { fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:800, color:injColor, background:injColor+'15', padding:"1px 5px", borderRadius:3 } }, injStatus) : null
+                )
               );
             })
           )
@@ -4202,8 +4267,8 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
           if (nbaId) endpoint = PROXY + '?league=nba_roster&team=' + nbaId;
         }
         else if (lg === 'NFL') {
-          var nflSlug = NFL_ESPN_TEAMS[teamId];
-          if (nflSlug) endpoint = PROXY + '?league=nfl_roster&team=' + nflSlug;
+          var nflSlug = NFL_ESPN_TEAMS[teamId] || teamId.toLowerCase();
+          endpoint = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + nflSlug + '/roster';
         }
         if (endpoint) {
           var r = await fetch(endpoint);
