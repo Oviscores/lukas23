@@ -7113,6 +7113,7 @@ async function fetchAllStatuts() {
   }
 }
 setTimeout(fetchAllStatuts, 2000);
+setInterval(fetchAllStatuts, 10 * 60 * 1000); // Actualisation toutes les 10 minutes
 </script>
 </body>
 </html>
