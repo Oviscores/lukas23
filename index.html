@@ -4175,7 +4175,7 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
           e.currentTarget.style.transform = "scale(1)";
         }
       },
-      getTeamLogo(tid, lg, 28), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: abbr.length > 2 ? 14 : 18, fontWeight: 900, color: col.fg, textAlign: "center", lineHeight: 1, userSelect: "none" } }, abbr)
+      getTeamLogo(tid, lg, 28)
     );
   }))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(20,20,20,0.75)", padding: "3px 7px", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 14, letterSpacing: "0.12em", color: "#fff", whiteSpace: "nowrap" } }, "MATCHS DU JOUR")), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr", gap: 0 } }, (function() {
       var today = new Date().toISOString().split('T')[0];
@@ -5671,7 +5671,7 @@ function TeamLogosBar({ lg, onTeamClick }) {
           e.currentTarget.style.transform = "scale(1)";
         }
       },
-      /* @__PURE__ */ getTeamLogo(tid, lg, 32), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#333", textAlign: "center", lineHeight: 1 } }, abbr)
+      /* @__PURE__ */ getTeamLogo(tid, lg, 32)
     );
   })));
 }
