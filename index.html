@@ -3030,10 +3030,32 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" };
   var jerseyBg = tc.bg || lc;
   var jerseyFg = tc.fg || "#fff";
-  var lines = rosterData.lines || [];
-  var defense = rosterData.defense || [];
-  var goalies = rosterData.goalies || [];
-  if (rosterData.goalie) goalies = [rosterData.goalie];
+  var lines = [], defense = [], goalies = [];
+  if (liveRoster && liveRoster.roster && lg === 'NHL') {
+    var fwds = liveRoster.roster.forwards || [];
+    var defs = liveRoster.roster.defensemen || [];
+    var gols = liveRoster.roster.goalies || [];
+    function pShort(p) { return (p.firstName && p.firstName.default ? p.firstName.default[0]+'. ' : '') + (p.lastName && p.lastName.default || ''); }
+    for (var li = 0; li < Math.min(4, Math.floor(fwds.length/3)); li++) {
+      lines.push([
+        { pos:'AG', name: pShort(fwds[li*3]||{}), num: (fwds[li*3]||{}).sweaterNumber||'' },
+        { pos:'C',  name: pShort(fwds[li*3+1]||{}), num: (fwds[li*3+1]||{}).sweaterNumber||'' },
+        { pos:'AD', name: pShort(fwds[li*3+2]||{}), num: (fwds[li*3+2]||{}).sweaterNumber||'' },
+      ]);
+    }
+    for (var di = 0; di < Math.min(4, Math.floor(defs.length/2)); di++) {
+      defense.push([
+        { pos:'D', name: pShort(defs[di*2]||{}), num: (defs[di*2]||{}).sweaterNumber||'' },
+        { pos:'D', name: pShort(defs[di*2+1]||{}), num: (defs[di*2+1]||{}).sweaterNumber||'' },
+      ]);
+    }
+    goalies = gols.slice(0,2).map(function(g){ return { pos:'G', name: pShort(g), num: g.sweaterNumber||'' }; });
+  } else if (rosterData) {
+    lines = rosterData.lines || [];
+    defense = rosterData.defense || [];
+    goalies = rosterData.goalies || [];
+    if (rosterData.goalie) goalies = [rosterData.goalie];
+  }
   function Jersey({ name, pos }) {
     return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 2, minWidth: 52 } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", width: 40, height: 46 } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: 5, top: 7, width: 30, height: 33, background: jerseyBg, borderRadius: "2px 2px 4px 4px", display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: jerseyFg } }, pos || "")), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: 0, top: 7, width: 7, height: 16, background: jerseyBg, borderRadius: "4px 0 0 4px", transform: "rotate(-8deg)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", right: 0, top: 7, width: 7, height: 16, background: jerseyBg, borderRadius: "0 4px 4px 0", transform: "rotate(8deg)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: "50%", top: 3, width: 12, height: 7, background: jerseyFg, borderRadius: 4, transform: "translateX(-50%)", border: "2px solid " + jerseyBg } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: 5, bottom: 0, right: 5, height: 3, background: lc, borderRadius: "0 0 4px 4px", opacity: 0.6 } })), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#111", textAlign: "center", maxWidth: 56, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, (name || "").split(" ").pop()));
   }
