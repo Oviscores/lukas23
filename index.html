@@ -1577,6 +1577,836 @@ const TEAMS_EXTRA = {
 Object.keys(TEAMS_EXTRA).forEach((lg) => {
   TEAMS_DB[lg] = [...TEAMS_DB[lg] || [], ...TEAMS_EXTRA[lg]];
 });
+const TEAMS_EXTRA2 = {
+  NHL: [
+    {
+      id: "ANA", name: "Anaheim Ducks", city: "Anaheim", arena: "Honda Center",
+      capacity: "—", founded: 1993, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Ducks d'Anaheim.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "ARI", name: "Arizona Coyotes", city: "Tempe", arena: "Mullett Arena",
+      capacity: "—", founded: 1972, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centrale", conference: "Ouest",
+      bio: "Les Coyotes de l'Arizona.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "BUF", name: "Buffalo Sabres", city: "Buffalo", arena: "KeyBank Center",
+      capacity: "—", founded: 1970, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Atlantique", conference: "Est",
+      bio: "Les Sabres de Buffalo.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CAR", name: "Carolina Hurricanes", city: "Raleigh", arena: "PNC Arena",
+      capacity: "—", founded: 1972, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Métropolitaine", conference: "Est",
+      bio: "Les Hurricanes de la Caroline.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CBJ", name: "Columbus Blue Jackets", city: "Columbus", arena: "Nationwide Arena",
+      capacity: "—", founded: 2000, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Métropolitaine", conference: "Est",
+      bio: "Les Blue Jackets de Columbus.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CGY", name: "Calgary Flames", city: "Calgary", arena: "Scotiabank Saddledome",
+      capacity: "—", founded: 1972, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Flames de Calgary.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CHI", name: "Chicago Blackhawks", city: "Chicago", arena: "United Center",
+      capacity: "—", founded: 1926, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centrale", conference: "Ouest",
+      bio: "Les Blackhawks de Chicago.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "DAL", name: "Dallas Stars", city: "Dallas", arena: "American Airlines Center",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centrale", conference: "Ouest",
+      bio: "Les Stars de Dallas.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "DET", name: "Detroit Red Wings", city: "Detroit", arena: "Little Caesars Arena",
+      capacity: "—", founded: 1926, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Atlantique", conference: "Est",
+      bio: "Les Red Wings de Detroit.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MIN", name: "Minnesota Wild", city: "Saint Paul", arena: "Xcel Energy Center",
+      capacity: "—", founded: 2000, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centrale", conference: "Ouest",
+      bio: "Le Wild du Minnesota.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NJD", name: "New Jersey Devils", city: "Newark", arena: "Prudential Center",
+      capacity: "—", founded: 1974, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Métropolitaine", conference: "Est",
+      bio: "Les Devils du New Jersey.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NSH", name: "Nashville Predators", city: "Nashville", arena: "Bridgestone Arena",
+      capacity: "—", founded: 1998, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centrale", conference: "Ouest",
+      bio: "Les Predators de Nashville.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "OTT", name: "Ottawa Senators", city: "Ottawa", arena: "Canadian Tire Centre",
+      capacity: "—", founded: 1992, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Atlantique", conference: "Est",
+      bio: "Les Sénateurs d'Ottawa.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "PHI", name: "Philadelphia Flyers", city: "Philadelphia", arena: "Wells Fargo Center",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Métropolitaine", conference: "Est",
+      bio: "Les Flyers de Philadelphie.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "PIT", name: "Pittsburgh Penguins", city: "Pittsburgh", arena: "PPG Paints Arena",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Métropolitaine", conference: "Est",
+      bio: "Les Penguins de Pittsburgh.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "SEA", name: "Seattle Kraken", city: "Seattle", arena: "Climate Pledge Arena",
+      capacity: "—", founded: 2021, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Kraken de Seattle.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "SJS", name: "San Jose Sharks", city: "San Jose", arena: "SAP Center",
+      capacity: "—", founded: 1991, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Sharks de San Jose.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "STL", name: "St. Louis Blues", city: "Saint Louis", arena: "Enterprise Center",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centrale", conference: "Ouest",
+      bio: "Les Blues de Saint Louis.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "TBL", name: "Tampa Bay Lightning", city: "Tampa", arena: "Amalie Arena",
+      capacity: "—", founded: 1992, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Atlantique", conference: "Est",
+      bio: "Le Lightning de Tampa Bay.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "VAN", name: "Vancouver Canucks", city: "Vancouver", arena: "Rogers Arena",
+      capacity: "—", founded: 1970, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Canucks de Vancouver.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "WPG", name: "Winnipeg Jets", city: "Winnipeg", arena: "Canada Life Centre",
+      capacity: "—", founded: 1999, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centrale", conference: "Ouest",
+      bio: "Les Jets de Winnipeg.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "WSH", name: "Washington Capitals", city: "Washington", arena: "Capital One Arena",
+      capacity: "—", founded: 1974, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Métropolitaine", conference: "Est",
+      bio: "Les Capitals de Washington.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NYI", name: "New York Islanders", city: "Elmont", arena: "UBS Arena",
+      capacity: "—", founded: 1972, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Métropolitaine", conference: "Est",
+      bio: "Les Islanders de New York.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "LAK", name: "Los Angeles Kings", city: "Los Angeles", arena: "Crypto.com Arena",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Kings de Los Angeles.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    }
+  ],
+  NFL: [
+    {
+      id: "ARI", name: "Arizona Cardinals", city: "Glendale", arena: "State Farm Stadium",
+      capacity: "—", founded: 1920, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Ouest", conference: "NFC",
+      bio: "Les Cardinals de l'Arizona.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "ATL", name: "Atlanta Falcons", city: "Atlanta", arena: "Mercedes-Benz Stadium",
+      capacity: "—", founded: 1966, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Sud", conference: "NFC",
+      bio: "Les Falcons d'Atlanta.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "BAL", name: "Baltimore Ravens", city: "Baltimore", arena: "M&T Bank Stadium",
+      capacity: "—", founded: 1996, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Nord", conference: "AFC",
+      bio: "Les Ravens de Baltimore.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CAR", name: "Carolina Panthers", city: "Charlotte", arena: "Bank of America Stadium",
+      capacity: "—", founded: 1995, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Sud", conference: "NFC",
+      bio: "Les Panthers de la Caroline.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CHI", name: "Chicago Bears", city: "Chicago", arena: "Soldier Field",
+      capacity: "—", founded: 1920, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Nord", conference: "NFC",
+      bio: "Les Bears de Chicago.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CIN", name: "Cincinnati Bengals", city: "Cincinnati", arena: "Paycor Stadium",
+      capacity: "—", founded: 1968, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Nord", conference: "AFC",
+      bio: "Les Bengals de Cincinnati.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CLE", name: "Cleveland Browns", city: "Cleveland", arena: "Cleveland Browns Stadium",
+      capacity: "—", founded: 1946, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Nord", conference: "AFC",
+      bio: "Les Browns de Cleveland.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "DEN", name: "Denver Broncos", city: "Denver", arena: "Empower Field",
+      capacity: "—", founded: 1960, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Ouest", conference: "AFC",
+      bio: "Les Broncos de Denver.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "DET", name: "Detroit Lions", city: "Detroit", arena: "Ford Field",
+      capacity: "—", founded: 1930, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Nord", conference: "NFC",
+      bio: "Les Lions de Detroit.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "GB", name: "Green Bay Packers", city: "Green Bay", arena: "Lambeau Field",
+      capacity: "—", founded: 1919, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Nord", conference: "NFC",
+      bio: "Les Packers de Green Bay.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "HOU", name: "Houston Texans", city: "Houston", arena: "NRG Stadium",
+      capacity: "—", founded: 2002, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Sud", conference: "AFC",
+      bio: "Les Texans de Houston.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "IND", name: "Indianapolis Colts", city: "Indianapolis", arena: "Lucas Oil Stadium",
+      capacity: "—", founded: 1953, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Sud", conference: "AFC",
+      bio: "Les Colts d'Indianapolis.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "JAX", name: "Jacksonville Jaguars", city: "Jacksonville", arena: "TIAA Bank Field",
+      capacity: "—", founded: 1995, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Sud", conference: "AFC",
+      bio: "Les Jaguars de Jacksonville.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "LAC", name: "LA Chargers", city: "Inglewood", arena: "SoFi Stadium",
+      capacity: "—", founded: 1960, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Ouest", conference: "AFC",
+      bio: "Les Chargers de Los Angeles.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "LAR", name: "LA Rams", city: "Inglewood", arena: "SoFi Stadium",
+      capacity: "—", founded: 1936, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Ouest", conference: "NFC",
+      bio: "Les Rams de Los Angeles.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "LV", name: "Las Vegas Raiders", city: "Las Vegas", arena: "Allegiant Stadium",
+      capacity: "—", founded: 1960, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Ouest", conference: "AFC",
+      bio: "Les Raiders de Las Vegas.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MIA", name: "Miami Dolphins", city: "Miami", arena: "Hard Rock Stadium",
+      capacity: "—", founded: 1966, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Est", conference: "AFC",
+      bio: "Les Dolphins de Miami.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MIN", name: "Minnesota Vikings", city: "Minneapolis", arena: "U.S. Bank Stadium",
+      capacity: "—", founded: 1961, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Nord", conference: "NFC",
+      bio: "Les Vikings du Minnesota.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NE", name: "New England Patriots", city: "Foxborough", arena: "Gillette Stadium",
+      capacity: "—", founded: 1960, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Est", conference: "AFC",
+      bio: "Les Patriots de la Nouvelle-Angleterre.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NO", name: "New Orleans Saints", city: "New Orleans", arena: "Caesars Superdome",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Sud", conference: "NFC",
+      bio: "Les Saints de la Nouvelle-Orléans.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NYG", name: "New York Giants", city: "East Rutherford", arena: "MetLife Stadium",
+      capacity: "—", founded: 1925, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Est", conference: "NFC",
+      bio: "Les Giants de New York.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NYJ", name: "New York Jets", city: "East Rutherford", arena: "MetLife Stadium",
+      capacity: "—", founded: 1960, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Est", conference: "AFC",
+      bio: "Les Jets de New York.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "PIT", name: "Pittsburgh Steelers", city: "Pittsburgh", arena: "Acrisure Stadium",
+      capacity: "—", founded: 1933, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Nord", conference: "AFC",
+      bio: "Les Steelers de Pittsburgh.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "SEA", name: "Seattle Seahawks", city: "Seattle", arena: "Lumen Field",
+      capacity: "—", founded: 1976, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Ouest", conference: "NFC",
+      bio: "Les Seahawks de Seattle.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "TB", name: "Tampa Bay Buccaneers", city: "Tampa", arena: "Raymond James Stadium",
+      capacity: "—", founded: 1976, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Sud", conference: "NFC",
+      bio: "Les Buccaneers de Tampa Bay.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "TEN", name: "Tennessee Titans", city: "Nashville", arena: "Nissan Stadium",
+      capacity: "—", founded: 1960, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AFC Sud", conference: "AFC",
+      bio: "Les Titans du Tennessee.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "WAS", name: "Washington Commanders", city: "Landover", arena: "FedExField",
+      capacity: "—", founded: 1932, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NFC Est", conference: "NFC",
+      bio: "Les Commanders de Washington.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    }
+  ],
+  NBA: [
+    {
+      id: "ATL", name: "Atlanta Hawks", city: "Atlanta", arena: "State Farm Arena",
+      capacity: "—", founded: 1946, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Est", conference: "Est",
+      bio: "Les Hawks d'Atlanta.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "BKN", name: "Brooklyn Nets", city: "Brooklyn", arena: "Barclays Center",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Atlantique", conference: "Est",
+      bio: "Les Nets de Brooklyn.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CHA", name: "Charlotte Hornets", city: "Charlotte", arena: "Spectrum Center",
+      capacity: "—", founded: 2004, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Est", conference: "Est",
+      bio: "Les Hornets de Charlotte.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CHI", name: "Chicago Bulls", city: "Chicago", arena: "United Center",
+      capacity: "—", founded: 1966, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centre", conference: "Est",
+      bio: "Les Bulls de Chicago.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CLE", name: "Cleveland Cavaliers", city: "Cleveland", arena: "Rocket Mortgage FieldHouse",
+      capacity: "—", founded: 1970, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centre", conference: "Est",
+      bio: "Les Cavaliers de Cleveland.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "DAL", name: "Dallas Mavericks", city: "Dallas", arena: "American Airlines Center",
+      capacity: "—", founded: 1980, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Ouest", conference: "Ouest",
+      bio: "Les Mavericks de Dallas.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "DET", name: "Detroit Pistons", city: "Detroit", arena: "Little Caesars Arena",
+      capacity: "—", founded: 1941, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centre", conference: "Est",
+      bio: "Les Pistons de Detroit.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "GSW", name: "Golden State Warriors", city: "San Francisco", arena: "Chase Center",
+      capacity: "—", founded: 1946, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Warriors de Golden State.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "HOU", name: "Houston Rockets", city: "Houston", arena: "Toyota Center",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Ouest", conference: "Ouest",
+      bio: "Les Rockets de Houston.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "IND", name: "Indiana Pacers", city: "Indianapolis", arena: "Gainbridge Fieldhouse",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centre", conference: "Est",
+      bio: "Les Pacers de l'Indiana.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "LAC", name: "LA Clippers", city: "Los Angeles", arena: "Crypto.com Arena",
+      capacity: "—", founded: 1970, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Clippers de Los Angeles.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "LAL", name: "Los Angeles Lakers", city: "Los Angeles", arena: "Crypto.com Arena",
+      capacity: "—", founded: 1947, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Lakers de Los Angeles.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MEM", name: "Memphis Grizzlies", city: "Memphis", arena: "FedExForum",
+      capacity: "—", founded: 1995, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Ouest", conference: "Ouest",
+      bio: "Les Grizzlies de Memphis.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MIL", name: "Milwaukee Bucks", city: "Milwaukee", arena: "Fiserv Forum",
+      capacity: "—", founded: 1968, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Centre", conference: "Est",
+      bio: "Les Bucks de Milwaukee.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MIN", name: "Minnesota Timberwolves", city: "Minneapolis", arena: "Target Center",
+      capacity: "—", founded: 1989, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Nord-Ouest", conference: "Ouest",
+      bio: "Les Timberwolves du Minnesota.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NOP", name: "New Orleans Pelicans", city: "New Orleans", arena: "Smoothie King Center",
+      capacity: "—", founded: 2002, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Ouest", conference: "Ouest",
+      bio: "Les Pelicans de la Nouvelle-Orléans.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "ORL", name: "Orlando Magic", city: "Orlando", arena: "Kia Center",
+      capacity: "—", founded: 1989, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Est", conference: "Est",
+      bio: "Le Magic d'Orlando.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "PHI", name: "Philadelphia 76ers", city: "Philadelphia", arena: "Wells Fargo Center",
+      capacity: "—", founded: 1946, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Atlantique", conference: "Est",
+      bio: "Les 76ers de Philadelphie.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "PHX", name: "Phoenix Suns", city: "Phoenix", arena: "Footprint Center",
+      capacity: "—", founded: 1968, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Suns de Phoenix.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "POR", name: "Portland Trail Blazers", city: "Portland", arena: "Moda Center",
+      capacity: "—", founded: 1970, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Nord-Ouest", conference: "Ouest",
+      bio: "Les Trail Blazers de Portland.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "SAC", name: "Sacramento Kings", city: "Sacramento", arena: "Golden 1 Center",
+      capacity: "—", founded: 1945, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Pacifique", conference: "Ouest",
+      bio: "Les Kings de Sacramento.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "SAS", name: "San Antonio Spurs", city: "San Antonio", arena: "AT&T Center",
+      capacity: "—", founded: 1967, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Ouest", conference: "Ouest",
+      bio: "Les Spurs de San Antonio.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "TOR", name: "Toronto Raptors", city: "Toronto", arena: "Scotiabank Arena",
+      capacity: "—", founded: 1995, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Atlantique", conference: "Est",
+      bio: "Les Raptors de Toronto.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "UTA", name: "Utah Jazz", city: "Salt Lake City", arena: "Delta Center",
+      capacity: "—", founded: 1974, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Nord-Ouest", conference: "Ouest",
+      bio: "Le Jazz de l'Utah.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "WAS", name: "Washington Wizards", city: "Washington", arena: "Capital One Arena",
+      capacity: "—", founded: 1961, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "Sud-Est", conference: "Est",
+      bio: "Les Wizards de Washington.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    }
+  ],
+  MLB: [
+    {
+      id: "ARI", name: "Arizona Diamondbacks", city: "Phoenix", arena: "Chase Field",
+      capacity: "—", founded: 1998, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Ouest", conference: "NL",
+      bio: "Les Diamondbacks de l'Arizona.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "BAL", name: "Baltimore Orioles", city: "Baltimore", arena: "Oriole Park",
+      capacity: "—", founded: 1901, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Est", conference: "AL",
+      bio: "Les Orioles de Baltimore.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "BOS", name: "Boston Red Sox", city: "Boston", arena: "Fenway Park",
+      capacity: "—", founded: 1901, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Est", conference: "AL",
+      bio: "Les Red Sox de Boston.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CHC", name: "Chicago Cubs", city: "Chicago", arena: "Wrigley Field",
+      capacity: "—", founded: 1876, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Central", conference: "NL",
+      bio: "Les Cubs de Chicago.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CWS", name: "Chicago White Sox", city: "Chicago", arena: "Guaranteed Rate Field",
+      capacity: "—", founded: 1900, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Central", conference: "AL",
+      bio: "Les White Sox de Chicago.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CIN", name: "Cincinnati Reds", city: "Cincinnati", arena: "Great American Ball Park",
+      capacity: "—", founded: 1882, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Central", conference: "NL",
+      bio: "Les Reds de Cincinnati.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "CLE", name: "Cleveland Guardians", city: "Cleveland", arena: "Progressive Field",
+      capacity: "—", founded: 1901, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Central", conference: "AL",
+      bio: "Les Guardians de Cleveland.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "COL", name: "Colorado Rockies", city: "Denver", arena: "Coors Field",
+      capacity: "—", founded: 1993, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Ouest", conference: "NL",
+      bio: "Les Rockies du Colorado.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "DET", name: "Detroit Tigers", city: "Detroit", arena: "Comerica Park",
+      capacity: "—", founded: 1901, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Central", conference: "AL",
+      bio: "Les Tigers de Detroit.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "KC", name: "Kansas City Royals", city: "Kansas City", arena: "Kauffman Stadium",
+      capacity: "—", founded: 1969, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Central", conference: "AL",
+      bio: "Les Royals de Kansas City.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "LAA", name: "Los Angeles Angels", city: "Anaheim", arena: "Angel Stadium",
+      capacity: "—", founded: 1961, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Ouest", conference: "AL",
+      bio: "Les Angels de Los Angeles.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MIA", name: "Miami Marlins", city: "Miami", arena: "loanDepot park",
+      capacity: "—", founded: 1993, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Est", conference: "NL",
+      bio: "Les Marlins de Miami.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MIL", name: "Milwaukee Brewers", city: "Milwaukee", arena: "American Family Field",
+      capacity: "—", founded: 1969, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Central", conference: "NL",
+      bio: "Les Brewers de Milwaukee.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "MIN", name: "Minnesota Twins", city: "Minneapolis", arena: "Target Field",
+      capacity: "—", founded: 1901, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Central", conference: "AL",
+      bio: "Les Twins du Minnesota.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "NYM", name: "New York Mets", city: "New York", arena: "Citi Field",
+      capacity: "—", founded: 1962, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Est", conference: "NL",
+      bio: "Les Mets de New York.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "OAK", name: "Oakland Athletics", city: "Oakland", arena: "Oakland Coliseum",
+      capacity: "—", founded: 1901, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Ouest", conference: "AL",
+      bio: "Les Athletics d'Oakland.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "PHI", name: "Philadelphia Phillies", city: "Philadelphia", arena: "Citizens Bank Park",
+      capacity: "—", founded: 1883, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Est", conference: "NL",
+      bio: "Les Phillies de Philadelphie.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "PIT", name: "Pittsburgh Pirates", city: "Pittsburgh", arena: "PNC Park",
+      capacity: "—", founded: 1882, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Central", conference: "NL",
+      bio: "Les Pirates de Pittsburgh.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "SD", name: "San Diego Padres", city: "San Diego", arena: "Petco Park",
+      capacity: "—", founded: 1969, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Ouest", conference: "NL",
+      bio: "Les Padres de San Diego.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "SEA", name: "Seattle Mariners", city: "Seattle", arena: "T-Mobile Park",
+      capacity: "—", founded: 1977, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Ouest", conference: "AL",
+      bio: "Les Mariners de Seattle.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "SF", name: "San Francisco Giants", city: "San Francisco", arena: "Oracle Park",
+      capacity: "—", founded: 1883, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Ouest", conference: "NL",
+      bio: "Les Giants de San Francisco.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "STL", name: "St. Louis Cardinals", city: "Saint Louis", arena: "Busch Stadium",
+      capacity: "—", founded: 1882, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Central", conference: "NL",
+      bio: "Les Cardinals de Saint Louis.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "TB", name: "Tampa Bay Rays", city: "Tampa", arena: "Tropicana Field",
+      capacity: "—", founded: 1998, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Est", conference: "AL",
+      bio: "Les Rays de Tampa Bay.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "TEX", name: "Texas Rangers", city: "Arlington", arena: "Globe Life Field",
+      capacity: "—", founded: 1961, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Ouest", conference: "AL",
+      bio: "Les Rangers du Texas.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "TOR", name: "Toronto Blue Jays", city: "Toronto", arena: "Rogers Centre",
+      capacity: "—", founded: 1977, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "AL Est", conference: "AL",
+      bio: "Les Blue Jays de Toronto.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    },
+    {
+      id: "WSH", name: "Washington Nationals", city: "Washington", arena: "Nationals Park",
+      capacity: "—", founded: 2005, coach: "—", gm: "—",
+      cups: [], lastCup: null, division: "NL Est", conference: "NL",
+      bio: "Les Nationals de Washington.",
+      season: { gp: 0, w: 0, l: 0, otl: 0, pts: 0, gf: 0, ga: 0, rank: 0 },
+      leaders: []
+    }
+  ]
+};
+Object.keys(TEAMS_EXTRA2).forEach((lg) => {
+  TEAMS_DB[lg] = [...TEAMS_DB[lg] || [], ...TEAMS_EXTRA2[lg]];
+});
+
 const LIVE_MATCHES = [
   { id: "m1", lg: "NHL", status: "LIVE", period: "P3 14:22", homeTeam: "TOR", awayTeam: "BOS", homeScore: 2, awayScore: 3, time: "20h00", arena: "Scotiabank Arena", city: "Toronto" },
   { id: "m2", lg: "NHL", status: "LIVE", period: "P2 08:44", homeTeam: "EDM", awayTeam: "VGK", homeScore: 1, awayScore: 1, time: "22h00", arena: "Rogers Place", city: "Edmonton" },
