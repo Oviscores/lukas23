@@ -4008,6 +4008,7 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
     }
     goalies = gols.slice(0,2).map(function(g){ return { name: pShort(g), num: g.sweaterNumber || '' }; });
   } else if (liveRoster && liveRoster.roster && lg === 'MLB') {
+    return null;
     // MLB : ordre de frappeurs par position + rotation lanceurs
     var mlbPlayers = liveRoster.roster.roster || [];
     var pitchingMap2 = {};
