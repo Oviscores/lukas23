@@ -7396,6 +7396,13 @@ async function fetchSanityArticles() {
     });
     // Remplacer les articles statiques
     window.__SANITY_ARTICLES__ = articles;
+    if (window.__setArts__) {
+      window.__setArts__(articles);
+    } else {
+      setTimeout(function() {
+        if (window.__setArts__) window.__setArts__(window.__SANITY_ARTICLES__);
+      }, 3000);
+    }
     if (window.__zoneus_refresh__) window.__zoneus_refresh__();
     console.log('Sanity OK:', articles.length, 'articles');
   } catch(e) {
