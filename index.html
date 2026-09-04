@@ -3331,16 +3331,15 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
     const col = TC[k] || { bg: "#555", fg: "#fff" };
     const abbr = TA[k] || tid;
     const nm = TEAM_NAMES[k] || tid;
-    const hasPage = (TEAMS_DB[lg] || []).find((t) => t.id === tid);
     return /* @__PURE__ */ React.createElement(
       "div",
       {
         key: tid,
-        onClick: () => hasPage && onTeamClick(tid),
+        onClick: () => onTeamClick(tid),
         title: nm,
-        style: { width: 38, height: 38, borderRadius: 4, background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: hasPage ? "pointer" : "default", opacity: hasPage ? 1 : 0.6, transition: "transform 0.15s", flexShrink: 0 },
+        style: { width: 38, height: 38, borderRadius: 4, background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: 1, transition: "transform 0.15s", flexShrink: 0 },
         onMouseEnter: (e) => {
-          if (hasPage) e.currentTarget.style.transform = "scale(1.2)";
+          e.currentTarget.style.transform = "scale(1.2)";
         },
         onMouseLeave: (e) => {
           e.currentTarget.style.transform = "scale(1)";
@@ -4826,20 +4825,17 @@ function TeamLogosBar({ lg, onTeamClick }) {
     var col = TC[k] || { bg: "#555", fg: "#fff" };
     var abbr = TA[k] || tid;
     var nm = TEAM_NAMES[k] || tid;
-    var hasPage = (TEAMS_DB[lg] || []).find(function(t) {
-      return t.id === tid;
-    });
     return /* @__PURE__ */ React.createElement(
       "div",
       {
         key: i,
         onClick: function() {
-          if (hasPage && onTeamClick) onTeamClick(tid, lg);
+          if (onTeamClick) onTeamClick(tid, lg);
         },
         title: nm,
-        style: { background: "rgba(255,255,255,0.5)", borderRadius: 4, padding: "4px 4px", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, cursor: hasPage ? "pointer" : "default", transition: "transform 0.15s" },
+        style: { background: "rgba(255,255,255,0.5)", borderRadius: 4, padding: "4px 4px", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, cursor: "pointer", transition: "transform 0.15s" },
         onMouseEnter: function(e) {
-          if (hasPage) e.currentTarget.style.transform = "scale(1.08)";
+          e.currentTarget.style.transform = "scale(1.08)";
         },
         onMouseLeave: function(e) {
           e.currentTarget.style.transform = "scale(1)";
