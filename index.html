@@ -3035,17 +3035,17 @@ function TeamAlignment({ rosterData, liveRoster, rosterLoading, lg, lc, tc }) {
     var defs = liveRoster.roster.defensemen || [];
     var gols = liveRoster.roster.goalies || [];
     function pShort(p) { return p ? (p.firstName && p.firstName.default ? p.firstName.default[0]+'. ' : '') + (p.lastName && p.lastName.default || '') : ''; }
-    var posMap = { C: 'C', L: 'AG', R: 'AD' };
-    // Trier: centres d'abord, puis AG, puis AD
-    var centres = fwds.filter(function(p){ return p.positionCode === 'C'; });
-    var leftWings = fwds.filter(function(p){ return p.positionCode === 'L'; });
-    var rightWings = fwds.filter(function(p){ return p.positionCode === 'R'; });
-    var nLines = Math.min(4, Math.max(centres.length, leftWings.length, rightWings.length));
+    var posLabels = { C: 'C', L: 'AG', R: 'AD' };
+    // Grouper par 3 en respectant l'ordre API
+    var nLines = Math.min(4, Math.ceil(fwds.length / 3));
     for (var li = 0; li < nLines; li++) {
+      var p0 = fwds[li*3] || null;
+      var p1 = fwds[li*3+1] || null;
+      var p2 = fwds[li*3+2] || null;
       lines.push([
-        { pos:'AG', name: pShort(leftWings[li]), num: leftWings[li] ? leftWings[li].sweaterNumber : '' },
-        { pos:'C',  name: pShort(centres[li]), num: centres[li] ? centres[li].sweaterNumber : '' },
-        { pos:'AD', name: pShort(rightWings[li]), num: rightWings[li] ? rightWings[li].sweaterNumber : '' },
+        { pos: p0 ? (posLabels[p0.positionCode] || p0.positionCode) : 'AG', name: pShort(p0), num: p0 ? p0.sweaterNumber : '' },
+        { pos: p1 ? (posLabels[p1.positionCode] || p1.positionCode) : 'C',  name: pShort(p1), num: p1 ? p1.sweaterNumber : '' },
+        { pos: p2 ? (posLabels[p2.positionCode] || p2.positionCode) : 'AD', name: pShort(p2), num: p2 ? p2.sweaterNumber : '' },
       ]);
     }
     for (var di = 0; di < Math.min(4, Math.floor(defs.length/2)); di++) {
