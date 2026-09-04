@@ -3813,7 +3813,7 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
     );
   }
   // ─── NFL ROSTER ─────────────────────────────────────────
-  if (liveRoster && liveRoster.athletes && lg === 'NFL') {
+  if (false && liveRoster && liveRoster.athletes && lg === 'NFL') {
     var nflGroups = {
       offense: (liveRoster.athletes.find(function(g){ return g.position === 'offense'; }) || {}).items || [],
       defense: (liveRoster.athletes.find(function(g){ return g.position === 'defense'; }) || {}).items || [],
@@ -4269,13 +4269,21 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
           if (nbaId) endpoint = PROXY + '?league=nba_roster&team=' + nbaId;
         }
         else if (lg === 'NFL') {
-          var nflSlug = NFL_ESPN_TEAMS[teamId] || teamId.toLowerCase();
-          endpoint = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + nflSlug + '/roster';
+          // NFL roster désactivé temporairement
+          endpoint = null;
         }
         if (endpoint) {
-          var r = await fetch(endpoint);
-          var d = await r.json();
-          setLiveRoster(d);
+          var controller = new AbortController();
+          var timeout = setTimeout(function(){ controller.abort(); }, 5000);
+          try {
+            var r = await fetch(endpoint, { signal: controller.signal });
+            var d = await r.json();
+            setLiveRoster(d);
+          } catch(fe) {
+            console.log('roster fetch timeout/error:', fe.message);
+          } finally {
+            clearTimeout(timeout);
+          }
         }
       } catch(e) { console.log('roster error:', e); }
       setRosterLoading(false);
