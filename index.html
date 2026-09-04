@@ -2551,7 +2551,8 @@ async function initLiveScores() {
     if (scores.length > 0) {
       window.LIVE_MATCHES = scores;
       // Déclencher re-render si possible
-      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      if (window.__setArts__) window.__setArts__(articles);
+    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
     }
   } catch(e) { console.log('initLiveScores error:', e); }
 }
@@ -6213,7 +6214,8 @@ function ZoneUS() {
     window.addEventListener('hashchange', onHashChange);
     return function() { delete window.__zoneus_refresh__; window.removeEventListener('hashchange', onHashChange); }; 
   }, []);
-  const [arts, setArts] = useState(ARTICLES);
+  const [arts, setArts] = useState(window.__SANITY_ARTICLES__ || ARTICLES);
+  window.__setArts__ = setArts;
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
   const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
@@ -7368,6 +7370,41 @@ async function fetchAllStatuts() {
     console.log('Statuts OK:', allPlayers.length);
   }
 }
+
+// ─── SANITY CMS ─────────────────────────────────────────────
+async function fetchSanityArticles() {
+  try {
+    var query = encodeURIComponent('*[_type == "article"] | order(publishedAt desc) [0...50] {_id, title, chapo, league, tag, franchise, hot, publishedAt, "imageUrl": image.asset->url}');
+    var url = 'https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query;
+    var resp = await fetch(url, {
+      headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' }
+    });
+    var data = await resp.json();
+    if (!data.result || !data.result.length) return;
+    var articles = data.result.map(function(a, i) {
+      return {
+        id: 'sanity_' + (i+1),
+        league: a.league || 'NHL',
+        tag: a.tag || 'ACTUS',
+        franchise: a.franchise || '',
+        hot: a.hot || false,
+        title: a.title || '',
+        chapo: a.chapo || '',
+        img: a.imageUrl || null,
+        publishedAt: a.publishedAt || ''
+      };
+    });
+    // Remplacer les articles statiques
+    window.__SANITY_ARTICLES__ = articles;
+    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+    console.log('Sanity OK:', articles.length, 'articles');
+  } catch(e) {
+    console.log('Sanity error:', e.message);
+  }
+}
+fetchSanityArticles();
+setInterval(fetchSanityArticles, 5 * 60 * 1000); // Refresh toutes les 5 min
+
 setTimeout(fetchAllStatuts, 2000);
 setInterval(fetchAllStatuts, 10 * 60 * 1000); // Actualisation toutes les 10 minutes
 </script>
