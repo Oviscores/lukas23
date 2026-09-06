@@ -3565,7 +3565,9 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
       e.currentTarget.style.background = "transparent";
     } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, a.title));
   }))));
-}center", color: "#bbb" } }, "Joueur introuvable");
+function PlayerPage({ playerId, lg, onBack, articles, onArticleClick }) {
+  const p = findPlayer(lg, playerId);
+  if (!p) return /* @__PURE__ */ React.createElement("div", { style: { padding: 40, textAlign: "center", color: "#bbb" } }, "Joueur introuvable")
   const lc = LG[lg].color;
   const dk = LG[lg].dark || "#111";
   const bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
