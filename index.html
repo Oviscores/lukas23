@@ -7297,6 +7297,25 @@ async function fetchAllStatuts() {
   }
 }
 
+function portableTextToHTML(body) {
+  if (!body || !Array.isArray(body)) return '';
+  return body.map(function(block) {
+    if (block._type === 'block' && Array.isArray(block.children)) {
+      var text = block.children.map(function(child) {
+        var t = (child.text || '').replace(/\n/g, '<br>');
+        if (!t) return '';
+        if (child.marks && child.marks.indexOf('strong') >= 0) t = '<strong>' + t + '</strong>';
+        if (child.marks && child.marks.indexOf('em') >= 0) t = '<em>' + t + '</em>';
+        return t;
+      }).join('');
+      if (block.style === 'h2') return '<h2 style="font-size:18px;font-weight:900;margin:16px 0 8px">' + text + '</h2>';
+      if (block.style === 'h3') return '<h3 style="font-size:15px;font-weight:800;margin:12px 0 6px">' + text + '</h3>';
+      return '<p style="margin:0 0 14px 0">' + text + '</p>';
+    }
+    return '';
+  }).join('');
+}
+
 async function fetchSanityArticles() {
   try {
     var query = encodeURIComponent('*[_type == "article"] | order(publishedAt desc) [0...50] {_id, title, chapo, body, league, tag, franchise, hot, publishedAt, "imageUrl": image.asset->url}');
