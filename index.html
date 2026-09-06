@@ -3440,7 +3440,7 @@ function PBg({ lg, h, seed = 1, img }) {
     {
       src: url,
       alt: lg,
-      style: { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" },
+      style: { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: img ? "contain" : "cover", objectPosition: "center", background: img ? "#000" : "transparent" },
       onError: (e) => {
         e.currentTarget.style.display = "none";
         if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = "flex";
