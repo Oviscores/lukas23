@@ -3535,15 +3535,9 @@ function portableTextToHTML(body) {
   if (!body || !Array.isArray(body)) return '';
   return body.map(function(block) {
     if (block._type === 'block' && Array.isArray(block.children)) {
-      var text = block.children.map(function(child) {
-        var t = (child.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        if (child.marks && child.marks.indexOf('strong') >= 0) t = '<strong>' + t + '</strong>';
-        if (child.marks && child.marks.indexOf('em') >= 0) t = '<em>' + t + '</em>';
-        return t;
+      return block.children.map(function(child) {
+        return child.text || '';
       }).join('');
-      if (block.style === 'h2') return '<h2 style="font-size:18px;font-weight:900;margin:16px 0 8px">' + text + '</h2>';
-      if (block.style === 'h3') return '<h3 style="font-size:15px;font-weight:800;margin:12px 0 6px">' + text + '</h3>';
-      return text;
     }
     return '';
   }).filter(Boolean).join('\n\n');
