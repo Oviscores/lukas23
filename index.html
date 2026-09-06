@@ -3408,52 +3408,11 @@ const STATS_FULL = {
     ]
   }
 };
-function portableTextToHTML(body) {
-  if (!body || !Array.isArray(body)) return '';
-  return body.map(function(block) {
-    if (block._type === 'block' && Array.isArray(block.children)) {
-      var text = block.children.map(function(child) {
-        var t = (child.text || '').replace(/\n/g, '<br>');
-        if (!t) return '';
-        if (child.marks && child.marks.indexOf('strong') >= 0) t = '<strong>' + t + '</strong>';
-        if (child.marks && child.marks.indexOf('em') >= 0) t = '<em>' + t + '</em>';
-        return t;
-      }).join('');
-      if (block.style === 'h2') return '<h2 style="font-size:18px;font-weight:900;margin:16px 0 8px;font-family:Barlow Condensed,sans-serif">' + text + '</h2>';
-      if (block.style === 'h3') return '<h3 style="font-size:15px;font-weight:800;margin:12px 0 6px;font-family:Barlow Condensed,sans-serif">' + text + '</h3>';
-      return '<p style="margin:0 0 14px 0">' + text + '</p>';
-    }
-    return '';
-  }).join('');
-}
-function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) {
-  const lc = LG[article.league] && LG[article.league].color || "#D50A0A";
-  const lg = article.league;
-  const related = (articles || []).filter(function(a) {
-    return a.id !== article.id && a.league === lg;
-  }).slice(0, 3);
-  const lgTeams = TEAMS_DB[lg] || [];
-  const linkedTeam = article.franchise ? lgTeams.filter(function(t) {
-    return t.id === article.franchise;
-  })[0] || null : null;
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99, img: article.img }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", padding: "22px 26px", borderRadius: "0 0 4px 4px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.8, marginBottom: 16, borderLeft: "3px solid " + lc, paddingLeft: 12, fontStyle: "italic" } }, article.chapo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#ccc", marginBottom: 20 } }, "Zone US \xB7 ", article.date), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.bodyHTML ? React.createElement("div", { dangerouslySetInnerHTML: { __html: article.bodyHTML }, style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#333", lineHeight: 1.9 } }) : article.chapo)), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
-    return /* @__PURE__ */ React.createElement("div", { key: i, onClick: function() {
-      onBack();
-      setTimeout(function() {
-      }, 100);
-    }, style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderBottom: "1px solid #f8f8f8", cursor: "pointer" }, onMouseEnter: function(e) {
-      e.currentTarget.style.background = lc + "08";
-    }, onMouseLeave: function(e) {
-      e.currentTarget.style.background = "transparent";
-    } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, a.title));
-  }))));
-}function LB({ lg, sz = 18 }) {
+function LB({ lg, sz = 18 }) {
   const logos = { NHL: 'https://a.espncdn.com/i/teamlogos/leagues/500/nhl.png', NFL: 'https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png', NBA: 'https://a.espncdn.com/i/teamlogos/leagues/500/nba.png', MLB: 'https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png' };
   const cfg = { NHL:{bg:"#000"}, NFL:{bg:"#013369"}, NBA:{bg:"#1D428A"}, MLB:{bg:"#041E42"} }[lg] || {bg:"#333"};
   return React.createElement("div", { style: { width: sz, height: sz, borderRadius: "50%", background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" } },
     logos[lg] ? React.createElement("img", { src: logos[lg], alt: lg, style: { width: sz*0.85, height: sz*0.85, objectFit: "contain" }, onError: function(e){e.target.style.display="none";} }) : null
-  );
-} null
   );
 }
 function TB({ id, lg, sz = 14 }) {
@@ -3496,7 +3455,7 @@ function HCard({ a, onClick }) {
       onMouseLeave: () => setHov(false),
       style: {
         position: "relative",
-        height: 240,
+        height: 320,
         borderRadius: 4,
         overflow: "hidden",
         cursor: "pointer",
@@ -3567,6 +3526,24 @@ function NCard({ a, onClick }) {
     } }, a.title))
   );
 }
+function portableTextToHTML(body) {
+  if (!body || !Array.isArray(body)) return '';
+  return body.map(function(block) {
+    if (block._type === 'block' && Array.isArray(block.children)) {
+      var text = block.children.map(function(child) {
+        var t = (child.text || '').replace(/\n/g, '<br>');
+        if (!t) return '';
+        if (child.marks && child.marks.indexOf('strong') >= 0) t = '<strong>' + t + '</strong>';
+        if (child.marks && child.marks.indexOf('em') >= 0) t = '<em>' + t + '</em>';
+        return t;
+      }).join('');
+      if (block.style === 'h2') return '<h2 style="font-size:18px;font-weight:900;margin:16px 0 8px">' + text + '</h2>';
+      if (block.style === 'h3') return '<h3 style="font-size:15px;font-weight:800;margin:12px 0 6px">' + text + '</h3>';
+      return '<p style="margin:0 0 14px 0">' + text + '</p>';
+    }
+    return '';
+  }).join('');
+}
 function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) {
   const lc = LG[article.league] && LG[article.league].color || "#D50A0A";
   const lg = article.league;
@@ -3577,7 +3554,7 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
   const linkedTeam = article.franchise ? lgTeams.filter(function(t) {
     return t.id === article.franchise;
   })[0] || null : null;
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99, img: article.img }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", padding: "22px 26px", borderRadius: "0 0 4px 4px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.8, marginBottom: 16, borderLeft: "3px solid " + lc, paddingLeft: 12, fontStyle: "italic" } }, article.chapo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#ccc", marginBottom: 20 } }, "Zone US \xB7 ", article.date), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.body || article.chapo)), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99, img: article.img }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", padding: "22px 26px", borderRadius: "0 0 4px 4px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.8, marginBottom: 16, borderLeft: "3px solid " + lc, paddingLeft: 12, fontStyle: "italic" } }, article.chapo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#ccc", marginBottom: 20 } }, "Zone US \xB7 ", article.date), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.bodyHTML ? null : article.chapo)), article.bodyHTML && React.createElement("div", { dangerouslySetInnerHTML: { __html: article.bodyHTML }, style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#333", lineHeight: 1.9 } }), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
     return /* @__PURE__ */ React.createElement("div", { key: i, onClick: function() {
       onBack();
       setTimeout(function() {
@@ -3588,10 +3565,7 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
       e.currentTarget.style.background = "transparent";
     } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, a.title));
   }))));
-}
-function PlayerPage({ playerId, lg, onBack, articles, onArticleClick }) {
-  const p = findPlayer(lg, playerId);
-  if (!p) return /* @__PURE__ */ React.createElement("div", { style: { padding: 40, textAlign: "center", color: "#bbb" } }, "Joueur introuvable");
+}center", color: "#bbb" } }, "Joueur introuvable");
   const lc = LG[lg].color;
   const dk = LG[lg].dark || "#111";
   const bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
@@ -7340,11 +7314,11 @@ async function fetchSanityArticles() {
         title: a.title || '',
         chapo: a.chapo || '',
         img: a.imageUrl || null,
-        body: null,
         bodyHTML: a.body ? portableTextToHTML(a.body) : null,
         publishedAt: a.publishedAt || ''
       };
     });
+    window.__SANITY_ARTICLES__ = sanityArts;
     var sanityLeagues = sanityArts.map(function(a){ return a.league; });
     var staticFiltered = (window.ARTICLES || []).filter(function(a){ return sanityLeagues.indexOf(a.league) === -1; });
     var merged = sanityArts.concat(staticFiltered);
@@ -7353,7 +7327,6 @@ async function fetchSanityArticles() {
     } else {
       setTimeout(function() { if (window.__setArts__) window.__setArts__(merged); }, 3000);
     }
-    window.__SANITY_ARTICLES__ = sanityArts;
     console.log('Sanity OK:', sanityArts.length, 'articles');
   } catch(e) {
     console.log('Sanity error:', e.message);
