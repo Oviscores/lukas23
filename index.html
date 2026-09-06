@@ -7350,6 +7350,7 @@ async function fetchSanityArticles() {
     } else {
       setTimeout(function() { if (window.__setArts__) window.__setArts__(merged); }, 3000);
     }
+    window.__SANITY_ARTICLES__ = sanityArts;
     console.log('Sanity OK:', sanityArts.length, 'articles');
   } catch(e) {
     console.log('Sanity error:', e.message);
