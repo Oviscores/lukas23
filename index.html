@@ -3538,9 +3538,7 @@ function portableTextToString(body) {
       return block.children.map(function(child) { return child.text || ''; }).join('');
     }
     return '';
-  }).filter(Boolean).join('
-
-');
+  }).filter(Boolean).join(' ');
 }
 
 function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) {
