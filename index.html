@@ -3428,10 +3428,10 @@ function TB({ id, lg, sz = 14 }) {
 function Logo({ w = 90, onClick }) {
   return /* @__PURE__ */ React.createElement("img", { src: window.LOGO, alt: "Zone US", width: w, onClick, style: { display: "block", objectFit: "contain", cursor: onClick ? "pointer" : "default" } });
 }
-function PBg({ lg, h, seed = 1 }) {
+function PBg({ lg, h, seed = 1, img }) {
   const kws = UNSPLASH[lg] || ["sport"];
   const kw = kws[seed % kws.length];
-  const url = "https://source.unsplash.com/featured/1200x800/?" + kw + "&sig=" + seed;
+  const url = img || "https://source.unsplash.com/featured/1200x800/?" + kw + "&sig=" + seed;
   const lc = LG[lg] && LG[lg].color || "#333";
   const dk = LG[lg] && LG[lg].dark || "#111";
   const em = LG[lg] && LG[lg].emoji || "\u2605";
@@ -3467,7 +3467,7 @@ function HCard({ a, onClick }) {
         transition: "box-shadow 0.25s"
       }
     },
-    /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, transform: hov ? "scale(1.04)" : "scale(1)", transition: "transform 0.5s" } }, /* @__PURE__ */ React.createElement(PBg, { lg: a.league, h: 90, seed: a.id })),
+    /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, transform: hov ? "scale(1.04)" : "scale(1)", transition: "transform 0.5s" } }, /* @__PURE__ */ React.createElement(PBg, { lg: a.league, h: 90, seed: a.id, img: a.img })),
     /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.92) 0%,rgba(0,0,0,0.4) 55%,transparent 100%)" } }),
     /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 0, left: 0, right: 0, height: 3, background: lc } }),
     /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 6, left: 6, display: "flex", alignItems: "center", gap: 3, zIndex: 2 } }, /* @__PURE__ */ React.createElement(LB, { lg: a.league, sz: 16 }), a.franchise && /* @__PURE__ */ getTeamLogo(a.franchise, a.league, 13)),
@@ -3513,7 +3513,7 @@ function NCard({ a, onClick }) {
         transition: "all 0.2s"
       }
     },
-    /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, transform: hov ? "scale(1.05)" : "scale(1)", transition: "transform 0.45s" } }, /* @__PURE__ */ React.createElement(PBg, { lg: a.league, h: 82, seed: a.id })),
+    /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, transform: hov ? "scale(1.05)" : "scale(1)", transition: "transform 0.45s" } }, /* @__PURE__ */ React.createElement(PBg, { lg: a.league, h: 82, seed: a.id, img: a.img })),
     /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.25) 55%,transparent 100%)" } }),
     /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 0, left: 0, right: 0, height: 3, background: lc } }),
     /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 4, left: 4, display: "flex", alignItems: "center", gap: 3 } }, /* @__PURE__ */ React.createElement(LB, { lg: a.league, sz: 13 })),
@@ -3540,7 +3540,7 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
   const linkedTeam = article.franchise ? lgTeams.filter(function(t) {
     return t.id === article.franchise;
   })[0] || null : null;
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99 }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", padding: "22px 26px", borderRadius: "0 0 4px 4px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.8, marginBottom: 16, borderLeft: "3px solid " + lc, paddingLeft: 12, fontStyle: "italic" } }, article.chapo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#ccc", marginBottom: 20 } }, "Zone US \xB7 ", article.date), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.body || article.chapo)), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99, img: article.img }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", padding: "22px 26px", borderRadius: "0 0 4px 4px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.8, marginBottom: 16, borderLeft: "3px solid " + lc, paddingLeft: 12, fontStyle: "italic" } }, article.chapo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#ccc", marginBottom: 20 } }, "Zone US \xB7 ", article.date), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.body || article.chapo)), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
     return /* @__PURE__ */ React.createElement("div", { key: i, onClick: function() {
       onBack();
       setTimeout(function() {
@@ -6130,6 +6130,7 @@ function ZoneUS() {
     return function() { delete window.__zoneus_refresh__; window.removeEventListener('hashchange', onHashChange); }; 
   }, []);
   const [arts, setArts] = useState(ARTICLES);
+  window.__setArts__ = setArts;
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
   const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
@@ -7284,6 +7285,48 @@ async function fetchAllStatuts() {
     console.log('Statuts OK:', allPlayers.length);
   }
 }
+
+// ─── SANITY CMS ─────────────────────────────────────────────
+async function fetchSanityArticles() {
+  try {
+    var query = encodeURIComponent('*[_type == "article"] | order(publishedAt desc) [0...50] {_id, title, chapo, league, tag, franchise, hot, publishedAt, "imageUrl": image.asset->url}');
+    var url = 'https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query;
+    var resp = await fetch(url, { headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' } });
+    var data = await resp.json();
+    if (!data.result || !data.result.length) return;
+    var sanityArts = data.result.map(function(a, i) {
+      return {
+        id: 'sanity_' + (i+1),
+        league: a.league || 'NHL',
+        tag: a.tag || 'ACTUS',
+        franchise: a.franchise || '',
+        hot: a.hot || false,
+        title: a.title || '',
+        chapo: a.chapo || '',
+        img: a.imageUrl || null,
+        publishedAt: a.publishedAt || ''
+      };
+    });
+    // Fusionner : articles Sanity en premier, statiques en dessous (sans doublons de ligue)
+    var sanityLeagues = sanityArts.map(function(a){ return a.league; });
+    var staticFiltered = ARTICLES.filter(function(a){ return sanityLeagues.indexOf(a.league) === -1; });
+    var merged = sanityArts.concat(staticFiltered);
+    window.__SANITY_ARTICLES__ = sanityArts;
+    if (window.__setArts__) {
+      window.__setArts__(merged);
+    } else {
+      setTimeout(function() {
+        if (window.__setArts__) window.__setArts__(merged);
+      }, 3000);
+    }
+    console.log('Sanity OK:', sanityArts.length, 'articles');
+  } catch(e) {
+    console.log('Sanity error:', e.message);
+  }
+}
+fetchSanityArticles();
+setInterval(fetchSanityArticles, 5 * 60 * 1000);
+
 setTimeout(fetchAllStatuts, 2000);
 setInterval(fetchAllStatuts, 10 * 60 * 1000); // Actualisation toutes les 10 minutes
 </script>
