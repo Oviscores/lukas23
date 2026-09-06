@@ -3536,7 +3536,7 @@ function portableTextToHTML(body) {
   return body.map(function(block) {
     if (block._type === 'block' && Array.isArray(block.children)) {
       var text = block.children.map(function(child) {
-        var t = child.text || '';
+        var t = (child.text || '').replace(/\n/g, '<br>');
         if (!t) return '';
         if (child.marks && child.marks.indexOf('strong') >= 0) t = '<strong>' + t + '</strong>';
         if (child.marks && child.marks.indexOf('em') >= 0) t = '<em>' + t + '</em>';
