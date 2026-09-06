@@ -679,6 +679,7 @@ const ARTICLES = [
   { id: 19, league: "NFL", tag: "RECORD", franchise: "KC", hot: false, title: "Patrick Mahomes - 200 touchdown passes en 7 saisons seulement", chapo: "Le quarterback des Chiefs atteint la barre des 200 TD, devenant le plus rapide de l histoire a ce cap.", date: "24 mai 2026", readTime: "3 min" },
   { id: 20, league: "MLB", tag: "TRANSFERT", franchise: "NYM", hot: false, title: "Juan Soto - 765M, le plus grand contrat de l histoire du baseball", chapo: "Juan Soto devient l athlete le mieux paye du sport professionnel americain avec ce contrat pharaonique.", date: "24 mai 2026", readTime: "5 min" }
 ];
+window.ARTICLES = ARTICLES;
 const NEWS_FEED = [
   { league: "NHL", time: "14h32", text: "McDavid absent 3 semaines - genou" },
   { league: "NBA", time: "13h58", text: "LeBron confirme sa 22e saison" },
@@ -7322,7 +7323,7 @@ async function fetchSanityArticles() {
     });
     // Fusionner : articles Sanity en premier, statiques en dessous (sans doublons de ligue)
     var sanityLeagues = sanityArts.map(function(a){ return a.league; });
-    var staticFiltered = ARTICLES.filter(function(a){ return sanityLeagues.indexOf(a.league) === -1; });
+    var staticFiltered = (window.ARTICLES || []).filter(function(a){ return sanityLeagues.indexOf(a.league) === -1; });
     var merged = sanityArts.concat(staticFiltered);
     window.__SANITY_ARTICLES__ = sanityArts;
     if (window.__setArts__) {
