@@ -7365,7 +7365,7 @@ window.fetchStandings = async function(lg) {
       result[divName] = div.teamRecords.map(function(t, i) {
         return {
           r: i + 1,
-          ab: t.team.abbreviation,
+          ab: t.team.abbreviation === 'AZ' ? 'ARI' : t.team.abbreviation,
           w: t.wins,
           l: t.losses,
           pct: t.winningPercentage,
