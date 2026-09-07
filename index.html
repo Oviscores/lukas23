@@ -2650,7 +2650,7 @@ async function fetchCalendarData(lg) {
             var htId = ht.team&&ht.team.id, atId = at.team&&at.team.id;
             return {id:'mlb_'+g.gamePk, away:at.team?(at.team.abbreviation==='AZ'?'ARI':at.team.abbreviation):'', home:ht.team?(ht.team.abbreviation==='AZ'?'ARI':ht.team.abbreviation):'',
               as:isLive||isFinal ? (at.score||0) : null, hs:isLive||isFinal ? (ht.score||0) : null, st:g.status?g.status.abstractGameState:'Preview', time:timeStr,
-              awayLogo:at.team&&at.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+at.team.abbreviation+'&lg=MLB':'', homeLogo:ht.team&&ht.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+ht.team.abbreviation+'&lg=MLB':''};
+              awayLogo:at.team&&at.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(at.team.abbreviation==='AZ'?'ARI':at.team.abbreviation)+'&lg=MLB':'', homeLogo:ht.team&&ht.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(ht.team.abbreviation==='AZ'?'ARI':ht.team.abbreviation)+'&lg=MLB':''};
           })
         };
       });
