@@ -79,6 +79,7 @@
 
 .livebar-wrapper { }
 @media (max-width: 768px) {
+  .ncards-grid { grid-template-columns: 1fr !important; }
   .standings-table { grid-template-columns: 1fr !important; overflow-x: hidden !important; width: 100% !important; }
   .standings-table > div { overflow-x: hidden !important; width: 100% !important; }
   .standings-table table { width: 100% !important; table-layout: fixed !important; }
@@ -4438,7 +4439,7 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
     var tc2 = TC[m.team + "_" + lg] || { bg: lc, fg: "#fff" };
     var pct = Math.round(m.current / m.target * 100);
     return /* @__PURE__ */ React.createElement("div", { key: i, style: { padding: "7px 10px", borderBottom: "1px solid rgba(0,0,0,0.04)", borderRight: "1px solid rgba(0,0,0,0.04)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 5, marginBottom: 3 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 16, height: 16, borderRadius: 2, background: tc2.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: tc2.fg } }, m.team)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 800, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, m.player), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: "#fff", background: lc, padding: "1px 6px", borderRadius: 2, flexShrink: 0 } }, "\xC0 " + m.diff + " " + m.unit)), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#666", marginBottom: 4 } }, m.cat + " \u2014 " + m.current + "/" + m.target), /* @__PURE__ */ React.createElement("div", { style: { height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { height: "100%", width: pct + "%", background: lc, borderRadius: 2 } })));
-  }))), rest.length > 3 && /* @__PURE__ */ React.createElement(HCard, { a: rest[3], onClick: onArticleClick }), rest.length > 4 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 8 } }, rest.slice(4, 7).map(function(a) {
+  }))), rest.length > 3 && /* @__PURE__ */ React.createElement(HCard, { a: rest[3], onClick: onArticleClick }), rest.length > 4 && /* @__PURE__ */ React.createElement("div", { className: "ncards-grid", style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 8 } }, rest.slice(4, 7).map(function(a) {
     return /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: onArticleClick });
   })), rest.length > 7 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(7, 10).map(function(a) {
     return /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: onArticleClick });
