@@ -6188,6 +6188,33 @@ function ZoneUS() {
   const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
   const page = _pageState[0];
   const _setPage = _pageState[1];
+  React.useEffect(function() {
+    var titles = {
+      home: "Zone US — L'actu NHL, NFL, NBA et MLB en français",
+      NHL: "NHL — Actualités hockey sur glace | Zone US",
+      NFL: "NFL — Actualités football américain | Zone US",
+      NBA: "NBA — Actualités basket-ball | Zone US",
+      MLB: "MLB — Actualités baseball | Zone US",
+      CalNHL: "Calendrier & Résultats NHL | Zone US",
+      CalNFL: "Calendrier & Résultats NFL | Zone US",
+      CalNBA: "Calendrier & Résultats NBA | Zone US",
+      CalMLB: "Calendrier & Résultats MLB | Zone US",
+    };
+    var descs = {
+      home: "Zone US, le média sportif francophone dédié aux 4 grandes ligues américaines : NHL, NFL, NBA et MLB.",
+      NHL: "Toute l'actualité NHL en français : résultats, classements, transferts et analyses.",
+      NFL: "Toute l'actualité NFL en français : résultats, classements, transferts et analyses.",
+      NBA: "Toute l'actualité NBA en français : résultats, classements, transferts et analyses.",
+      MLB: "Toute l'actualité MLB en français : résultats, classements, transferts et analyses.",
+    };
+    document.title = titles[page] || "Zone US — Sport américain en français";
+    var desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', descs[page] || descs.home);
+    var og = document.querySelector('meta[property="og:title"]');
+    if (og) og.setAttribute('content', document.title);
+    var ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', descs[page] || descs.home);
+  }, [page]);
   const setPage = function(p) {
     _setPage(p);
     window.location.hash = p === "home" ? "" : p;
@@ -6856,28 +6883,7 @@ async function fetchStandings(lg) {
 }
 </script>
 <script>
-
-function syncGSTATS(lg) {
-  var sp = window.STATS_PAGES && window.STATS_PAGES[lg];
-  if (!sp || !sp.players || !sp.players.length) return;
-  GSTATS[lg] = sp.players.map(function(c) {
-    return {
-      label: c.label, unit: '',
-      players: c.data.map(function(p) { return { name: p.name, team: p.ab, val: p.val }; })
-    };
-  });
-}
-window.__NHL_STATS_LOADED__ = false;
-async function fetchNHLStats() {
-  if (window.__NHL_STATS_LOADED__) return;
-  window.__NHL_STATS_LOADED__ = true;
-  const P = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-  const S = '20252026';
-  function pp(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(p){var n=(p.firstName&&p.firstName.default||'')+' '+(p.lastName&&p.lastName.default||'');var ab=(p.teamAbbrevs&&p.teamAbbrevs.default)||p.teamAbbrev||'';return{name:n.trim(),ab:ab,val:p.value!==undefined?p.value:0};});}
-  function pg(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(g){var n=(g.firstName&&g.firstName.default||'')+' '+(g.lastName&&g.lastName.default||'');var ab=(g.teamAbbrevs&&g.teamAbbrevs.default)||(g.teamAbbrev&&g.teamAbbrev.default)||g.teamAbbrev||'';var v=g.value!==undefined?g.value:0;if(c==='savePctg')v=typeof v==='number'?v.toFixed(3):v;return{name:n.trim(),ab:ab,val:v};});}
-  function pt(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(t){return{ab:(t.teamAbbrevs&&t.teamAbbrevs.default)||t.teamAbbrev||'',val:t.value!==undefined?t.value:0};});}
-  try {
-    var pC=['goals','assists','points','powerPlayPoints','hits','penaltyMinutes','plusMinus','gameWinningGoals','shots','blockedShots','timeOnIcePerGame'];
+ts','timeOnIcePerGame'];
     var tC=['teamPowerPlayPct','teamPenaltyKillPct','hits'];
     var gC=['savePctg','wins','goalsAgainstAverage','shutouts'];
     var pL={goals:'Buts',assists:'Passes',points:'Points',plusMinus:'+/-',penaltyMinutes:'Min. pénalité',powerPlayPoints:'Points PP',gameWinningGoals:'Buts vainqueurs',shots:'Tirs',hits:'Mises en échec',blockedShots:'Tirs bloqués',timeOnIcePerGame:'Temps de glace'};
@@ -7375,6 +7381,32 @@ async function fetchSanityArticles() {
     if (window.__setArts__) window.__setArts__(merged);
     else setTimeout(function(){ if(window.__setArts__) window.__setArts__(merged); }, 3000);
     console.log('Sanity OK:', sanityArts.length, 'articles');
+    // JSON-LD articles pour Google
+    var existingLd = document.querySelector('script[data-type="articles-ld"]');
+    if (existingLd) existingLd.remove();
+    var ld = document.createElement('script');
+    ld.type = 'application/ld+json';
+    ld.setAttribute('data-type', 'articles-ld');
+    ld.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": sanityArts.map(function(a, i) {
+        return {
+          "@type": "ListItem",
+          "position": i + 1,
+          "item": {
+            "@type": "NewsArticle",
+            "headline": a.title,
+            "description": a.chapo,
+            "image": a.img || "https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp",
+            "datePublished": a.publishedAt,
+            "publisher": { "@type": "Organization", "name": "Zone US", "url": "https://zoneus.fr" },
+            "url": "https://zoneus.fr/"
+          }
+        };
+      })
+    });
+    document.head.appendChild(ld);
   } catch(e) { console.log('Sanity error:', e.message); }
 }
 window.fetchStandings = async function(lg) {
