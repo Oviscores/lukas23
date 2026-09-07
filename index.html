@@ -4285,7 +4285,9 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
     if (window.fetchStandings) window.fetchStandings(lg);
   }, [lg]);
   const hero = lgArts[0], rest = lgArts.slice(1);
-  const confs = CONF_STANDINGS[lg] || {};
+  const [confs, setConfs] = React.useState(CONF_STANDINGS[lg] || {});
+  React.useEffect(function() { setConfs(CONF_STANDINGS[lg] || {}); }, [lg]);
+  window.__setStandings__ = function(l, data) { if (l === lg) setConfs(data); };
   const confKeys = Object.keys(confs);
   const playerStatus = PLAYER_STATUS[lg] || [];
   const news = LNEWS[lg] || [];
@@ -7341,6 +7343,43 @@ async function fetchSanityArticles() {
 }
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5 * 60 * 1000);
+
+// ─── MLB STANDINGS ──────────────────────────────────────
+var __STANDINGS_CACHE__ = {};
+window.fetchStandings = async function(lg) {
+  if (lg !== 'MLB') return;
+  if (__STANDINGS_CACHE__[lg] && Date.now() - __STANDINGS_CACHE__[lg].ts < 300000) {
+    if (window.__setStandings__) window.__setStandings__(lg, __STANDINGS_CACHE__[lg].data);
+    return;
+  }
+  try {
+    var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_standings');
+    var data = await resp.json();
+    var divMap = {201:'AL Est', 202:'AL Central', 203:'AL Ouest', 204:'NL Est', 205:'NL Central', 206:'NL Ouest'};
+    var result = {};
+    (data.records || []).forEach(function(div, di) {
+      var divName = divMap[div.division.id] || ('Div ' + div.division.id);
+      result[divName] = div.teamRecords.map(function(t, i) {
+        return {
+          r: i + 1,
+          ab: t.team.abbreviation,
+          w: t.wins,
+          l: t.losses,
+          pct: t.winningPercentage,
+          gb: t.gamesBack === '-' ? '-' : t.gamesBack
+        };
+      });
+    });
+    __STANDINGS_CACHE__[lg] = { ts: Date.now(), data: result };
+    // Mettre à jour CONF_STANDINGS
+    if (window.__CONF_STANDINGS__) window.__CONF_STANDINGS__.MLB = result;
+    if (window.__setStandings__) window.__setStandings__(lg, result);
+    console.log('MLB standings OK');
+  } catch(e) {
+    console.log('MLB standings error:', e.message);
+  }
+};
+
 </script>
 </body>
 </html>
