@@ -6279,6 +6279,34 @@ function ZoneUS() {
   const goArticle = function(a) {
     window.location.hash = a ? 'article-' + slugify(a.title) : (page === 'home' ? '' : page);
     setSelArticle(a);
+    // Mettre à jour OG pour le partage
+    var ogTitle = document.querySelector('meta[property="og:title"]');
+    var ogDesc = document.querySelector('meta[property="og:description"]');
+    var ogImg = document.querySelector('meta[property="og:image"]');
+    var ogUrl = document.querySelector('meta[property="og:url"]');
+    var twTitle = document.querySelector('meta[name="twitter:title"]');
+    var twDesc = document.querySelector('meta[name="twitter:description"]');
+    var twImg = document.querySelector('meta[name="twitter:image"]');
+    if (a) {
+      var slug = slugify(a.title);
+      var img = a.img || 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp';
+      if (ogTitle) ogTitle.setAttribute('content', a.title + ' | Zone US');
+      if (ogDesc) ogDesc.setAttribute('content', a.chapo || a.title);
+      if (ogImg) ogImg.setAttribute('content', img);
+      if (ogUrl) ogUrl.setAttribute('content', 'https://zoneus.fr/#article-' + slug);
+      if (twTitle) twTitle.setAttribute('content', a.title + ' | Zone US');
+      if (twDesc) twDesc.setAttribute('content', a.chapo || a.title);
+      if (twImg) twImg.setAttribute('content', img);
+      document.title = a.title + ' | Zone US';
+    } else {
+      if (ogTitle) ogTitle.setAttribute('content', "Zone US — L’actu NHL, NFL, NBA et MLB en français");
+      if (ogDesc) ogDesc.setAttribute('content', 'Le média sportif francophone dédié aux 4 grandes ligues américaines.');
+      if (ogImg) ogImg.setAttribute('content', 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp');
+      if (ogUrl) ogUrl.setAttribute('content', 'https://zoneus.fr/');
+      if (twTitle) twTitle.setAttribute('content', "Zone US — L’actu NHL, NFL, NBA et MLB en français");
+      if (twDesc) twDesc.setAttribute('content', 'Le média sportif francophone dédié aux 4 grandes ligues américaines.');
+      if (twImg) twImg.setAttribute('content', 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp');
+    }
   };
   const [selPlayer, setSelPlayer] = useState(null);
   const [selTeam, setSelTeam] = useState(null);
