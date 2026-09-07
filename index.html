@@ -37,6 +37,12 @@
 }
 
 .livebar-wrapper { }
+@media (max-width: 768px) {
+  .standings-table { grid-template-columns: 1fr !important; overflow-x: hidden !important; width: 100% !important; }
+  .standings-table > div { overflow-x: hidden !important; width: 100% !important; }
+  .standings-table table { width: 100% !important; table-layout: fixed !important; }
+  .standings-table td, .standings-table th { padding: 4px 5px !important; font-size: 10px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+}
 @media (max-width: 768px) { .livebar-wrapper { display: none !important; } }
 /* Mobile calendrier */
 @media (max-width: 768px) {
