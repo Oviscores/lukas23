@@ -6215,7 +6215,10 @@ function ZoneUS() {
     var hash = window.location.hash.slice(1);
     if (hash.startsWith('article-')) {
       var artId = hash.replace('article-', '');
-      var found = arts.find(function(a) { return a.id === artId || a.id === artId; });
+      var found = arts.find(function(a) {
+        var s = a.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+        return s === artId || a.id === artId;
+      });
       if (found) setSelArticle(found);
     }
     // Ecouter changements hash
@@ -6266,8 +6269,15 @@ function ZoneUS() {
     window.location.hash = p === "home" ? "" : p;
   };
   const [selArticle, setSelArticle] = useState(null);
+  const slugify = function(str) {
+    return str.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60);
+  };
   const goArticle = function(a) {
-    window.location.hash = a ? 'article-' + a.id : (page === 'home' ? '' : page);
+    window.location.hash = a ? 'article-' + slugify(a.title) : (page === 'home' ? '' : page);
     setSelArticle(a);
   };
   const [selPlayer, setSelPlayer] = useState(null);
