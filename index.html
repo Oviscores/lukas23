@@ -7399,7 +7399,8 @@ async function fetchSanityArticles() {
     });
     window.__SANITY_ARTICLES__ = sanityArts;
     var sl = sanityArts.map(function(a){ return a.league; });
-    var merged = sanityArts.concat((window.ARTICLES||[]).filter(function(a){ return sl.indexOf(a.league)===-1; }));
+    var staticFiltered = (window.ARTICLES||[]).filter(function(a){ return sl.indexOf(a.league)===-1; });
+    var merged = sanityArts.length >= 6 ? sanityArts : sanityArts.concat(staticFiltered);
     if (window.__setArts__) window.__setArts__(merged);
     else setTimeout(function(){ if(window.__setArts__) window.__setArts__(merged); }, 3000);
     console.log('Sanity OK:', sanityArts.length, 'articles');
