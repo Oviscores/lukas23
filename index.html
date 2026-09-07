@@ -4237,8 +4237,10 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
   }
   var fkO = ["BOS", "NYR", "PIT", "WSH", "PHI", "CBJ", "NJD", "NYI", "CAR", "FLA"];
   var fkT = ["19h00", "19h30", "20h00", "21h00", "22h00"];
-  while (upcomingMatches.length < 5) {
-    var fo = fkO[upcomingMatches.length % fkO.length];
+  var _safeCount = 0;
+  while (upcomingMatches.length < 5 && _safeCount < 50) {
+    _safeCount++;
+    var fo = fkO[_safeCount % fkO.length];
     if (fo !== teamId) upcomingMatches.push({ id: "fu-" + upcomingMatches.length, home: teamId, away: fo, hs: null, as: null, st: "\xC0 venir", time: fkT[upcomingMatches.length % fkT.length], dayLabel: "J+" + (upcomingMatches.length + 1) });
   }
   for (var j = schedule.todayIdx - 1; j >= 0; j--) {
@@ -4248,9 +4250,11 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
   }
   var fkS = [[3, 1], [2, 4], [5, 2], [1, 3], [4, 2]];
   var fkO2 = ["MTL", "OTT", "BUF", "DET", "PIT"];
-  while (recentMatches.length < 5) {
-    var fs = fkS[recentMatches.length % fkS.length];
-    var fo2 = fkO2[recentMatches.length % fkO2.length];
+  var _safeCount2 = 0;
+  while (recentMatches.length < 5 && _safeCount2 < 50) {
+    _safeCount2++;
+    var fs = fkS[_safeCount2 % fkS.length];
+    var fo2 = fkO2[_safeCount2 % fkO2.length];
     if (fo2 !== teamId) recentMatches.push({ id: "fr-" + recentMatches.length, home: teamId, away: fo2, hs: fs[0], as: fs[1], st: "Final", time: "", dayLabel: "J-" + (recentMatches.length + 1) });
   }
   var rosterData = team ? team.alignment : null;
