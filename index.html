@@ -7520,6 +7520,61 @@ window.fetchStandings = async function(lg) {
 };
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
+
+// Injection boutons partage via MutationObserver
+function injectShareButtons() {
+  var existing = document.getElementById('zone-share-bar');
+  if (existing) return;
+  // Chercher le div "Zone US" dans la page
+  var allDivs = document.querySelectorAll('div');
+  for (var i = 0; i < allDivs.length; i++) {
+    var d = allDivs[i];
+    if (d.textContent && d.textContent.indexOf('Zone US') === 0 && d.children.length === 0) {
+      var bar = document.createElement('div');
+      bar.id = 'zone-share-bar';
+      bar.style.cssText = 'display:flex;gap:8px;margin:8px 0 12px;flex-wrap:wrap;';
+      var url = window.location.href;
+      var title = document.title;
+      // Bouton copier
+      var btnCopy = document.createElement('button');
+      btnCopy.textContent = 'Partager';
+      btnCopy.style.cssText = 'background:#f0f0f0;border:none;border-radius:4px;padding:5px 10px;font-size:11px;cursor:pointer;font-weight:700;font-family:Barlow,sans-serif;';
+      btnCopy.onclick = function() {
+        if (navigator.clipboard) navigator.clipboard.writeText(url).then(function() {
+          btnCopy.textContent = 'Lien copie !';
+          setTimeout(function(){ btnCopy.textContent = 'Partager'; }, 2000);
+        });
+      };
+      // Bouton X
+      var btnX = document.createElement('a');
+      btnX.href = 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(title);
+      btnX.target = '_blank';
+      btnX.textContent = 'X';
+      btnX.style.cssText = 'background:#000;color:#fff;border-radius:4px;padding:5px 10px;font-size:11px;font-weight:700;text-decoration:none;font-family:Barlow,sans-serif;';
+      // Bouton WhatsApp
+      var btnWA = document.createElement('a');
+      btnWA.href = 'https://wa.me/?text=' + encodeURIComponent(title + ' ' + url);
+      btnWA.target = '_blank';
+      btnWA.textContent = 'WhatsApp';
+      btnWA.style.cssText = 'background:#25D366;color:#fff;border-radius:4px;padding:5px 10px;font-size:11px;font-weight:700;text-decoration:none;font-family:Barlow,sans-serif;';
+      bar.appendChild(btnCopy);
+      bar.appendChild(btnX);
+      bar.appendChild(btnWA);
+      d.parentNode.insertBefore(bar, d.nextSibling);
+      break;
+    }
+  }
+}
+
+var shareObserver = new MutationObserver(function() {
+  if (window.location.hash.indexOf('article-') >= 0) {
+    setTimeout(injectShareButtons, 300);
+  } else {
+    var bar = document.getElementById('zone-share-bar');
+    if (bar) bar.remove();
+  }
+});
+shareObserver.observe(document.getElementById('root'), { childList: true, subtree: true });
 </script>
 </body>
 </html>
