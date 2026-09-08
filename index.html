@@ -1,47 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zone US — L'actu NHL, NFL, NBA et MLB en français</title>
-  <meta name="description" content="Zone US, le média sportif francophone dédié aux 4 grandes ligues américaines : NHL, NFL, NBA et MLB. Résultats, classements, analyses et actualités en français.">
-  <meta name="keywords" content="NHL, NFL, NBA, MLB, hockey, football américain, basket, baseball, sport américain, francophone, actualité sportive">
-  <meta name="author" content="Zone US">
+  <meta name="description" content="Zone US, le média sportif francophone dédié aux 4 grandes ligues américaines : NHL, NFL, NBA et MLB.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://zoneus.fr/">
-
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Zone US">
   <meta property="og:title" content="Zone US — L'actu NHL, NFL, NBA et MLB en français">
-  <meta property="og:description" content="Le média sportif francophone dédié aux 4 grandes ligues américaines. Résultats, classements et actualités.">
+  <meta property="og:description" content="Le média sportif francophone dédié aux 4 grandes ligues américaines.">
   <meta property="og:image" content="https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp">
-  <meta property="og:image:width" content="1774">
-  <meta property="og:image:height" content="887">
   <meta property="og:url" content="https://zoneus.fr/">
   <meta property="og:locale" content="fr_FR">
-
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Zone US — L'actu NHL, NFL, NBA et MLB en français">
   <meta name="twitter:description" content="Le média sportif francophone dédié aux 4 grandes ligues américaines.">
   <meta name="twitter:image" content="https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp">
-
-  <!-- JSON-LD Organisation -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsMediaOrganization",
-    "name": "Zone US",
-    "url": "https://zoneus.fr",
-    "logo": "https://zoneus.fr/favicon.ico",
-    "description": "Média sportif francophone dédié au NHL, NFL, NBA et MLB",
-    "sameAs": [],
-    "foundingDate": "2026",
-    "email": "contact@zoneus.fr"
-  }
-  </script>
+  <link rel="preload" href="https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp" as="image" type="image/webp">
+  <link rel="preconnect" href="https://raw.githubusercontent.com">
+  <link rel="preconnect" href="https://cdn.sanity.io">
+  <link rel="preconnect" href="https://a.espncdn.com">
+  <link rel="dns-prefetch" href="https://zoneus-proxy.vivienfrappier.workers.dev">
   <link rel="icon" type="image/png" href="data:image/png;base64,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">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -79,7 +60,6 @@
 
 .livebar-wrapper { }
 @media (max-width: 768px) {
-  .ncards-grid { grid-template-columns: 1fr !important; display: grid !important; }
   .standings-table { grid-template-columns: 1fr !important; overflow-x: hidden !important; width: 100% !important; }
   .standings-table > div { overflow-x: hidden !important; width: 100% !important; }
   .standings-table table { width: 100% !important; table-layout: fixed !important; }
@@ -98,28 +78,14 @@
 }
 ::-webkit-scrollbar { width: 0; height: 0; }
 </style>
-  <link rel="preload" href="https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp" as="image" type="image/webp">
-  <link rel="preconnect" href="https://raw.githubusercontent.com">
-  <link rel="preconnect" href="https://cdn.sanity.io">
-  <link rel="preconnect" href="https://a.espncdn.com">
-  <link rel="preconnect" href="https://assets.nhle.com">
-  <link rel="dns-prefetch" href="https://zoneus-proxy.vivienfrappier.workers.dev">
 </head>
 <body>
   <div id="root"></div>
 <noscript>
   <div style="font-family:sans-serif;max-width:900px;margin:0 auto;padding:20px">
     <h1>Zone US — L'actu NHL, NFL, NBA et MLB en français</h1>
-    <p>Zone US est le média sportif francophone dédié aux 4 grandes ligues américaines : NHL (hockey), NFL (football américain), NBA (basket-ball) et MLB (baseball).</p>
-    <h2>Nos rubriques</h2>
-    <ul>
-      <li><strong>NHL</strong> — Actualités, résultats et classements de la Ligue nationale de hockey</li>
-      <li><strong>NFL</strong> — Actualités, résultats et classements de la National Football League</li>
-      <li><strong>NBA</strong> — Actualités, résultats et classements de la National Basketball Association</li>
-      <li><strong>MLB</strong> — Actualités, résultats et classements de la Major League Baseball</li>
-    </ul>
+    <p>Zone US est le média sportif francophone dédié aux 4 grandes ligues américaines : NHL, NFL, NBA et MLB.</p>
     <p>Pour profiter pleinement de Zone US, veuillez activer JavaScript dans votre navigateur.</p>
-    <p>Contact : <a href="mailto:contact@zoneus.fr">contact@zoneus.fr</a></p>
   </div>
 </noscript>
   <script>
@@ -3606,32 +3572,7 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
   const linkedTeam = article.franchise ? lgTeams.filter(function(t) {
     return t.id === article.franchise;
   })[0] || null : null;
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99, img: article.img }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", padding: "22px 26px", borderRadius: "0 0 4px 4px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.8, marginBottom: 16, borderLeft: "3px solid " + lc, paddingLeft: 12, fontStyle: "italic" } }, article.chapo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#ccc", marginBottom: 12 } }, "Zone US \xB7 ", article.date),
-    React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" } },
-      React.createElement("button", {
-        id: "share-btn",
-        onClick: function() {
-          var url = window.location.href;
-          if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(function() {
-              var btn = document.getElementById("share-btn");
-              if (btn) { btn.textContent = "Lien copie !"; setTimeout(function(){ btn.textContent = "Partager"; }, 2000); }
-            });
-          }
-        },
-        style: { background: "#f0f0f0", border: "none", borderRadius: 4, padding: "5px 10px", fontSize: 11, cursor: "pointer", fontWeight: 700 }
-      }, "Partager"),
-      React.createElement("a", {
-        href: "https://twitter.com/intent/tweet?url=" + encodeURIComponent(window.location.href) + "&text=" + encodeURIComponent(article.title),
-        target: "_blank",
-        style: { background: "#000", color: "#fff", borderRadius: 4, padding: "5px 10px", fontSize: 11, fontWeight: 700, textDecoration: "none" }
-      }, "X"),
-      React.createElement("a", {
-        href: "https://wa.me/?text=" + encodeURIComponent(article.title + " " + window.location.href),
-        target: "_blank",
-        style: { background: "#25D366", color: "#fff", borderRadius: 4, padding: "5px 10px", fontSize: 11, fontWeight: 700, textDecoration: "none" }
-      }, "WhatsApp")
-    ), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.body ? null : article.chapo)), article.body && React.createElement("div", { dangerouslySetInnerHTML: { __html: article.body }, style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#333", lineHeight: 1.9 } }), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99, img: article.img }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", padding: "22px 26px", borderRadius: "0 0 4px 4px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.8, marginBottom: 16, borderLeft: "3px solid " + lc, paddingLeft: 12, fontStyle: "italic" } }, article.chapo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#ccc", marginBottom: 20 } }, "Zone US \xB7 ", article.date), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.body ? null : article.chapo)), article.body && React.createElement("div", { dangerouslySetInnerHTML: { __html: article.body }, style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#333", lineHeight: 1.9 } }), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
     return /* @__PURE__ */ React.createElement("div", { key: i, onClick: function() {
       onBack();
       setTimeout(function() {
@@ -3642,7 +3583,23 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
       e.currentTarget.style.background = "transparent";
     } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, a.title));
   }))));
-}ateElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg, " \xB7 Profil joueur")), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1100, margin: "0 auto", padding: "20px 20px 60px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 6, padding: "24px 28px", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.15)", border: "3px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, "#" + p.jersey)), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos, " \xB7 ", p.team, " \xB7 ", lg), /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 900, color: "#fff", lineHeight: 1, marginBottom: 8 } }, p.name), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 16, flexWrap: "wrap" } }, [{ l: "N\xE9 le", v: p.born }, { l: "Lieu", v: p.birthplace }, { l: "Nationalit\xE9", v: p.nationality }, { l: "Taille", v: p.height }, { l: "Poids", v: p.weight }, { l: "Tir", v: p.shoots }].map(function(s, i) {
+}
+function PlayerPage({ playerId, lg, onBack, articles, onArticleClick }) {
+  const p = findPlayer(lg, playerId);
+  if (!p) return /* @__PURE__ */ React.createElement("div", { style: { padding: 40, textAlign: "center", color: "#bbb" } }, "Joueur introuvable");
+  const lc = LG[lg].color;
+  const dk = LG[lg].dark || "#111";
+  const bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
+  const Hd = ({ label }) => /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(20,20,20,0.75)", padding: "4px 10px", backdropFilter: "blur(4px)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 12, letterSpacing: "0.08em", color: "#fff", whiteSpace: "nowrap" } }, label));
+  const nhlSns = (p.career || []).filter(function(s) {
+    return s.lg === "NHL";
+  });
+  const pLast = p.name.split(" ")[1] ? p.name.split(" ")[1].toLowerCase() : "";
+  const related = (articles || []).filter(function(a) {
+    return a.league === lg && (a.franchise === p.team || a.title.toLowerCase().includes(pLast) || (a.chapo || "").toLowerCase().includes(pLast));
+  }).slice(0, 6);
+  const gamelog = p.gamelog || [];
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg, " \xB7 Profil joueur")), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1100, margin: "0 auto", padding: "20px 20px 60px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 6, padding: "24px 28px", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.15)", border: "3px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, "#" + p.jersey)), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos, " \xB7 ", p.team, " \xB7 ", lg), /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 900, color: "#fff", lineHeight: 1, marginBottom: 8 } }, p.name), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 16, flexWrap: "wrap" } }, [{ l: "N\xE9 le", v: p.born }, { l: "Lieu", v: p.birthplace }, { l: "Nationalit\xE9", v: p.nationality }, { l: "Taille", v: p.height }, { l: "Poids", v: p.weight }, { l: "Tir", v: p.shoots }].map(function(s, i) {
     return /* @__PURE__ */ React.createElement("div", { key: i }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.45)" } }, s.l), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#fff" } }, s.v));
   }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, flexShrink: 0 } }, lg === "NHL" && [{ l: "PJ", v: nhlSns.reduce(function(a, s) {
     return a + (s.gp || 0);
@@ -4448,7 +4405,7 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
     var tc2 = TC[m.team + "_" + lg] || { bg: lc, fg: "#fff" };
     var pct = Math.round(m.current / m.target * 100);
     return /* @__PURE__ */ React.createElement("div", { key: i, style: { padding: "7px 10px", borderBottom: "1px solid rgba(0,0,0,0.04)", borderRight: "1px solid rgba(0,0,0,0.04)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 5, marginBottom: 3 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 16, height: 16, borderRadius: 2, background: tc2.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: tc2.fg } }, m.team)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 800, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, m.player), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: "#fff", background: lc, padding: "1px 6px", borderRadius: 2, flexShrink: 0 } }, "\xC0 " + m.diff + " " + m.unit)), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#666", marginBottom: 4 } }, m.cat + " \u2014 " + m.current + "/" + m.target), /* @__PURE__ */ React.createElement("div", { style: { height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { height: "100%", width: pct + "%", background: lc, borderRadius: 2 } })));
-  }))), rest.length > 3 && /* @__PURE__ */ React.createElement(HCard, { a: rest[3], onClick: onArticleClick }), rest.length > 4 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: window.innerWidth < 768 ? "1fr" : "repeat(auto-fill,minmax(280px,1fr))", gap: 8, padding: "0 8px" } }, rest.slice(4, 7).map(function(a) {
+  }))), rest.length > 3 && /* @__PURE__ */ React.createElement(HCard, { a: rest[3], onClick: onArticleClick }), rest.length > 4 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(4, 7).map(function(a) {
     return /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: onArticleClick });
   })), rest.length > 7 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(7, 10).map(function(a) {
     return /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: onArticleClick });
@@ -6219,26 +6176,6 @@ function ZoneUS() {
   const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
   const page = _pageState[0];
   const _setPage = _pageState[1];
-  // Lire hash article au chargement
-  React.useEffect(function() {
-    var hash = window.location.hash.slice(1);
-    if (hash.startsWith('article-')) {
-      var artId = hash.replace('article-', '');
-      var found = arts.find(function(a) {
-        var s = a.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
-        return s === artId || a.id === artId;
-      });
-      if (found) setSelArticle(found);
-    }
-    // Ecouter changements hash
-    var onHash = function() {
-      var h = window.location.hash.slice(1);
-      if (!h.startsWith('article-')) setSelArticle(null);
-    };
-    window.addEventListener('hashchange', onHash);
-    return function() { window.removeEventListener('hashchange', onHash); };
-  }, [arts]);
-
   React.useEffect(function() {
     var titles = {
       home: "Zone US — L'actu NHL, NFL, NBA et MLB en français",
@@ -6246,25 +6183,8 @@ function ZoneUS() {
       NFL: "NFL — Actualités football américain | Zone US",
       NBA: "NBA — Actualités basket-ball | Zone US",
       MLB: "MLB — Actualités baseball | Zone US",
-      CalNHL: "Calendrier & Résultats NHL | Zone US",
-      CalNFL: "Calendrier & Résultats NFL | Zone US",
-      CalNBA: "Calendrier & Résultats NBA | Zone US",
-      CalMLB: "Calendrier & Résultats MLB | Zone US",
-    };
-    var descs = {
-      home: "Zone US, le média sportif francophone dédié aux 4 grandes ligues américaines : NHL, NFL, NBA et MLB.",
-      NHL: "Toute l'actualité NHL en français : résultats, classements, transferts et analyses.",
-      NFL: "Toute l'actualité NFL en français : résultats, classements, transferts et analyses.",
-      NBA: "Toute l'actualité NBA en français : résultats, classements, transferts et analyses.",
-      MLB: "Toute l'actualité MLB en français : résultats, classements, transferts et analyses.",
     };
     document.title = titles[page] || "Zone US — Sport américain en français";
-    var desc = document.querySelector('meta[name="description"]');
-    if (desc) desc.setAttribute('content', descs[page] || descs.home);
-    var og = document.querySelector('meta[property="og:title"]');
-    if (og) og.setAttribute('content', document.title);
-    var ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', descs[page] || descs.home);
   }, [page]);
   const setPage = function(p) {
     _setPage(p);
@@ -6279,42 +6199,24 @@ function ZoneUS() {
   };
   const [selArticle, setSelArticle] = useState(null);
   const slugify = function(str) {
-    return str.toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 60);
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
   };
   const goArticle = function(a) {
     window.location.hash = a ? 'article-' + slugify(a.title) : (page === 'home' ? '' : page);
     setSelArticle(a);
-    // Mettre à jour OG pour le partage
     var ogTitle = document.querySelector('meta[property="og:title"]');
     var ogDesc = document.querySelector('meta[property="og:description"]');
     var ogImg = document.querySelector('meta[property="og:image"]');
-    var ogUrl = document.querySelector('meta[property="og:url"]');
     var twTitle = document.querySelector('meta[name="twitter:title"]');
-    var twDesc = document.querySelector('meta[name="twitter:description"]');
     var twImg = document.querySelector('meta[name="twitter:image"]');
     if (a) {
-      var slug = slugify(a.title);
       var img = a.img || 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp';
       if (ogTitle) ogTitle.setAttribute('content', a.title + ' | Zone US');
       if (ogDesc) ogDesc.setAttribute('content', a.chapo || a.title);
       if (ogImg) ogImg.setAttribute('content', img);
-      if (ogUrl) ogUrl.setAttribute('content', 'https://zoneus.fr/#article-' + slug);
       if (twTitle) twTitle.setAttribute('content', a.title + ' | Zone US');
-      if (twDesc) twDesc.setAttribute('content', a.chapo || a.title);
       if (twImg) twImg.setAttribute('content', img);
       document.title = a.title + ' | Zone US';
-    } else {
-      if (ogTitle) ogTitle.setAttribute('content', "Zone US — L’actu NHL, NFL, NBA et MLB en français");
-      if (ogDesc) ogDesc.setAttribute('content', 'Le média sportif francophone dédié aux 4 grandes ligues américaines.');
-      if (ogImg) ogImg.setAttribute('content', 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp');
-      if (ogUrl) ogUrl.setAttribute('content', 'https://zoneus.fr/');
-      if (twTitle) twTitle.setAttribute('content', "Zone US — L’actu NHL, NFL, NBA et MLB en français");
-      if (twDesc) twDesc.setAttribute('content', 'Le média sportif francophone dédié aux 4 grandes ligues américaines.');
-      if (twImg) twImg.setAttribute('content', 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp');
     }
   };
   const [selPlayer, setSelPlayer] = useState(null);
@@ -6722,7 +6624,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
         )
       ), window.BANNERS[page] && !["home", "Fantasy", "AllNews", "AllStatuts", "NFL", "Cal-NFL", "Stats-NFL", "Fantasy-NFL", "NHL", "Cal-NHL", "Stats-NHL", "Fantasy-NHL", "NBA", "Cal-NBA", "Stats-NBA", "Fantasy-NBA", "MLB", "Cal-MLB", "Stats-MLB", "Fantasy-MLB"].includes(page) && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", overflow: "hidden", maxHeight: 80, lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNERS[page.replace("Stats-", "").replace("Cal-", "").replace("Fantasy-", "")], alt: page, style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover", objectPosition: "center center" } })), selMatch ? /* @__PURE__ */ React.createElement(MatchPage, { match: selMatch, onBack: goBack }) : selTeam ? /* @__PURE__ */ React.createElement(TeamPage, { teamId: selTeam.teamId, lg: selTeam.lg, onBack: goBack, articles: arts, onArticleClick: setSelArticle, onPlayerClick: goPlayer, onMatchClick: goScore }) : selPlayer ? /* @__PURE__ */ React.createElement(PlayerPage, { playerId: selPlayer.playerId, lg: selPlayer.lg, onBack: goBack, articles: arts, onArticleClick: setSelArticle }) : playersList ? /* @__PURE__ */ React.createElement(PlayersListPage, { lg: playersList, onPlayerClick: goPlayer, onBack: goBack }) : selArticle ? /* @__PURE__ */ React.createElement(ArticlePage, { article: selArticle, onBack: goBack, articles: arts, onPlayerClick: goPlayer, onTeamClick: goTeam }) : ["Stats-NHL", "Stats-NFL", "Stats-NBA", "Stats-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(StatsPage, { lg: page.replace("Stats-", ""), onPlayerClick: goPlayer, onBack: function(){ window.location.hash = "home"; }, statsVersion: statsVersion, onStatFull: function(ci, t) {
     setStatFull({ lg: page.replace("Stats-", ""), catIndex: ci, type: t });
-  }, onBack: goBack }) : ["Cal-NFL", "Cal-NBA", "Cal-NHL", "Cal-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(CalendarPage, { lg: page.replace("Cal-", ""), onBack: function(){ window.location.hash = "home"; }, onMatchClick: goMatch }) : ["NFL", "NBA", "NHL", "MLB"].includes(page) ? /* @__PURE__ */ React.createElement(LeaguePage, { lg: page, articles: arts, statsVersion: statsVersion, onBack: function(){ window.location.hash = "home"; }, onArticleClick: setSelArticle, onMatchClick: goScore, onTeamClick: (tid) => goTeam(tid, page), onStandingsClick: (lg) => setPage("Cal-" + lg), onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: (lg) => navigate("Fantasy-" + lg), onNavigate: setPage }) : ["Fantasy-NHL", "Fantasy-NFL", "Fantasy-NBA", "Fantasy-MLB"].includes(page) ? /* @__PURE__ */ React.createElement("div", null, page === "Fantasy-NHL" && /* @__PURE__ */ React.createElement(FantasyPageNHL, { lg: "NHL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NHL") }), page === "Fantasy-NFL" && /* @__PURE__ */ React.createElement(FantasyPageNFL, { lg: "NFL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NFL") }), page === "Fantasy-NBA" && /* @__PURE__ */ React.createElement(FantasyPageNBA, { lg: "NBA", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NBA") }), page === "Fantasy-MLB" && /* @__PURE__ */ React.createElement(FantasyPageMLB, { lg: "MLB", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "MLB") })) : page === "AllStatuts" ? /* @__PURE__ */ React.createElement(AllStatutsPage, { players: PLAYERS, onBack: () => setPage(prevPage || "home"), onPlayerClick: goPlayer }) : page === "AllNews" ? /* @__PURE__ */ React.createElement(AllNewsPage, { feed, onArticleClick: setSelArticle, onBack: () => setPage(prevPage || "home") }) : page === "Fantasy" ? /* @__PURE__ */ React.createElement(FantasyHome, { onNavigate: setPage }) : /* @__PURE__ */ React.createElement("div", { className: "col3", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "220px 1fr 220px", gap: 14, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(LeftCol, { onMatchClick: goScore, onStandingsClick: (lg) => setPage("Cal-" + lg) }), /* @__PURE__ */ React.createElement("main", { style: { display: "flex", flexDirection: "column", gap: 8, minWidth: 0 } }, hero && /* @__PURE__ */ React.createElement(HCard, { a: hero, onClick: goArticle }), rest.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: window.innerWidth < 768 ? "1fr" : "1fr 1fr 1fr", gap: 8 } }, rest.slice(0, 3).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 3 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: window.innerWidth < 768 ? "1fr" : "1fr 1fr", gap: 8 } }, rest.slice(3, 5).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 5 && /* @__PURE__ */ React.createElement(HCard, { a: rest[5], onClick: goArticle }), rest.length > 6 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(6, 9).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 9 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(9, 11).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 11 && /* @__PURE__ */ React.createElement(HCard, { a: rest[11], onClick: goArticle }), rest.length > 12 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(12).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle })))), /* @__PURE__ */ React.createElement(RightCol, { feed, statsVersion: statsVersion, onGen: generate, generating: gen, genLg, onArticleClick: setSelArticle, onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: function(lg) {
+  }, onBack: goBack }) : ["Cal-NFL", "Cal-NBA", "Cal-NHL", "Cal-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(CalendarPage, { lg: page.replace("Cal-", ""), onBack: function(){ window.location.hash = "home"; }, onMatchClick: goMatch }) : ["NFL", "NBA", "NHL", "MLB"].includes(page) ? /* @__PURE__ */ React.createElement(LeaguePage, { lg: page, articles: arts, statsVersion: statsVersion, onBack: function(){ window.location.hash = "home"; }, onArticleClick: setSelArticle, onMatchClick: goScore, onTeamClick: (tid) => goTeam(tid, page), onStandingsClick: (lg) => setPage("Cal-" + lg), onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: (lg) => navigate("Fantasy-" + lg), onNavigate: setPage }) : ["Fantasy-NHL", "Fantasy-NFL", "Fantasy-NBA", "Fantasy-MLB"].includes(page) ? /* @__PURE__ */ React.createElement("div", null, page === "Fantasy-NHL" && /* @__PURE__ */ React.createElement(FantasyPageNHL, { lg: "NHL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NHL") }), page === "Fantasy-NFL" && /* @__PURE__ */ React.createElement(FantasyPageNFL, { lg: "NFL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NFL") }), page === "Fantasy-NBA" && /* @__PURE__ */ React.createElement(FantasyPageNBA, { lg: "NBA", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NBA") }), page === "Fantasy-MLB" && /* @__PURE__ */ React.createElement(FantasyPageMLB, { lg: "MLB", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "MLB") })) : page === "AllStatuts" ? /* @__PURE__ */ React.createElement(AllStatutsPage, { players: PLAYERS, onBack: () => setPage(prevPage || "home"), onPlayerClick: goPlayer }) : page === "AllNews" ? /* @__PURE__ */ React.createElement(AllNewsPage, { feed, onArticleClick: setSelArticle, onBack: () => setPage(prevPage || "home") }) : page === "Fantasy" ? /* @__PURE__ */ React.createElement(FantasyHome, { onNavigate: setPage }) : /* @__PURE__ */ React.createElement("div", { className: "col3", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "220px 1fr 220px", gap: 14, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(LeftCol, { onMatchClick: goScore, onStandingsClick: (lg) => setPage("Cal-" + lg) }), /* @__PURE__ */ React.createElement("main", { style: { display: "flex", flexDirection: "column", gap: 8, minWidth: 0 } }, hero && /* @__PURE__ */ React.createElement(HCard, { a: hero, onClick: goArticle }), rest.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: window.innerWidth < 768 ? "1fr" : "1fr 1fr 1fr", gap: 8 } }, rest.slice(0, 3).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 3 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: window.innerWidth < 768 ? "1fr" : "1fr 1fr", gap: 8 } }, rest.slice(3, 5).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 5 && /* @__PURE__ */ React.createElement(HCard, { a: rest[5], onClick: goArticle }), rest.length > 6 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(6, 9).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 9 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(9, 11).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 11 && /* @__PURE__ */ React.createElement(HCard, { a: rest[11], onClick: goArticle }), rest.length > 12 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(12).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle })))), /* @__PURE__ */ React.createElement(RightCol, { feed, statsVersion: statsVersion, onGen: generate, generating: gen, genLg, onArticleClick: setSelArticle, onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: function(lg) {
     setPage("Stats-" + lg);
   }, onPlayerClick: goPlayer, onMoreStats: (lg) => setPage("Stats-" + lg) })), /* @__PURE__ */ React.createElement("footer", { style: { background: "rgba(15,15,15,0.92)", backdropFilter: "blur(8px)", borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 20, padding: "6px 20px 4px" } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", display: "flex", flexDirection: "column", gap: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" } },  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap" } }, ["NHL", "NFL", "NBA", "MLB"].map(function(lg2) {
     return /* @__PURE__ */ React.createElement(
@@ -6973,7 +6875,28 @@ async function fetchStandings(lg) {
 }
 </script>
 <script>
-ts','timeOnIcePerGame'];
+
+function syncGSTATS(lg) {
+  var sp = window.STATS_PAGES && window.STATS_PAGES[lg];
+  if (!sp || !sp.players || !sp.players.length) return;
+  GSTATS[lg] = sp.players.map(function(c) {
+    return {
+      label: c.label, unit: '',
+      players: c.data.map(function(p) { return { name: p.name, team: p.ab, val: p.val }; })
+    };
+  });
+}
+window.__NHL_STATS_LOADED__ = false;
+async function fetchNHLStats() {
+  if (window.__NHL_STATS_LOADED__) return;
+  window.__NHL_STATS_LOADED__ = true;
+  const P = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+  const S = '20252026';
+  function pp(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(p){var n=(p.firstName&&p.firstName.default||'')+' '+(p.lastName&&p.lastName.default||'');var ab=(p.teamAbbrevs&&p.teamAbbrevs.default)||p.teamAbbrev||'';return{name:n.trim(),ab:ab,val:p.value!==undefined?p.value:0};});}
+  function pg(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(g){var n=(g.firstName&&g.firstName.default||'')+' '+(g.lastName&&g.lastName.default||'');var ab=(g.teamAbbrevs&&g.teamAbbrevs.default)||(g.teamAbbrev&&g.teamAbbrev.default)||g.teamAbbrev||'';var v=g.value!==undefined?g.value:0;if(c==='savePctg')v=typeof v==='number'?v.toFixed(3):v;return{name:n.trim(),ab:ab,val:v};});}
+  function pt(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(t){return{ab:(t.teamAbbrevs&&t.teamAbbrevs.default)||t.teamAbbrev||'',val:t.value!==undefined?t.value:0};});}
+  try {
+    var pC=['goals','assists','points','powerPlayPoints','hits','penaltyMinutes','plusMinus','gameWinningGoals','shots','blockedShots','timeOnIcePerGame'];
     var tC=['teamPowerPlayPct','teamPenaltyKillPct','hits'];
     var gC=['savePctg','wins','goalsAgainstAverage','shutouts'];
     var pL={goals:'Buts',assists:'Passes',points:'Points',plusMinus:'+/-',penaltyMinutes:'Min. pénalité',powerPlayPoints:'Points PP',gameWinningGoals:'Buts vainqueurs',shots:'Tirs',hits:'Mises en échec',blockedShots:'Tirs bloqués',timeOnIcePerGame:'Temps de glace'};
@@ -7472,32 +7395,6 @@ async function fetchSanityArticles() {
     if (window.__setArts__) window.__setArts__(merged);
     else setTimeout(function(){ if(window.__setArts__) window.__setArts__(merged); }, 3000);
     console.log('Sanity OK:', sanityArts.length, 'articles');
-    // JSON-LD articles pour Google
-    var existingLd = document.querySelector('script[data-type="articles-ld"]');
-    if (existingLd) existingLd.remove();
-    var ld = document.createElement('script');
-    ld.type = 'application/ld+json';
-    ld.setAttribute('data-type', 'articles-ld');
-    ld.text = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "itemListElement": sanityArts.map(function(a, i) {
-        return {
-          "@type": "ListItem",
-          "position": i + 1,
-          "item": {
-            "@type": "NewsArticle",
-            "headline": a.title,
-            "description": a.chapo,
-            "image": a.img || "https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp",
-            "datePublished": a.publishedAt,
-            "publisher": { "@type": "Organization", "name": "Zone US", "url": "https://zoneus.fr" },
-            "url": "https://zoneus.fr/"
-          }
-        };
-      })
-    });
-    document.head.appendChild(ld);
   } catch(e) { console.log('Sanity error:', e.message); }
 }
 window.fetchStandings = async function(lg) {
@@ -7520,61 +7417,6 @@ window.fetchStandings = async function(lg) {
 };
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
-
-// Injection boutons partage via MutationObserver
-function injectShareButtons() {
-  var existing = document.getElementById('zone-share-bar');
-  if (existing) return;
-  // Chercher le div "Zone US" dans la page
-  var allDivs = document.querySelectorAll('div');
-  for (var i = 0; i < allDivs.length; i++) {
-    var d = allDivs[i];
-    if (d.textContent && d.textContent.indexOf('Zone US') === 0 && d.children.length === 0) {
-      var bar = document.createElement('div');
-      bar.id = 'zone-share-bar';
-      bar.style.cssText = 'display:flex;gap:8px;margin:8px 0 12px;flex-wrap:wrap;';
-      var url = window.location.href;
-      var title = document.title;
-      // Bouton copier
-      var btnCopy = document.createElement('button');
-      btnCopy.textContent = 'Partager';
-      btnCopy.style.cssText = 'background:#f0f0f0;border:none;border-radius:4px;padding:5px 10px;font-size:11px;cursor:pointer;font-weight:700;font-family:Barlow,sans-serif;';
-      btnCopy.onclick = function() {
-        if (navigator.clipboard) navigator.clipboard.writeText(url).then(function() {
-          btnCopy.textContent = 'Lien copie !';
-          setTimeout(function(){ btnCopy.textContent = 'Partager'; }, 2000);
-        });
-      };
-      // Bouton X
-      var btnX = document.createElement('a');
-      btnX.href = 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(title);
-      btnX.target = '_blank';
-      btnX.textContent = 'X';
-      btnX.style.cssText = 'background:#000;color:#fff;border-radius:4px;padding:5px 10px;font-size:11px;font-weight:700;text-decoration:none;font-family:Barlow,sans-serif;';
-      // Bouton WhatsApp
-      var btnWA = document.createElement('a');
-      btnWA.href = 'https://wa.me/?text=' + encodeURIComponent(title + ' ' + url);
-      btnWA.target = '_blank';
-      btnWA.textContent = 'WhatsApp';
-      btnWA.style.cssText = 'background:#25D366;color:#fff;border-radius:4px;padding:5px 10px;font-size:11px;font-weight:700;text-decoration:none;font-family:Barlow,sans-serif;';
-      bar.appendChild(btnCopy);
-      bar.appendChild(btnX);
-      bar.appendChild(btnWA);
-      d.parentNode.insertBefore(bar, d.nextSibling);
-      break;
-    }
-  }
-}
-
-var shareObserver = new MutationObserver(function() {
-  if (window.location.hash.indexOf('article-') >= 0) {
-    setTimeout(injectShareButtons, 300);
-  } else {
-    var bar = document.getElementById('zone-share-bar');
-    if (bar) bar.remove();
-  }
-});
-shareObserver.observe(document.getElementById('root'), { childList: true, subtree: true });
 </script>
 </body>
 </html>
