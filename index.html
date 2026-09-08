@@ -4814,11 +4814,14 @@ function MatchPage({ match, onBack }) {
                 return { name: p.person && p.person.fullName || '', pos: 'P', summary: pit.summary || '' };
               }).filter(Boolean);
               return React.createElement("div", { key: side, style: { marginBottom: 12 } },
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#fff", background: side === 'home' ? hc.bg : ac.bg, padding: "3px 8px", marginBottom: 4 } }, teamAb + " — FRAPPEURS"),
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#fff", background: side === 'home' ? hc.bg : ac.bg, padding: "6px 10px", marginBottom: 0, letterSpacing: "0.05em" } }, teamAb + " — FRAPPEURS"),
                 batters.map(function(p, i) {
-                  return React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", padding: "3px 8px", borderBottom: "1px solid rgba(0,0,0,0.04)", fontSize: 11 } },
-                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700 } }, p.pos + " " + p.name),
-                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", color: lc, fontWeight: 800 } }, p.summary)
+                  return React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 10px", background: i % 2 === 0 ? "#fff" : "#f5f5f5", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
+                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+                      React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", background: lc, borderRadius: 3, padding: "2px 5px", minWidth: 28, textAlign: "center" } }, p.pos),
+                      React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 14, fontWeight: 700, color: "#111" } }, p.name)
+                    ),
+                    React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 14, color: lc, fontWeight: 900 } }, p.summary)
                   );
                 }),
                 pitchers.length > 0 && React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#fff", background: side === 'home' ? hc.bg : ac.bg, padding: "3px 8px", marginTop: 6, marginBottom: 4 } }, teamAb + " — LANCEURS"),
