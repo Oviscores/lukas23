@@ -6178,6 +6178,24 @@ function AllNewsPage({ feed, onArticleClick, onBack }) {
   ))));
 }
 
+
+function LegalPage({ onBack }) {
+  return React.createElement("div", { style: { maxWidth: 800, margin: "0 auto", padding: "30px 20px", fontFamily: "'Barlow',sans-serif" } },
+    React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontSize: 12, marginBottom: 20 } }, "← Retour"),
+    React.createElement("h1", { style: { fontSize: 22, fontWeight: 900, marginBottom: 24, borderBottom: "2px solid #e30613", paddingBottom: 10 } }, "Mentions légales"),
+    React.createElement("h2", { style: { fontSize: 15, fontWeight: 800, marginTop: 20, marginBottom: 8 } }, "Éditeur du site"),
+    React.createElement("p", { style: { fontSize: 13, color: "#444", lineHeight: 1.7 } }, "Site : Zone US", React.createElement("br", null), "Email : contact@zoneus.fr"),
+    React.createElement("h2", { style: { fontSize: 15, fontWeight: 800, marginTop: 20, marginBottom: 8 } }, "Hébergement"),
+    React.createElement("p", { style: { fontSize: 13, color: "#444", lineHeight: 1.7 } }, "GitHub Pages", React.createElement("br", null), "Microsoft Corporation", React.createElement("br", null), "One Microsoft Way, Redmond, WA 98052, USA"),
+    React.createElement("h2", { style: { fontSize: 15, fontWeight: 800, marginTop: 20, marginBottom: 8 } }, "Propriété intellectuelle"),
+    React.createElement("p", { style: { fontSize: 13, color: "#444", lineHeight: 1.7 } }, "L'ensemble du contenu éditorial publié sur Zone US (textes, articles, analyses) est la propriété exclusive de Zone US. Toute reproduction, même partielle, est interdite sans autorisation préalable."),
+    React.createElement("h2", { style: { fontSize: 15, fontWeight: 800, marginTop: 20, marginBottom: 8 } }, "Données personnelles"),
+    React.createElement("p", { style: { fontSize: 13, color: "#444", lineHeight: 1.7 } }, "Zone US ne collecte aucune donnée personnelle. Aucun cookie publicitaire n'est utilisé."),
+    React.createElement("h2", { style: { fontSize: 15, fontWeight: 800, marginTop: 20, marginBottom: 8 } }, "Contact"),
+    React.createElement("p", { style: { fontSize: 13, color: "#444", lineHeight: 1.7 } }, "Pour toute question : contact@zoneus.fr")
+  );
+}
+
 function ZoneUS() {
     const [menuOpen, setMenuOpen] = React.useState(false);
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);
@@ -6219,6 +6237,7 @@ function ZoneUS() {
     window.location.hash = p === "home" ? "" : p;
   };
   const [selArticle, setSelArticle] = useState(null);
+  const [showLegal, setShowLegal] = React.useState(false);
   const slugify = function(str) {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
   };
@@ -6357,6 +6376,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   const CSS = `@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0;}html,body{overflow-x:hidden;max-width:100%;}@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}.tick{animation:fadein 0.4s ease;}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}.dot{animation:pulse 1.8s ease infinite;}nav{scrollbar-width:none;}nav::-webkit-scrollbar{display:none;}.nitem:hover .ndd{opacity:1!important;visibility:visible!important;transform:translateY(0)!important;pointer-events:auto!important;}.livebar{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;align-items:stretch;}.livebar::-webkit-scrollbar{display:none;}@keyframes livepulse{0%,100%{opacity:1}50%{opacity:0.4}}.livebadge{animation:livepulse 1.4s ease infinite;}`;
   const hero = arts[0], rest = arts.slice(1);
   const fullScreen = selArticle || selPlayer || selTeam || playersList || selMatch;
+  if (showLegal) return React.createElement(LegalPage, { onBack: function() { setShowLegal(false); } });
   if (statFull) return /* @__PURE__ */ React.createElement(StatFullPage, { lg: statFull.lg, catIndex: statFull.catIndex, type: statFull.type, onBack: function() {
     setStatFull(null);
   }, onPlayerClick: goPlayer });
@@ -6716,7 +6736,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
       },
       item
     );
-  })), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 6, color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em" } }, "\xA9 2026 ZONE US \u2014 Tous droits r\xE9serv\xE9s"))),
+  })), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 6, color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em" } }, "\xA9 2026 ZONE US \u2014 Tous droits r\xE9serv\xE9s, React.createElement("button", { onClick: function() { setShowLegal(true); }, style: { background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 10, cursor: "pointer", marginLeft: 12 } }, "Mentions legales")))),
         /* Contact email */
         /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.1)", textAlign: "center" } },
           /* @__PURE__ */ React.createElement("a", { href: "mailto:contact@zoneus.fr",
