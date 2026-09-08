@@ -6348,6 +6348,36 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   const bgStyle = { backgroundImage: "url(" + window.BG + ")", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center", minHeight: "100vh" };
   const CSS = `@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0;}html,body{overflow-x:hidden;max-width:100%;}@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}.tick{animation:fadein 0.4s ease;}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}.dot{animation:pulse 1.8s ease infinite;}nav{scrollbar-width:none;}nav::-webkit-scrollbar{display:none;}.nitem:hover .ndd{opacity:1!important;visibility:visible!important;transform:translateY(0)!important;pointer-events:auto!important;}.livebar{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;align-items:stretch;}.livebar::-webkit-scrollbar{display:none;}@keyframes livepulse{0%,100%{opacity:1}50%{opacity:0.4}}.livebadge{animation:livepulse 1.4s ease infinite;}`;
   const hero = arts[0], rest = arts.slice(1);
+  // Rendu mobile simplifié
+  if (typeof window !== 'undefined' && window.innerWidth < 768 && !selArticle && !selPlayer && !selTeam && !playersList && !selMatch && !statFull) {
+    return React.createElement("div", { style: Object.assign({}, bgStyle, { overflowX: "hidden" }) },
+      React.createElement("button", { onClick: function() { setShowMenu(function(v) { return !v; }); }, style: { position: "fixed", top: 10, left: 10, zIndex: 300, background: "rgba(255,255,255,0.95)", border: "none", borderRadius: 6, padding: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.15)", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4 } },
+        React.createElement("span", { style: { width: 18, height: 2, background: "#333", display: "block" } }),
+        React.createElement("span", { style: { width: 18, height: 2, background: "#333", display: "block" } }),
+        React.createElement("span", { style: { width: 18, height: 2, background: "#333", display: "block" } })
+      ),
+      showMenu && React.createElement("div", { style: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.85)", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 } },
+        React.createElement("button", { onClick: function() { setShowMenu(false); }, style: { position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#fff", fontSize: 24, cursor: "pointer" } }, "×"),
+        ["NHL","NFL","NBA","MLB"].map(function(lg2) {
+          return React.createElement("button", { key: lg2, onClick: function() { setPage(lg2); setShowMenu(false); }, style: { background: "none", border: "none", color: "#fff", fontSize: 28, fontWeight: 900, fontFamily: "'Barlow Condensed',sans-serif", cursor: "pointer", letterSpacing: "0.1em" } }, lg2);
+        })
+      ),
+      React.createElement("img", { src: window.BANNER_HOME, alt: "Zone US", style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover" } }),
+      React.createElement("div", { style: { padding: "8px 10px" } },
+        arts.slice(0, 50).map(function(a, i) {
+          return React.createElement("div", { key: a.id, onClick: function() { goArticle(a); }, style: { display: "flex", gap: 10, padding: "10px 0", borderBottom: "1px solid rgba(0,0,0,0.07)", cursor: "pointer" } },
+            React.createElement("div", { style: { position: "relative", width: 80, minWidth: 80, height: 60, borderRadius: 4, overflow: "hidden", background: "#eee" } },
+              React.createElement("img", { src: a.img || ("https://source.unsplash.com/featured/160x120/sport?sig=" + i), alt: "", style: { width: "100%", height: "100%", objectFit: "cover" } })
+            ),
+            React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+              React.createElement("div", { style: { fontSize: 9, fontWeight: 800, color: LG[a.league] ? LG[a.league].color : "#e30613", textTransform: "uppercase", marginBottom: 3 } }, a.league + (a.tag ? " · " + a.tag : "")),
+              React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#111", lineHeight: 1.3, fontFamily: "'Barlow Condensed',sans-serif", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" } }, a.title)
+            )
+          );
+        })
+      )
+    );
+  }
   const fullScreen = selArticle || selPlayer || selTeam || playersList || selMatch;
   if (statFull) return /* @__PURE__ */ React.createElement(StatFullPage, { lg: statFull.lg, catIndex: statFull.catIndex, type: statFull.type, onBack: function() {
     setStatFull(null);
