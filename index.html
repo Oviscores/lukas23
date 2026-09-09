@@ -6709,11 +6709,10 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     { href: "https://www.instagram.com/zone_us_fr/", label: "IG", bg: "linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)" },
     { href: "https://www.facebook.com/profile.php?id=61593973693003", label: "f", bg: "#1877F2" }
   ].map(function(s, i) {
-    return /* @__PURE__ */ React.createElement("a", {
+    return /* @__PURE__ */ React.createElement("button", {
       key: i,
-      href: s.href,
-      target: "_blank",
-      style: { display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: s.bg, borderRadius: 5, textDecoration: "none", color: "#fff", fontWeight: 900, fontSize: 11, fontFamily: "Barlow Condensed,sans-serif" }
+      onClick: function() { window.open(s.href, '_blank', 'noopener,noreferrer'); },
+      style: { display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: s.bg, borderRadius: 5, border: "none", cursor: "pointer", color: "#fff", fontWeight: 900, fontSize: 11, fontFamily: "Barlow Condensed,sans-serif" }
     }, s.label);
   })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", background: "rgba(255,255,255,0.04)", borderRadius: 3, border: "1px solid rgba(255,255,255,0.06)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12 } }, "\u26A0\uFE0F"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.4)", lineHeight: 1.5 } }, "Jouer comporte des risques : endettement, isolement, d\xE9pendance. Pour \xEAtre aid\xE9, appelez le 09 74 75 13 13 (appel non surtax\xE9). Zone US promeut le jeu responsable. R\xE9serv\xE9 aux personnes majeures.")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 4, paddingTop: 4, borderTop: "1px solid rgba(255,255,255,0.06)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap" } }, ["Mentions l\xE9gales", "CGU", "Politique de confidentialit\xE9", "Contact", "\xC0 propos"].map(function(item, i) {
     return /* @__PURE__ */ React.createElement(
