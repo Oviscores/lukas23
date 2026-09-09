@@ -761,7 +761,6 @@ const LNEWS = {
   MLB: [{ time: "12h44", text: "Ohtani : 18 HR en 55 matchs" }, { time: "11h28", text: "Soto signe aux Mets 765M" }, { time: "10h15", text: "Judge : 500 HR en carriere" }, { time: "09h40", text: "Dodgers : rotation remaniee" }, { time: "08h55", text: "Yankees : 11 victoires de suite" }, { time: "08h20", text: "Cole : meilleur lanceur AL" }, { time: "07h50", text: "Trout de retour apres 3 sem." }, { time: "07h30", text: "Braves recrutent un SS" }]
 };
 const TICKER = [
-  "NFL : Seattle Seahawks vs New England Patriots - Ce soir 2h20 (heure fr) - Semaine 1 NFL 2026",
   "NHL : Ovechkin 2 buts - Capitals eliminent Pittsburgh",
   "NBA : Celtics 112-98 Heat - Tatum 45 pts - Serie 3-1",
   "NFL : Draft - Raiders QB 1er rang global",
@@ -2576,8 +2575,7 @@ async function fetchLiveScores() {
       const isLive = status && (status.state === 'in');
       const isFinal = status && status.completed;
       results.push({
-        id: 'nfl_' + g.id,
-        lg: 'NFL',
+        id: 'nfl_' + g.id, lg: 'NFL',
         status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING',
         period: comp.status && comp.status.period ? 'Q' + comp.status.period : '',
         homeTeam: home.team ? home.team.abbreviation : '',
@@ -3600,19 +3598,10 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
       React.createElement("span", { style: { color: "#ddd" } }, "|"),
       React.createElement("span", { style: { fontFamily: "Barlow,sans-serif", fontSize: 12, fontWeight: 700, color: "#555" } }, "Redaction Zone US")
     ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", margin: "8px 0" } },
-      React.createElement("button", {
-        onClick: function() {
-          if (navigator.clipboard) navigator.clipboard.writeText(window.location.href).then(function() {
-            var el = document.getElementById("cp-btn");
-            if (el) { el.textContent = "Lien copie !"; setTimeout(function(){ el.textContent = "Partager"; }, 2000); }
-          });
-        },
-        id: "cp-btn",
-        style: { background: "#f0f0f0", border: "none", borderRadius: 4, padding: "5px 12px", fontSize: 12, cursor: "pointer", fontWeight: 700 }
-      }, "Partager"),
+      React.createElement("button", { onClick: function() { if (navigator.clipboard) navigator.clipboard.writeText(window.location.href).then(function() { var el = document.getElementById("cp-btn"); if (el) { el.textContent = "Lien copie !"; setTimeout(function(){ el.textContent = "Partager"; }, 2000); } }); }, id: "cp-btn", style: { background: "#f0f0f0", border: "none", borderRadius: 4, padding: "5px 12px", fontSize: 12, cursor: "pointer", fontWeight: 700 } }, "Partager"),
       React.createElement("a", { href: "https://twitter.com/intent/tweet?url=" + encodeURIComponent(window.location.href) + "&text=" + encodeURIComponent(article.title), target: "_blank", style: { display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, background: "#000", borderRadius: 4, textDecoration: "none", color: "#fff", fontWeight: 900, fontSize: 13 } }, "X"),
       React.createElement("a", { href: "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(window.location.href), target: "_blank", style: { display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, background: "#1877F2", borderRadius: 4, textDecoration: "none", color: "#fff", fontWeight: 900, fontSize: 13 } }, "f"),
-      React.createElement("a", { href: "https://www.instagram.com/zoneus_fr/", target: "_blank", style: { display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, background: "linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", borderRadius: 4, textDecoration: "none", color: "#fff", fontWeight: 900, fontSize: 11 } }, "IG")
+      React.createElement("a", { href: "https://www.instagram.com/zone_us_fr/", target: "_blank", style: { display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, background: "linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", borderRadius: 4, textDecoration: "none", color: "#fff", fontWeight: 900, fontSize: 11 } }, "IG")
     ), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.body ? null : article.chapo)), article.body && React.createElement("div", { dangerouslySetInnerHTML: { __html: article.body }, style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#333", lineHeight: 1.9 } }), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
     return /* @__PURE__ */ React.createElement("div", { key: i, onClick: function() {
       onBack();
@@ -4935,7 +4924,11 @@ function CalendarPage({ lg, onBack, onMatchClick }) {
     }
   }, [window.__CAL_CACHE__[lg]]);
   const day = schedule.days[dayIdx];
-  const confs = CONF_STANDINGS[lg] || {};
+  const [confs, setConfs] = React.useState((window.__CONF_STANDINGS__ || CONF_STANDINGS)[lg] || {});
+  React.useEffect(function() {
+    setConfs((window.__CONF_STANDINGS__ || CONF_STANDINGS)[lg] || {});
+    window.__setStandings__ = function(l, data) { if (l === lg) setConfs(data); };
+  }, [lg]);
   const confKeys = Object.keys(confs);
   const bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
   return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10, marginRight: 8 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement("div", { style: { width: 3, height: 16, background: lc, borderRadius: 2 } }), /* @__PURE__ */ React.createElement(LB, { lg, sz: 16 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 21, fontWeight: 900, letterSpacing: "0.06em", color: "#222" } }, lg, " \u2014 CALENDRIER / R\xC9SULTATS")), /* @__PURE__ */ React.createElement("div", { ref: scrollRef, style: { background: "linear-gradient(135deg," + dk + "," + lc + ")", borderRadius: 4, display: "flex", overflowX: "auto", scrollbarWidth: "none", WebkitOverflowScrolling: "touch", justifyContent: "center" } }, schedule.days.map(function(d, i) {
@@ -6221,14 +6214,8 @@ function ZoneUS() {
   const page = _pageState[0];
   const _setPage = _pageState[1];
   React.useEffect(function() {
-    var titles = {
-      home: "Zone US — L'actu NHL, NFL, NBA et MLB en français",
-      NHL: "NHL — Actualités hockey sur glace | Zone US",
-      NFL: "NFL — Actualités football américain | Zone US",
-      NBA: "NBA — Actualités basket-ball | Zone US",
-      MLB: "MLB — Actualités baseball | Zone US",
-    };
-    document.title = titles[page] || "Zone US — Sport américain en français";
+    var titles = { home: "Zone US — L'actu NHL, NFL, NBA et MLB en français", NHL: "NHL | Zone US", NFL: "NFL | Zone US", NBA: "NBA | Zone US", MLB: "MLB | Zone US" };
+    document.title = titles[page] || "Zone US";
   }, [page]);
   const setPage = function(p) {
     _setPage(p);
@@ -6248,16 +6235,12 @@ function ZoneUS() {
   const goArticle = function(a) {
     window.location.hash = a ? 'article-' + slugify(a.title) : (page === 'home' ? '' : page);
     setSelArticle(a);
-    var ogTitle = document.querySelector('meta[property="og:title"]');
-    var ogImg = document.querySelector('meta[property="og:image"]');
-    var twTitle = document.querySelector('meta[name="twitter:title"]');
-    var twImg = document.querySelector('meta[name="twitter:image"]');
     if (a) {
       var img = a.img || 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp';
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      var ogImg = document.querySelector('meta[property="og:image"]');
       if (ogTitle) ogTitle.setAttribute('content', a.title + ' | Zone US');
       if (ogImg) ogImg.setAttribute('content', img);
-      if (twTitle) twTitle.setAttribute('content', a.title + ' | Zone US');
-      if (twImg) twImg.setAttribute('content', img);
       document.title = a.title + ' | Zone US';
     }
   };
@@ -6377,7 +6360,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   const bgStyle = { backgroundImage: "url(" + window.BG + ")", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center", minHeight: "100vh" };
   const CSS = `@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0;}html,body{overflow-x:hidden;max-width:100%;}@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}.tick{animation:fadein 0.4s ease;}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}.dot{animation:pulse 1.8s ease infinite;}nav{scrollbar-width:none;}nav::-webkit-scrollbar{display:none;}.nitem:hover .ndd{opacity:1!important;visibility:visible!important;transform:translateY(0)!important;pointer-events:auto!important;}.livebar{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;align-items:stretch;}.livebar::-webkit-scrollbar{display:none;}@keyframes livepulse{0%,100%{opacity:1}50%{opacity:0.4}}.livebadge{animation:livepulse 1.4s ease infinite;}`;
   const hero = arts[0], rest = arts.slice(1);
-    const fullScreen = selArticle || selPlayer || selTeam || playersList || selMatch;
+  const fullScreen = selArticle || selPlayer || selTeam || playersList || selMatch;
   if (statFull) return /* @__PURE__ */ React.createElement(StatFullPage, { lg: statFull.lg, catIndex: statFull.catIndex, type: statFull.type, onBack: function() {
     setStatFull(null);
   }, onPlayerClick: goPlayer });
@@ -6666,7 +6649,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
         )
       ), window.BANNERS[page] && !["home", "Fantasy", "AllNews", "AllStatuts", "NFL", "Cal-NFL", "Stats-NFL", "Fantasy-NFL", "NHL", "Cal-NHL", "Stats-NHL", "Fantasy-NHL", "NBA", "Cal-NBA", "Stats-NBA", "Fantasy-NBA", "MLB", "Cal-MLB", "Stats-MLB", "Fantasy-MLB"].includes(page) && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", overflow: "hidden", maxHeight: 80, lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNERS[page.replace("Stats-", "").replace("Cal-", "").replace("Fantasy-", "")], alt: page, style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover", objectPosition: "center center" } })), selMatch ? /* @__PURE__ */ React.createElement(MatchPage, { match: selMatch, onBack: goBack }) : selTeam ? /* @__PURE__ */ React.createElement(TeamPage, { teamId: selTeam.teamId, lg: selTeam.lg, onBack: goBack, articles: arts, onArticleClick: goArticle, onPlayerClick: goPlayer, onMatchClick: goScore }) : selPlayer ? /* @__PURE__ */ React.createElement(PlayerPage, { playerId: selPlayer.playerId, lg: selPlayer.lg, onBack: goBack, articles: arts, onArticleClick: setSelArticle }) : playersList ? /* @__PURE__ */ React.createElement(PlayersListPage, { lg: playersList, onPlayerClick: goPlayer, onBack: goBack }) : selArticle ? /* @__PURE__ */ React.createElement(ArticlePage, { article: selArticle, onBack: goBack, articles: arts, onPlayerClick: goPlayer, onTeamClick: goTeam }) : ["Stats-NHL", "Stats-NFL", "Stats-NBA", "Stats-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(StatsPage, { lg: page.replace("Stats-", ""), onPlayerClick: goPlayer, onBack: function(){ window.location.hash = "home"; }, statsVersion: statsVersion, onStatFull: function(ci, t) {
     setStatFull({ lg: page.replace("Stats-", ""), catIndex: ci, type: t });
-  }, onBack: goBack }) : ["Cal-NFL", "Cal-NBA", "Cal-NHL", "Cal-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(CalendarPage, { lg: page.replace("Cal-", ""), onBack: function(){ window.location.hash = "home"; }, onMatchClick: goMatch }) : ["NFL", "NBA", "NHL", "MLB"].includes(page) ? /* @__PURE__ */ React.createElement(LeaguePage, { lg: page, articles: arts, statsVersion: statsVersion, onBack: function(){ window.location.hash = "home"; }, onArticleClick: setSelArticle, onMatchClick: goScore, onTeamClick: (tid) => goTeam(tid, page), onStandingsClick: (lg) => setPage("Cal-" + lg), onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: (lg) => navigate("Fantasy-" + lg), onNavigate: setPage }) : ["Fantasy-NHL", "Fantasy-NFL", "Fantasy-NBA", "Fantasy-MLB"].includes(page) ? /* @__PURE__ */ React.createElement("div", null, page === "Fantasy-NHL" && /* @__PURE__ */ React.createElement(FantasyPageNHL, { lg: "NHL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NHL") }), page === "Fantasy-NFL" && /* @__PURE__ */ React.createElement(FantasyPageNFL, { lg: "NFL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NFL") }), page === "Fantasy-NBA" && /* @__PURE__ */ React.createElement(FantasyPageNBA, { lg: "NBA", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NBA") }), page === "Fantasy-MLB" && /* @__PURE__ */ React.createElement(FantasyPageMLB, { lg: "MLB", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "MLB") })) : page === "AllStatuts" ? /* @__PURE__ */ React.createElement(AllStatutsPage, { players: PLAYERS, onBack: () => setPage(prevPage || "home"), onPlayerClick: goPlayer }) : page === "AllNews" ? /* @__PURE__ */ React.createElement(AllNewsPage, { feed, onArticleClick: setSelArticle, onBack: () => setPage(prevPage || "home") }) : page === "Fantasy" ? /* @__PURE__ */ React.createElement(FantasyHome, { onNavigate: setPage }) : /* @__PURE__ */ React.createElement("div", { className: "col3", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "220px 1fr 220px", gap: 14, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(LeftCol, { onMatchClick: goScore, onStandingsClick: (lg) => setPage("Cal-" + lg) }), /* @__PURE__ */ React.createElement("main", { style: { display: "flex", flexDirection: "column", gap: 8, minWidth: 0 } }, hero && /* @__PURE__ */ React.createElement(HCard, { a: hero, onClick: goArticle }), rest.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(0, 3).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 3 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(3, 5).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 5 && /* @__PURE__ */ React.createElement(HCard, { a: rest[5], onClick: goArticle }), rest.length > 6 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(6, 9).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 9 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(9, 11).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 11 && /* @__PURE__ */ React.createElement(HCard, { a: rest[11], onClick: goArticle }), rest.length > 12 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(12).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle })))), /* @__PURE__ */ React.createElement(RightCol, { feed, statsVersion: statsVersion, onGen: generate, generating: gen, genLg, onArticleClick: setSelArticle, onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: function(lg) {
+  }, onBack: goBack }) : ["Cal-NFL", "Cal-NBA", "Cal-NHL", "Cal-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(CalendarPage, { lg: page.replace("Cal-", ""), onBack: function(){ window.location.hash = "home"; }, onMatchClick: goMatch }) : ["NFL", "NBA", "NHL", "MLB"].includes(page) ? /* @__PURE__ */ React.createElement(LeaguePage, { lg: page, articles: arts, statsVersion: statsVersion, onBack: function(){ window.location.hash = "home"; }, onArticleClick: goArticle, onMatchClick: goScore, onTeamClick: (tid) => goTeam(tid, page), onStandingsClick: (lg) => setPage("Cal-" + lg), onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: (lg) => navigate("Fantasy-" + lg), onNavigate: setPage }) : ["Fantasy-NHL", "Fantasy-NFL", "Fantasy-NBA", "Fantasy-MLB"].includes(page) ? /* @__PURE__ */ React.createElement("div", null, page === "Fantasy-NHL" && /* @__PURE__ */ React.createElement(FantasyPageNHL, { lg: "NHL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NHL") }), page === "Fantasy-NFL" && /* @__PURE__ */ React.createElement(FantasyPageNFL, { lg: "NFL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NFL") }), page === "Fantasy-NBA" && /* @__PURE__ */ React.createElement(FantasyPageNBA, { lg: "NBA", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NBA") }), page === "Fantasy-MLB" && /* @__PURE__ */ React.createElement(FantasyPageMLB, { lg: "MLB", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "MLB") })) : page === "AllStatuts" ? /* @__PURE__ */ React.createElement(AllStatutsPage, { players: PLAYERS, onBack: () => setPage(prevPage || "home"), onPlayerClick: goPlayer }) : page === "AllNews" ? /* @__PURE__ */ React.createElement(AllNewsPage, { feed, onArticleClick: goArticle, onBack: () => setPage(prevPage || "home") }) : page === "Fantasy" ? /* @__PURE__ */ React.createElement(FantasyHome, { onNavigate: setPage }) : /* @__PURE__ */ React.createElement("div", { className: "col3", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "220px 1fr 220px", gap: 14, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(LeftCol, { onMatchClick: goScore, onStandingsClick: (lg) => setPage("Cal-" + lg) }), /* @__PURE__ */ React.createElement("main", { style: { display: "flex", flexDirection: "column", gap: 8, minWidth: 0 } }, hero && /* @__PURE__ */ React.createElement(HCard, { a: hero, onClick: goArticle }), rest.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(0, 3).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 3 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(3, 5).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 5 && /* @__PURE__ */ React.createElement(HCard, { a: rest[5], onClick: goArticle }), rest.length > 6 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(6, 9).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 9 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(9, 11).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 11 && /* @__PURE__ */ React.createElement(HCard, { a: rest[11], onClick: goArticle }), rest.length > 12 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(12).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle })))), /* @__PURE__ */ React.createElement(RightCol, { feed, statsVersion: statsVersion, onGen: generate, generating: gen, genLg, onArticleClick: goArticle, onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: function(lg) {
     setPage("Stats-" + lg);
   }, onPlayerClick: goPlayer, onMoreStats: (lg) => setPage("Stats-" + lg) })), /* @__PURE__ */ React.createElement("footer", { style: { background: "rgba(15,15,15,0.92)", backdropFilter: "blur(8px)", borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 20, padding: "6px 20px 4px" } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", display: "flex", flexDirection: "column", gap: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" } },  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap" } }, ["NHL", "NFL", "NBA", "MLB"].map(function(lg2) {
     return /* @__PURE__ */ React.createElement(
@@ -6704,9 +6687,24 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
       },
       item.l
     );
-  })), /* @__PURE__ */ React.createElement("div", { style: { marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" } }, React.createElement("button", { onClick: function() { window.open("https://x.com/ZoneUS_fr", "_blank", "noopener,noreferrer"); }, style: { display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "#000", borderRadius: 5, border: "none", cursor: "pointer", color: "#fff", fontWeight: 900, fontSize: 11 } }, "X"),
-    React.createElement("button", { onClick: function() { window.open("https://www.instagram.com/zone_us_fr/", "_blank", "noopener,noreferrer"); }, style: { display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", borderRadius: 5, border: "none", cursor: "pointer", color: "#fff", fontWeight: 900, fontSize: 11 } }, "IG"),
-    React.createElement("button", { onClick: function() { window.open("https://www.facebook.com/profile.php?id=61593973693003", "_blank", "noopener,noreferrer"); }, style: { display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "#1877F2", borderRadius: 5, border: "none", cursor: "pointer", color: "#fff", fontWeight: 900, fontSize: 11 } }, "f"))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", background: "rgba(255,255,255,0.04)", borderRadius: 3, border: "1px solid rgba(255,255,255,0.06)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12 } }, "\u26A0\uFE0F"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.4)", lineHeight: 1.5 } }, "Jouer comporte des risques : endettement, isolement, d\xE9pendance. Pour \xEAtre aid\xE9, appelez le 09 74 75 13 13 (appel non surtax\xE9). Zone US promeut le jeu responsable. R\xE9serv\xE9 aux personnes majeures.")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 4, paddingTop: 4, borderTop: "1px solid rgba(255,255,255,0.06)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap" } }, ["Mentions l\xE9gales", "CGU", "Politique de confidentialit\xE9", "Contact", "\xC0 propos"].map(function(item, i) {
+  })), /* @__PURE__ */ React.createElement("div", { style: { marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" } }, ["\u{1D54F}", "\u{1F4F8}", "\u{1F3B5}"].map(function(s, i) {
+    return /* @__PURE__ */ React.createElement(
+      "span",
+      {
+        key: i,
+        style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", padding: "4px 8px", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 3, cursor: "pointer" },
+        onMouseEnter: function(e) {
+          e.currentTarget.style.color = "#fff";
+          e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+        },
+        onMouseLeave: function(e) {
+          e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+          e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+        }
+      },
+      s
+    );
+  }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, padding: "4px 8px", background: "rgba(255,255,255,0.04)", borderRadius: 3, border: "1px solid rgba(255,255,255,0.06)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12 } }, "\u26A0\uFE0F"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.4)", lineHeight: 1.5 } }, "Jouer comporte des risques : endettement, isolement, d\xE9pendance. Pour \xEAtre aid\xE9, appelez le 09 74 75 13 13 (appel non surtax\xE9). Zone US promeut le jeu responsable. R\xE9serv\xE9 aux personnes majeures.")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 4, paddingTop: 4, borderTop: "1px solid rgba(255,255,255,0.06)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap" } }, ["Mentions l\xE9gales", "CGU", "Politique de confidentialit\xE9", "Contact", "\xC0 propos"].map(function(item, i) {
     return /* @__PURE__ */ React.createElement(
       "a",
       {
@@ -6722,7 +6720,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
       },
       item
     );
-  })), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 6, color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em" } }, "\xA9 2026 ZONE US \u2014 Tous droits r\xE9serv\xE9s")))),
+  })), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 6, color: "rgba(255,255,255,0.2)", letterSpacing: "0.08em" } }, "\xA9 2026 ZONE US \u2014 Tous droits r\xE9serv\xE9s"))),
         /* Contact email */
         /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,0.1)", textAlign: "center" } },
           /* @__PURE__ */ React.createElement("a", { href: "mailto:contact@zoneus.fr",
