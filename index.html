@@ -2563,6 +2563,34 @@ async function fetchLiveScores() {
     if (oa !== ob) return oa - ob;
     return (a.time || '').localeCompare(b.time || '');
   });
+  // NFL
+  try {
+    const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard');
+    const d = await r.json();
+    for (const g of (d.events || [])) {
+      const comp = g.competitions && g.competitions[0];
+      if (!comp) continue;
+      const home = comp.competitors.find(c => c.homeAway === 'home') || {};
+      const away = comp.competitors.find(c => c.homeAway === 'away') || {};
+      const status = comp.status && comp.status.type;
+      const isLive = status && (status.state === 'in');
+      const isFinal = status && status.completed;
+      results.push({
+        id: 'nfl_' + g.id,
+        lg: 'NFL',
+        status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING',
+        period: comp.status && comp.status.period ? 'Q' + comp.status.period : '',
+        homeTeam: home.team ? home.team.abbreviation : '',
+        awayTeam: away.team ? away.team.abbreviation : '',
+        homeScore: isLive || isFinal ? parseInt(home.score || 0) : null,
+        awayScore: isLive || isFinal ? parseInt(away.score || 0) : null,
+        time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
+        homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500/' + home.team.abbreviation.toLowerCase() + '.png' : '',
+        awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500/' + away.team.abbreviation.toLowerCase() + '.png' : ''
+      });
+    }
+  } catch(e) { console.log('NFL livebar error:', e.message); }
+
   return results;
 }
 
