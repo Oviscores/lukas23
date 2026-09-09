@@ -2585,8 +2585,8 @@ async function fetchLiveScores() {
         homeScore: isLive || isFinal ? parseInt(home.score || 0) : null,
         awayScore: isLive || isFinal ? parseInt(away.score || 0) : null,
         time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
-        homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500/' + home.team.abbreviation.toLowerCase() + '.png' : '',
-        awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500/' + away.team.abbreviation.toLowerCase() + '.png' : ''
+        homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + home.team.abbreviation.toLowerCase() + '.png' : '',
+        awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + away.team.abbreviation.toLowerCase() + '.png' : ''
       });
     }
   } catch(e) { console.log('NFL livebar error:', e.message); }
