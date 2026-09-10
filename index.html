@@ -5022,12 +5022,15 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
             });
             all.sort(function(a,b){return b.date.localeCompare(a.date);});
           } else {
-            // NFL/NHL/NBA: 5 prochains matchs
+            // NFL/NHL/NBA: matchs récents + prochains
+            var yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1); var yStr = yesterday.toISOString().split('T')[0];
             cache.days.forEach(function(d) {
-              if (d.date >= today) {
+              if (d.date >= yStr) {
                 (d.matches||[]).forEach(function(m) {
-                  if (m.st==='Preview'||m.st===''||!m.st) {
-                    var dateAbbr = d.label || d.date;
+                  var dateAbbr = d.label || d.date;
+                  if (m.st==='Final'||m.st==='F'||m.st==='FINAL') {
+                    all.push({away:m.away,home:m.home,as:m.as,hs:m.hs,st:'FINAL',time:m.time,date:d.date,dateLabel:dateAbbr});
+                  } else if (m.st==='Preview'||m.st===''||!m.st) {
                     all.push({away:m.away,home:m.home,as:null,hs:null,st:'UPCOMING',time:m.time,date:d.date,dateLabel:dateAbbr});
                   }
                 });
