@@ -7085,7 +7085,7 @@ async function fetchLeagueStats(lg) {
         {cat:'interceptions',label:'Interceptions déf.'}
       ];
       var results = await Promise.all(nflCats.map(function(c) {
-        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2024')
+        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026')
           .then(function(r){return r.json();}).catch(function(){return null;});
       }));
       var players = nflCats.map(function(c,i) {
@@ -7227,7 +7227,7 @@ async function fetchLeagueStats(lg) {
 
   if (lg === 'NFL') {
     try {
-      var d = await fetch(PROXY+'?league=nfl_leaders&season=2024').then(function(r){return r.json();});
+      var d = await fetch(PROXY+'?league=nfl_leaders&season=2026').then(function(r){return r.json();});
       if (!d||!d.categories) { window.__STATS_LOADED__.NFL=false; return; }
       var players = [];
       (d.categories||[]).forEach(function(cat) {
@@ -7486,6 +7486,12 @@ window.fetchStandings = async function(lg) {
 };
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
+
+// Forcer rechargement stats NFL 2026
+setTimeout(function() {
+  if (window.__STATS_LOADED__) window.__STATS_LOADED__.NFL = false;
+  if (window.fetchLeagueStats) window.fetchLeagueStats('NFL');
+}, 2000);
 
 // NFL Standings
 var NFL_DIV = {
