@@ -4877,13 +4877,16 @@ function MatchPage({ match, onBack }) {
             var homeS = play.homeScore !== undefined ? play.homeScore : '';
             var teamAb = play.team && play.team.abbreviation || '';
             return React.createElement("div", { key: i, style: { display: "flex", gap: 10, padding: "8px 12px", borderBottom: "1px solid rgba(0,0,0,0.05)", alignItems: "flex-start", background: i % 2 === 0 ? "#fff" : "#f8f8f8" } },
-              React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", minWidth: 36 } },
-                React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 9, fontWeight: 900, color: "#fff", background: badgeBg, borderRadius: 3, padding: "1px 4px", marginBottom: 2 } }, abbr || '?'),
-                React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 9, color: "#999" } }, "Q" + (play.period && play.period.number || ''))
+              React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", minWidth: 40, gap: 3 } },
+                React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", background: badgeBg, borderRadius: 4, padding: "2px 6px" } }, abbr || '?'),
+                React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 10, fontWeight: 700, color: "#aaa" } }, "Q" + (play.period && play.period.number || ''))
               ),
               React.createElement("div", { style: { flex: 1 } },
-                React.createElement("div", { style: { fontFamily: "\'Barlow\',sans-serif", fontSize: 11, color: "#111", lineHeight: 1.4, marginBottom: 3 } }, play.text || ''),
-                React.createElement("div", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 10, color: "#777" } }, teamAb + "  " + awayS + " - " + homeS)
+                React.createElement("div", { style: { fontFamily: "\'Barlow\',sans-serif", fontSize: 12, color: "#111", lineHeight: 1.5, marginBottom: 4 } }, play.text || ''),
+                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+                  React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 11, fontWeight: 800, color: "#333", background: "#f0f0f0", borderRadius: 3, padding: "1px 6px" } }, awayS + " - " + homeS),
+                  React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 10, color: "#aaa" } }, teamAb)
+                )
               )
             );
           })
