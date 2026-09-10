@@ -7486,6 +7486,64 @@ window.fetchStandings = async function(lg) {
 };
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
+
+// NFL Standings
+var NFL_DIV = {
+  'BUF':'AFC Est','MIA':'AFC Est','NE':'AFC Est','NYJ':'AFC Est',
+  'BAL':'AFC Nord','CIN':'AFC Nord','CLE':'AFC Nord','PIT':'AFC Nord',
+  'HOU':'AFC Sud','IND':'AFC Sud','JAX':'AFC Sud','TEN':'AFC Sud',
+  'DEN':'AFC Ouest','KC':'AFC Ouest','LV':'AFC Ouest','LAC':'AFC Ouest',
+  'DAL':'NFC Est','NYG':'NFC Est','PHI':'NFC Est','WSH':'NFC Est',
+  'CHI':'NFC Nord','DET':'NFC Nord','GB':'NFC Nord','MIN':'NFC Nord',
+  'ATL':'NFC Sud','CAR':'NFC Sud','NO':'NFC Sud','TB':'NFC Sud',
+  'ARI':'NFC Ouest','LAR':'NFC Ouest','SF':'NFC Ouest','SEA':'NFC Ouest'
+};
+window.fetchStandings = async function(lg) {
+  if (lg === 'MLB') {
+    try {
+      var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_standings');
+      var data = await resp.json();
+      var divMap = {201:'AL Est',202:'AL Central',203:'AL Ouest',204:'NL Est',205:'NL Central',206:'NL Ouest'};
+      var result = {};
+      (data.records||[]).forEach(function(div) {
+        result[divMap[div.division.id]||'Div'+div.division.id] = div.teamRecords.map(function(t,i) {
+          return { r:i+1, ab:t.team.abbreviation==='AZ'?'ARI':t.team.abbreviation, w:t.wins, l:t.losses, pct:t.winningPercentage, gb:t.gamesBack==='-'?'-':t.gamesBack };
+        });
+      });
+      window.__CONF_STANDINGS__.MLB = result;
+      CONF_STANDINGS.MLB = result;
+      if (window.__setStandings__) window.__setStandings__('MLB', result);
+      console.log('MLB standings OK');
+    } catch(e) { console.log('MLB standings error:', e.message); }
+  }
+  if (lg === 'NFL') {
+    try {
+      var resp2 = await fetch('https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=2026');
+      var data2 = await resp2.json();
+      var result2 = {};
+      (data2.children||[]).forEach(function(conf) {
+        (conf.standings && conf.standings.entries||[]).forEach(function(e) {
+          var ab = e.team && e.team.abbreviation || '';
+          var div = NFL_DIV[ab] || 'Autre';
+          if (!result2[div]) result2[div] = [];
+          var wins = (e.stats.find(function(s){return s.name==='wins';})||{}).value || 0;
+          var losses = (e.stats.find(function(s){return s.name==='losses';})||{}).value || 0;
+          var pct = (e.stats.find(function(s){return s.name==='winPercent';})||{}).displayValue || '.000';
+          result2[div].push({ ab:ab, w:wins, l:losses, pct:pct });
+        });
+      });
+      // Trier par victoires
+      Object.keys(result2).forEach(function(div) {
+        result2[div].sort(function(a,b){return b.w-a.w;});
+        result2[div].forEach(function(t,i){t.r=i+1;});
+      });
+      window.__CONF_STANDINGS__.NFL = result2;
+      CONF_STANDINGS.NFL = result2;
+      if (window.__setStandings__) window.__setStandings__('NFL', result2);
+      console.log('NFL standings OK');
+    } catch(e) { console.log('NFL standings error:', e.message); }
+  }
+};
 </script>
 </body>
 </html>
