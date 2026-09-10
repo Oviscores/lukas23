@@ -2574,6 +2574,7 @@ async function fetchLiveScores() {
       const status = comp.status && comp.status.type;
       const isLive = status && (status.state === 'in');
       const isFinal = status && status.completed;
+      if (isFinal) continue; // Exclure les matchs terminés du livebar
       results.push({
         id: 'nfl_' + g.id, lg: 'NFL',
         status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING',
