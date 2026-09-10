@@ -5046,9 +5046,9 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
                 (d.matches||[]).forEach(function(m) {
                   var dateAbbr = d.label || d.date;
                   if (m.st==='Final'||m.st==='F'||m.st==='FINAL') {
-                    all.push({away:m.away,home:m.home,as:m.as,hs:m.hs,st:'FINAL',time:m.time,date:d.date,dateLabel:dateAbbr});
+                    all.push({away:m.away,home:m.home,as:m.as,hs:m.hs,st:'FINAL',time:m.time,date:d.date,dateLabel:dateAbbr,eventId:m.id});
                   } else if (m.st==='Preview'||m.st===''||!m.st) {
-                    all.push({away:m.away,home:m.home,as:null,hs:null,st:'UPCOMING',time:m.time,date:d.date,dateLabel:dateAbbr});
+                    all.push({away:m.away,home:m.home,as:null,hs:null,st:'UPCOMING',time:m.time,date:d.date,dateLabel:dateAbbr,eventId:m.id});
                   }
                 });
               }
@@ -6365,6 +6365,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   function goScore(g, lg) {
     goMatch({
       id: g.id || (g.away + "-" + g.home),
+      eventId: g.eventId || g.id || null,
       lg,
       status: g.st === "Final" ? "FINAL" : g.st === "Live" ? "LIVE" : (g.st || "FINAL"),
       period: "Final",
