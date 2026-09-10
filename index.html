@@ -6388,6 +6388,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   function goScore(g, lg) {
     goMatch({
       id: g.id || (g.away + "-" + g.home),
+      eventId: g.eventId || g.id || null,
       lg,
       status: g.st === "Final" ? "FINAL" : g.st === "Live" ? "LIVE" : (g.st || "FINAL"),
       period: "Final",
