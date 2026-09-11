@@ -3634,7 +3634,13 @@ function MatchScoreInArticle({ matchId, matchLg }) {
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: badgeBg, borderRadius: 3, padding: "1px 5px" } }, abbr),
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa" } }, "Q" + (play.period && play.period.number || ''))
           ),
-          React.createElement("span", { style: { fontFamily: "Barlow,sans-serif", fontSize: 11, color: "#333", flex: 1, lineHeight: 1.4 } }, play.text || '')
+          React.createElement("div", { style: { flex: 1 } },
+            React.createElement("div", { style: { fontFamily: "Barlow,sans-serif", fontSize: 11, color: "#333", lineHeight: 1.4, marginBottom: 3 } }, play.text || ''),
+            React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
+              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333", background: "#f0f0f0", borderRadius: 3, padding: "1px 6px" } }, (play.awayScore||0) + " - " + (play.homeScore||0)),
+              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#aaa" } }, play.team && play.team.abbreviation || '')
+            )
+          )
         );
       })
     )
