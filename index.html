@@ -6315,6 +6315,24 @@ function ZoneUS() {
   }, []);
   const [arts, setArts] = useState(ARTICLES);
   window.__setArts__ = setArts;
+  // Lire query param article au chargement
+  React.useEffect(function() {
+    var params = new URLSearchParams(window.location.search);
+    var artSlug = params.get('article');
+    if (artSlug && arts.length > 1) {
+      var found = arts.find(function(a) {
+        var s = a.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+        return s === artSlug;
+      });
+      if (found) setSelArticle(found);
+    }
+    var onPop = function() {
+      var p = new URLSearchParams(window.location.search);
+      if (!p.get('article')) setSelArticle(null);
+    };
+    window.addEventListener('popstate', onPop);
+    return function() { window.removeEventListener('popstate', onPop); };
+  }, [arts]);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
   const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
@@ -6340,7 +6358,12 @@ function ZoneUS() {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
   };
   const goArticle = function(a) {
-    window.location.hash = a ? 'article-' + slugify(a.title) : (page === 'home' ? '' : page);
+    if (a) {
+      var slug = slugify(a.title);
+      history.pushState({}, '', '?article=' + slug);
+    } else {
+      history.pushState({}, '', window.location.pathname);
+    }
     setSelArticle(a);
     if (a) {
       var img = a.img || 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp';
@@ -6349,6 +6372,8 @@ function ZoneUS() {
       if (ogTitle) ogTitle.setAttribute('content', a.title + ' | Zone US');
       if (ogImg) ogImg.setAttribute('content', img);
       document.title = a.title + ' | Zone US';
+      var ogUrl = document.querySelector('meta[property="og:url"]');
+      if (ogUrl) ogUrl.setAttribute('content', 'https://zoneus.fr/?article=' + slugify(a.title));
     }
   };
   const [selPlayer, setSelPlayer] = useState(null);
