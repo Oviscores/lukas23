@@ -7189,8 +7189,9 @@ async function fetchLeagueStats(lg) {
       if (players.length > 0) {
         window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
         window.STATS_PAGES.NFL.players = players;
-        if (window.__setStatsPage__ && window.__setStatsPage__.NFL) window.__setStatsPage__.NFL({teams:[], players:players});
+        syncGSTATS('NFL');
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
       console.log('NFL stats OK - '+players.length+' cats');
     } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
