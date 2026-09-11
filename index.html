@@ -7180,7 +7180,7 @@ async function fetchLeagueStats(lg) {
         {cat:'interceptions',label:'Interceptions déf.'}
       ];
       var results = await Promise.all(nflCats.map(function(c) {
-        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026')
+        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026&_='+Date.now())
           .then(function(r){return r.json();}).catch(function(){return null;});
       }));
       var players = nflCats.map(function(c,i) {
