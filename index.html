@@ -6040,9 +6040,9 @@ function StatFullPage({ lg, catIndex, type, onBack, onPlayerClick }) {
   React.useEffect(function() {
     window.__setStatsPage__ = window.__setStatsPage__ || {};
     window.__setStatsPage__[lg] = setData;
-    if (window.__STATS_LOADED__ && !window.__STATS_LOADED__[lg]) {
-      if (window.fetchLeagueStats) window.fetchLeagueStats(lg);
-    }
+    // Forcer rechargement stats
+    if (window.__STATS_LOADED__) window.__STATS_LOADED__[lg] = false;
+    if (window.fetchLeagueStats) window.fetchLeagueStats(lg);
     return function() { if (window.__setStatsPage__) delete window.__setStatsPage__[lg]; };
   }, [lg]);
   if (!data || ((!data.players || !data.players.length) && (!data.teams || !data.teams.length))) return /* @__PURE__ */ React.createElement("div", { style: { padding: 40, textAlign: "center", color: "#fff" } },
