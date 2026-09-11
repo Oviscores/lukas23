@@ -6038,10 +6038,24 @@ function StatFullPage({ lg, catIndex, type, onBack, onPlayerClick }) {
   var lc = LG[lg].color;
   var [tick, setTick] = React.useState(0);
   React.useEffect(function() {
+    // Forcer reload stats si pas encore chargées
+    if (window.__STATS_LOADED__ && !window.__STATS_LOADED__[lg]) {
+      if (window.fetchLeagueStats) window.fetchLeagueStats(lg);
+    }
     var prev = window.__zoneus_refresh__;
     window.__zoneus_refresh__ = function() { setTick(function(t){return t+1;}); if(prev) prev(); };
-    return function() { window.__zoneus_refresh__ = prev; };
-  }, []);
+    // Vérifier toutes les secondes pendant 10s si les données arrivent
+    var checks = 0;
+    var interval = setInterval(function() {
+      checks++;
+      var d = window.STATS_PAGES[lg];
+      if ((d && d.players && d.players.length > 0) || checks > 10) {
+        clearInterval(interval);
+        setTick(function(t){return t+1;});
+      }
+    }, 1000);
+    return function() { window.__zoneus_refresh__ = prev; clearInterval(interval); };
+  }, [lg]);
   var data = window.STATS_PAGES[lg];
   if (!data || ((!data.players || !data.players.length) && (!data.teams || !data.teams.length))) return /* @__PURE__ */ React.createElement("div", { style: { padding: 40, textAlign: "center", color: "#fff" } },
     /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "🏈"),
