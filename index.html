@@ -6036,6 +6036,12 @@ function TeamLogosBar({ lg, onTeamClick }) {
 
 function StatFullPage({ lg, catIndex, type, onBack, onPlayerClick }) {
   var lc = LG[lg].color;
+  var [tick, setTick] = React.useState(0);
+  React.useEffect(function() {
+    var prev = window.__zoneus_refresh__;
+    window.__zoneus_refresh__ = function() { setTick(function(t){return t+1;}); if(prev) prev(); };
+    return function() { window.__zoneus_refresh__ = prev; };
+  }, []);
   var data = window.STATS_PAGES[lg];
   if (!data || ((!data.players || !data.players.length) && (!data.teams || !data.teams.length))) return /* @__PURE__ */ React.createElement("div", { style: { padding: 40, textAlign: "center", color: "#fff" } },
     /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "🏈"),
