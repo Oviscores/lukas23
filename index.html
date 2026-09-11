@@ -6036,15 +6036,16 @@ function TeamLogosBar({ lg, onTeamClick }) {
 
 function StatFullPage({ lg, catIndex, type, onBack, onPlayerClick }) {
   var lc = LG[lg].color;
-  var [data, setData] = React.useState(window.STATS_PAGES[lg]);
+  var [tick, setTick] = React.useState(0);
   React.useEffect(function() {
-    window.__setStatsPage__ = window.__setStatsPage__ || {};
-    window.__setStatsPage__[lg] = setData;
+    // Exposer setTick pour forcer re-render quand GSTATS est mis à jour
+    window.__stats_setTick__ = setTick;
     // Forcer rechargement stats
     if (window.__STATS_LOADED__) window.__STATS_LOADED__[lg] = false;
     if (window.fetchLeagueStats) window.fetchLeagueStats(lg);
-    return function() { if (window.__setStatsPage__) delete window.__setStatsPage__[lg]; };
+    return function() { window.__stats_setTick__ = null; };
   }, [lg]);
+  var data = window.STATS_PAGES[lg];
   if (!data || ((!data.players || !data.players.length) && (!data.teams || !data.teams.length))) return /* @__PURE__ */ React.createElement("div", { style: { padding: 40, textAlign: "center", color: "#fff" } },
     /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "🏈"),
     /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 900, letterSpacing: "0.1em" } }, "SAISON À VENIR"),
