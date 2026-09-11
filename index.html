@@ -3613,13 +3613,13 @@ function MatchScoreInArticle({ matchId, matchLg }) {
     ),
     home && away && React.createElement("div", { style: { display: "flex", justifyContent: "space-around", alignItems: "center", padding: "16px 20px", background: "#111" } },
       React.createElement("div", { style: { textAlign: "center", flex: 1 } },
-        home && home.team && home.team.logo && React.createElement("img", { src: away.team.logo, alt: away.team.abbreviation, style: { width: 56, height: 56, objectFit: "contain", marginBottom: 6 } }),
+        React.createElement("img", { src: 'https://a.espncdn.com/i/teamlogos/' + matchLg.toLowerCase() + '/500/' + (away.team && away.team.abbreviation || '').toLowerCase() + '.png', alt: away.team && away.team.abbreviation || '', style: { width: 56, height: 56, objectFit: "contain", marginBottom: 6 } }),
         React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.7)", marginBottom: 4 } }, away.team && away.team.abbreviation || ''),
         React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 40, fontWeight: 900, color: "#fff" } }, away.score || '0')
       ),
       React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, fontWeight: 700, color: "rgba(255,255,255,0.3)", padding: "0 12px" } }, "-"),
       React.createElement("div", { style: { textAlign: "center", flex: 1 } },
-        home && home.team && home.team.logo && React.createElement("img", { src: home.team.logo, alt: home.team.abbreviation, style: { width: 56, height: 56, objectFit: "contain", marginBottom: 6 } }),
+        React.createElement("img", { src: 'https://a.espncdn.com/i/teamlogos/' + matchLg.toLowerCase() + '/500/' + (home.team && home.team.abbreviation || '').toLowerCase() + '.png', alt: home.team && home.team.abbreviation || '', style: { width: 56, height: 56, objectFit: "contain", marginBottom: 6 } }),
         React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.7)", marginBottom: 4 } }, home.team && home.team.abbreviation || ''),
         React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 40, fontWeight: 900, color: "#fff" } }, home.score || '0')
       )
