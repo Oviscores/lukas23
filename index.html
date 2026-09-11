@@ -7619,6 +7619,12 @@ window.fetchStandings = async function(lg) {
 
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
+
+// Charger stats NFL 2026 au démarrage
+if (window.__STATS_LOADED__) window.__STATS_LOADED__.NFL = false;
+setTimeout(function() {
+  if (window.fetchLeagueStats) window.fetchLeagueStats('NFL');
+}, 1000);
 </script>
 </body>
 </html>
