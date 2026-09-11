@@ -7320,26 +7320,6 @@ async function fetchLeagueStats(lg) {
     return;
   }
 
-  if (lg === 'NFL') {
-    try {
-      var d = await fetch(PROXY+'?league=nfl_leaders&season=2026').then(function(r){return r.json();});
-      if (!d||!d.categories) { window.__STATS_LOADED__.NFL=false; return; }
-      var players = [];
-      (d.categories||[]).forEach(function(cat) {
-        var data = (cat.leaders||[]).slice(0,5).map(function(e) {
-          return {name:e.athlete&&(e.athlete.displayName||e.athlete.shortName)||'',ab:e.team&&e.team.abbreviation||'',val:e.displayValue||e.value||0};
-        });
-        if (data.length) players.push({label:cat.displayName||cat.name||'',data:data});
-      });
-      if (players.length>0) {
-        window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
-        window.STATS_PAGES.NFL.players = players;
-        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-      }
-      console.log('NFL stats OK - '+players.length+' cats');
-    } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
-    return;
-  }
 }
 
 </script>
