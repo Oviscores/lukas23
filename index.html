@@ -7019,7 +7019,7 @@ async function fetchStandings(lg) {
       if (Object.keys(confs).length > 0) { CONF_STANDINGS.NBA = confs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
     }
     if (lg === 'NFL') {
-      var r = await fetch('https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=2024');
+      var r = await fetch('https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=2026');
       var d = await r.json();
       if (!d || !d.children) return;
       var divs = {};
@@ -7621,6 +7621,11 @@ window.fetchStandings = async function(lg) {
 
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
+
+setTimeout(function() {
+  if (window.__STATS_LOADED__) window.__STATS_LOADED__.NFL = false;
+  if (window.fetchLeagueStats) window.fetchLeagueStats('NFL');
+}, 2000);
 </script>
 </body>
 </html>
