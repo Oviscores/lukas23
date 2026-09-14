@@ -3599,7 +3599,7 @@ function TeamCardInArticle({ teamId, teamLg, onTeamClick }) {
   var record = teamData && teamData.season ? teamData.season.w + '-' + teamData.season.l : '';
   
   return React.createElement("div", {
-    onClick: function() { if (onTeamClick) onTeamClick(); },
+    onClick: function() { if (onTeamClick) onTeamClick(teamId + '_' + teamLg, teamLg); },
     style: { 
       background: 'linear-gradient(135deg, ' + dk + ' 0%, #1a1a2e 100%)',
       borderRadius: 10, overflow: 'hidden', marginTop: 24, cursor: 'pointer',
