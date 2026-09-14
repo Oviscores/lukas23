@@ -3594,8 +3594,8 @@ function TeamCardInArticle({ teamId, teamLg, onTeamClick }) {
   var dk = LG[teamLg] ? (LG[teamLg].dark || '#111') : '#111';
   var logoUrl = 'https://zoneus-proxy.vivienfrappier.workers.dev?logo=' + teamId + '&lg=' + teamLg;
   var teamKey = teamId + '_' + teamLg;
-  var teamData = TEAMS_DB && TEAMS_DB[teamLg] && TEAMS_DB[teamLg].find(function(t){ return t.ab === teamId; });
-  var fullName = teamData ? teamData.city + ' ' + teamData.name : teamId;
+  var teamData = TEAMS_DB && TEAMS_DB[teamLg] && TEAMS_DB[teamLg].find(function(t){ return t.id === teamId; });
+  var fullName = teamData ? (teamData.city ? teamData.city + ' ' + teamData.name : teamData.name) : teamId;
   var record = teamData && teamData.season ? teamData.season.w + '-' + teamData.season.l : '';
   
   return React.createElement("div", {
