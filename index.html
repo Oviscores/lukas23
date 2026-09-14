@@ -203,10 +203,10 @@ var __async = (__this, __arguments, generator) => {
 };
 const { useState, useEffect } = React;
 const LG = {
-  NFL: { color: "#D50A0A", dark: "#013369", label: "Football", emoji: "\u{1F3C8},
-  MLB: { color: "#002D62", dark: "#D50A0A", label: "Baseball", emoji: "\u26BE" },
-  NHL: { color: "#00A3E0", dark: "#001F5B", label: "Hockey", emoji: "\u{1F3D2},
-  NBA: { color: "#C8102E", dark: "#1D428A", label: "Basketball", emoji: "\u{1F3C0}
+  NHL: { color: "#00A3E0", dark: "#001F5B", label: "Hockey", emoji: "\u{1F3D2}" },
+  NFL: { color: "#D50A0A", dark: "#013369", label: "Football", emoji: "\u{1F3C8}" },
+  NBA: { color: "#C8102E", dark: "#1D428A", label: "Basketball", emoji: "\u{1F3C0}" },
+  MLB: { color: "#002D62", dark: "#D50A0A", label: "Baseball", emoji: "\u26BE" }
 }
 window.LG = LG;;
 const TC = {
@@ -735,7 +735,12 @@ const GSTATS = {
     { label: "Save%", unit: "SV%", players: [{ name: "Hellebuyck", team: "WPG", val: ".928" }, { name: "Shesterkin", team: "NYR", val: ".924" }, { name: "Bobrovsky", team: "FLA", val: ".921" }, { name: "Sorokin", team: "NYI", val: ".919" }, { name: "Vladar", team: "CGY", val: ".917" }] },
     { label: "Points", unit: "PTS", players: [{ name: "McDavid", team: "EDM", val: 112 }, { name: "MacKinnon", team: "COL", val: 104 }, { name: "Kucherov", team: "TBL", val: 99 }, { name: "Draisaitl", team: "EDM", val: 97 }, { name: "Matthews", team: "TOR", val: 89 }] }
   ],
-  NFL: [],
+  NFL: [
+    { label: "TD", unit: "TD", players: [{ name: "Mahomes", team: "KC", val: 38 }, { name: "Allen", team: "BUF", val: 35 }, { name: "Hurts", team: "PHI", val: 34 }, { name: "Jackson", team: "BAL", val: 32 }, { name: "Burrow", team: "CIN", val: 30 }] },
+    { label: "Pass Yds", unit: "yds", players: [{ name: "Mahomes", team: "KC", val: 4181 }, { name: "Allen", team: "BUF", val: 4044 }, { name: "Hurts", team: "PHI", val: 3858 }, { name: "Jackson", team: "BAL", val: 3678 }, { name: "Burrow", team: "CIN", val: 3601 }] },
+    { label: "Rush Yds", unit: "yds", players: [{ name: "McCaffrey", team: "SF", val: 1459 }, { name: "Cook", team: "BUF", val: 1102 }, { name: "Pacheco", team: "KC", val: 1098 }, { name: "Pollard", team: "DAL", val: 1034 }, { name: "Swift", team: "PHI", val: 986 }] },
+    { label: "Sacks", unit: "sk", players: [{ name: "Parsons", team: "DAL", val: 19 }, { name: "Crosby", team: "LV", val: 17 }, { name: "Garrett", team: "CLE", val: 16 }, { name: "Watt", team: "PIT", val: 15 }, { name: "Allen", team: "JAX", val: 14 }] }
+  ],
   NBA: [
     { label: "Points", unit: "pts", players: [{ name: "Doncic", team: "DAL", val: 32.4 }, { name: "SGA", team: "OKC", val: 30.1 }, { name: "Tatum", team: "BOS", val: 28.1 }, { name: "Giannis", team: "MIL", val: 27.8 }, { name: "Jokic", team: "DEN", val: 26.4 }] },
     { label: "Rebonds", unit: "reb", players: [{ name: "Jokic", team: "DEN", val: 13.1 }, { name: "Giannis", team: "MIL", val: 12.4 }, { name: "Ayton", team: "POR", val: 11.8 }, { name: "Sabonis", team: "SAC", val: 11.5 }, { name: "Gobert", team: "MIN", val: 11.2 }] },
@@ -5199,7 +5204,7 @@ function RightCol({ feed, statsVersion, onGen, generating, genLg, onArticleClick
   }), !showAllPlayers && PLAYERS.length > 5 ? /* @__PURE__ */ React.createElement(MoreBtn, { label: "+ d'infos", onClick: () => {
     console.log("AllStatuts click", typeof onNavigate);
     if (onMorePlayers) onMorePlayers();
-  } }) : showAllPlayers && /* @__PURE__ */ React.createElement(MoreBtn, { label: "R\xE9duire", onClick: () => setShowAllPlayers(false) })), ["NFL", "MLB", "NHL", "NBA"].map((lg) => {
+  } }) : showAllPlayers && /* @__PURE__ */ React.createElement(MoreBtn, { label: "R\xE9duire", onClick: () => setShowAllPlayers(false) })), Object.keys(LG).map((lg) => {
     const lc2 = LG[lg].color;
     const _sp = window.STATS_PAGES && window.STATS_PAGES[lg];
     const lgStats = (_sp && _sp.players && _sp.players.length > 0)
@@ -7174,7 +7179,7 @@ async function fetchLeagueStats(lg) {
         {cat:'interceptions',label:'Interceptions déf.'}
       ];
       var results = await Promise.all(nflCats.map(function(c) {
-        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026&_='+Date.now())
+        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026&_='+Date.now()+'')
           .then(function(r){return r.json();}).catch(function(){return null;});
       }));
       var players = nflCats.map(function(c,i) {
@@ -7185,16 +7190,13 @@ async function fetchLeagueStats(lg) {
         }).filter(function(e){return e.name;});
         return data.length ? {label:c.label,data:data} : null;
       }).filter(Boolean);
-      console.log('NFL DEBUG players[0]:', players.length > 0 ? players[0].data[0].name : 'VIDE');
       if (players.length > 0) {
         window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
         window.STATS_PAGES.NFL.players = players;
-        syncGSTATS('NFL');
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
       console.log('NFL stats OK - '+players.length+' cats');
-    } catch(e) { console.error('NFL stats ERREUR:', e.message, e.stack); window.__STATS_LOADED__.NFL=false; }
+    } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
     return;
   }
 }
@@ -7243,45 +7245,7 @@ async function fetchNHLStats() {
     console.log('NHL stats OK');
   } catch(e){console.log('NHL stats err',e);window.__NHL_STATS_LOADED__=false;}
 }
-async function f
-
-  if (lg === 'NFL') {
-    try {
-      var nflCats = [
-        {cat:'passingYards',label:'Yards passés'},
-        {cat:'passingTouchdowns',label:'TD passés'},
-        {cat:'rushingYards',label:'Yards course'},
-        {cat:'rushingTouchdowns',label:'TD course'},
-        {cat:'receivingYards',label:'Yards réception'},
-        {cat:'receivingTouchdowns',label:'TD réception'},
-        {cat:'sacks',label:'Sacks'},
-        {cat:'interceptions',label:'Interceptions déf.'}
-      ];
-      var results = await Promise.all(nflCats.map(function(c) {
-        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026&_='+Date.now())
-          .then(function(r){return r.json();}).catch(function(){return null;});
-      }));
-      var players = nflCats.map(function(c,i) {
-        var d = results[i];
-        if (!d || !d.leaders) return null;
-        var data = d.leaders.slice(0,5).map(function(e) {
-          return {name:e.name||'',ab:e.teamAb||'',val:e.displayValue||String(e.value||0)};
-        }).filter(function(e){return e.name;});
-        return data.length ? {label:c.label,data:data} : null;
-      }).filter(Boolean);
-      console.log('NFL DEBUG players[0]:', players.length > 0 ? players[0].data[0].name : 'VIDE');
-      if (players.length > 0) {
-        window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
-        window.STATS_PAGES.NFL.players = players;
-        syncGSTATS('NFL');
-        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
-      }
-      console.log('NFL stats OK - '+players.length+' cats');
-    } catch(e) { console.error('NFL stats ERREUR:', e.message, e.stack); window.__STATS_LOADED__.NFL=false; }
-    return;
-  }
-}etchLeagueStats(lg) {
+async function fetchLeagueStats(lg) {
   if (lg !== 'NFL' && window.__STATS_LOADED__[lg]) return;
   window.__STATS_LOADED__[lg] = true;
   var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
@@ -7355,6 +7319,41 @@ async function f
     return;
   }
 
+
+
+  if (lg === 'NFL') {
+    try {
+      var nflCats = [
+        {cat:'passingYards',label:'Yards passés'},
+        {cat:'passingTouchdowns',label:'TD passés'},
+        {cat:'rushingYards',label:'Yards course'},
+        {cat:'rushingTouchdowns',label:'TD course'},
+        {cat:'receivingYards',label:'Yards réception'},
+        {cat:'receivingTouchdowns',label:'TD réception'},
+        {cat:'sacks',label:'Sacks'},
+        {cat:'interceptions',label:'Interceptions déf.'}
+      ];
+      var results = await Promise.all(nflCats.map(function(c) {
+        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026&_='+Date.now()+'')
+          .then(function(r){return r.json();}).catch(function(){return null;});
+      }));
+      var players = nflCats.map(function(c,i) {
+        var d = results[i];
+        if (!d || !d.leaders) return null;
+        var data = d.leaders.slice(0,5).map(function(e) {
+          return {name:e.name||'',ab:e.teamAb||'',val:e.displayValue||String(e.value||0)};
+        }).filter(function(e){return e.name;});
+        return data.length ? {label:c.label,data:data} : null;
+      }).filter(Boolean);
+      if (players.length > 0) {
+        window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
+        window.STATS_PAGES.NFL.players = players;
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
+      console.log('NFL stats OK - '+players.length+' cats');
+    } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
+    return;
+  }
 }
 
 </script>
@@ -7636,12 +7635,6 @@ window.fetchStandings = async function(lg) {
 
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
-
-// Charger stats NFL 2026 au démarrage
-if (window.__STATS_LOADED__) window.__STATS_LOADED__.NFL = false;
-setTimeout(function() {
-  if (window.fetchLeagueStats) window.fetchLeagueStats('NFL');
-}, 1000);
 </script>
 </body>
 </html>
