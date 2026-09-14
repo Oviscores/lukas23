@@ -4971,14 +4971,14 @@ function MatchPage({ match, onBack }) {
                 var labelFr = statName === 'passing' ? 'PASSEURS' : statName === 'rushing' ? 'COUREURS' : 'RECEVEURS';
                 var cols = statGroup.labels || [];
                 return React.createElement("div", { key: statName },
-                  React.createElement("div", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 10, fontWeight: 800, color: "#fff", background: teamColor, padding: "6px 10px", letterSpacing: "0.05em" } }, teamAb + " — " + labelFr),
+                  React.createElement("div", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 12, fontWeight: 900, color: "#fff", background: teamColor, padding: "10px 14px", letterSpacing: "0.08em", marginTop: 10 } }, teamAb + " — " + labelFr),
                   statGroup.athletes.map(function(a, i) {
                     var name = a.athlete && a.athlete.displayName || '';
                     var stats = a.stats || [];
                     var summary = cols.slice(0,4).map(function(c,ci) { return c + ': ' + (stats[ci]||'-'); }).join('  ');
                     return React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 10px", background: i % 2 === 0 ? "#fff" : "#f5f5f5", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
                       React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 14, fontWeight: 700, color: "#111" } }, name),
-                      React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 12, color: teamColor, fontWeight: 900 } }, summary)
+                      React.createElement("span", { style: { fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 12, color: "#444", fontWeight: 700, background: "#f0f0f0", borderRadius: 3, padding: "1px 8px" } }, summary)
                     );
                   })
                 );
