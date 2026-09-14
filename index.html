@@ -7248,6 +7248,7 @@ async function fetchNHLStats() {
     console.log('NHL stats OK');
   } catch(e){console.log('NHL stats err',e);window.__NHL_STATS_LOADED__=false;}
 }
+window.fetchLeagueStats = fetchLeagueStats;
 async function fetchLeagueStats(lg) {
   if (lg !== 'NFL' && window.__STATS_LOADED__[lg]) return;
   window.__STATS_LOADED__[lg] = true;
