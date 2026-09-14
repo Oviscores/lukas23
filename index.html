@@ -3588,6 +3588,46 @@ function NCard({ a, onClick }) {
   );
 }
 
+
+function TeamCardInArticle({ teamId, teamLg, onTeamClick }) {
+  var lc = LG[teamLg] ? LG[teamLg].color : '#e30613';
+  var dk = LG[teamLg] ? (LG[teamLg].dark || '#111') : '#111';
+  var logoUrl = 'https://zoneus-proxy.vivienfrappier.workers.dev?logo=' + teamId + '&lg=' + teamLg;
+  var teamKey = teamId + '_' + teamLg;
+  var teamData = TEAMS_DB && TEAMS_DB[teamLg] && TEAMS_DB[teamLg].find(function(t){ return t.ab === teamId; });
+  var fullName = teamData ? teamData.city + ' ' + teamData.name : teamId;
+  var record = teamData && teamData.season ? teamData.season.w + '-' + teamData.season.l : '';
+  
+  return React.createElement("div", {
+    onClick: function() { if (onTeamClick) onTeamClick(); },
+    style: { 
+      background: 'linear-gradient(135deg, ' + dk + ' 0%, #1a1a2e 100%)',
+      borderRadius: 10, overflow: 'hidden', marginTop: 24, cursor: 'pointer',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+      border: '1px solid rgba(255,255,255,0.08)'
+    }
+  },
+    React.createElement("div", { style: { background: lc, padding: '6px 16px', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.12em' } },
+      "FICHE ÉQUIPE · " + teamLg
+    ),
+    React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px' } },
+      React.createElement("img", { 
+        src: logoUrl, alt: teamId,
+        style: { width: 72, height: 72, objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }
+      }),
+      React.createElement("div", { style: { flex: 1 } },
+        React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1.1, marginBottom: 4 } }, fullName),
+        record && React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.6)', marginBottom: 8 } }, 'Bilan : ' + record),
+        React.createElement("div", { 
+          style: { display: 'inline-flex', alignItems: 'center', gap: 6, background: lc, borderRadius: 4, padding: '4px 10px' }
+        },
+          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: '0.05em' } }, "VOIR LA FICHE →")
+        )
+      )
+    )
+  );
+}
+
 function MatchScoreInArticle({ matchId, matchLg }) {
   var [bx, setBx] = React.useState(null);
   var [loading, setLoading] = React.useState(true);
@@ -3670,7 +3710,8 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) 
       React.createElement("a", { href: "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(window.location.href), target: "_blank", style: { display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, background: "#1877F2", borderRadius: 4, textDecoration: "none", color: "#fff", fontWeight: 900, fontSize: 13 } }, "f"),
       React.createElement("a", { href: "https://www.instagram.com/zone_us_fr/", target: "_blank", style: { display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, background: "linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", borderRadius: 4, textDecoration: "none", color: "#fff", fontWeight: 900, fontSize: 11 } }, "IG")
     ), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#333", lineHeight: 1.9 } }, article.body ? null : article.chapo)), article.body && React.createElement("div", { dangerouslySetInnerHTML: { __html: article.body }, style: { fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#333", lineHeight: 1.9 } }),
-    article.matchId && React.createElement(MatchScoreInArticle, { matchId: article.matchId, matchLg: article.matchLg || article.league }), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
+    article.matchId && React.createElement(MatchScoreInArticle, { matchId: article.matchId, matchLg: article.matchLg || article.league }),
+    article.teamId && React.createElement(TeamCardInArticle, { teamId: article.teamId, teamLg: article.teamLg || article.league, onTeamClick: onBack }), related.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "4px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "\xC0 LIRE AUSSI")), related.map(function(a, i) {
     return /* @__PURE__ */ React.createElement("div", { key: i, onClick: function() {
       onBack();
       setTimeout(function() {
@@ -7560,13 +7601,13 @@ function portableTextToHTML(body) {
 }
 async function fetchSanityArticles() {
   try {
-    var query = encodeURIComponent('*[_type == "article"] | order(ordre asc, publishedAt desc) [0...50] {_id, title, chapo, body, league, tag, franchise, hot, publishedAt, matchId, matchLg, ordre, "imageUrl": image.asset->url}');
+    var query = encodeURIComponent('*[_type == "article"] | order(ordre asc, publishedAt desc) [0...50] {_id, title, chapo, body, league, tag, franchise, hot, publishedAt, matchId, matchLg, teamId, teamLg, ordre, "imageUrl": image.asset->url}');
     var url = 'https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query;
     var resp = await fetch(url, { headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' } });
     var data = await resp.json();
     if (!data.result || !data.result.length) return;
     var sanityArts = data.result.map(function(a, i) {
-      return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null };
+      return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null, teamId: a.teamId||null, teamLg: a.teamLg||null };
     });
     window.__SANITY_ARTICLES__ = sanityArts;
     var sl = sanityArts.map(function(a){ return a.league; });
