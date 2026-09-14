@@ -7351,20 +7351,17 @@ async function fetchLeagueStats(lg) {
       if (players.length > 0) {
         window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
         window.STATS_PAGES.NFL.players = players;
+        syncGSTATS('NFL');
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
+      console.log('NFL DEBUG players[0]:', players.length > 0 ? players[0].data[0].name : 'VIDE');
       console.log('NFL stats OK - '+players.length+' cats');
     } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
     return;
   }
 }
-
-</script>
-<script>
-// ============================================================
-// FANTASY DATA — Fetch real injuries & news for all leagues
-// ============================================================
-window.__FANTASY_LOADED__ = {};
+__FANTASY_LOADED__ = {};
 
 async function fetchFantasyData(lg) {
   if (window.__FANTASY_LOADED__[lg]) return;
