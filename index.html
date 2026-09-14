@@ -5199,7 +5199,7 @@ function RightCol({ feed, statsVersion, onGen, generating, genLg, onArticleClick
   }), !showAllPlayers && PLAYERS.length > 5 ? /* @__PURE__ */ React.createElement(MoreBtn, { label: "+ d'infos", onClick: () => {
     console.log("AllStatuts click", typeof onNavigate);
     if (onMorePlayers) onMorePlayers();
-  } }) : showAllPlayers && /* @__PURE__ */ React.createElement(MoreBtn, { label: "R\xE9duire", onClick: () => setShowAllPlayers(false) })), Object.keys(LG).map((lg) => {
+  } }) : showAllPlayers && /* @__PURE__ */ React.createElement(MoreBtn, { label: "R\xE9duire", onClick: () => setShowAllPlayers(false) })), ["NFL", "MLB", "NHL", "NBA"].map((lg) => {
     const lc2 = LG[lg].color;
     const _sp = window.STATS_PAGES && window.STATS_PAGES[lg];
     const lgStats = (_sp && _sp.players && _sp.players.length > 0)
