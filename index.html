@@ -7082,7 +7082,7 @@ async function fetchNHLStats() {
 window.__STATS_LOADED__ = window.__STATS_LOADED__ || {};
 
 async function fetchLeagueStats(lg) {
-  if (window.__STATS_LOADED__[lg]) return;
+  if (lg !== 'NFL' && window.__STATS_LOADED__[lg]) return;
   window.__STATS_LOADED__[lg] = true;
   var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
 
