@@ -7243,7 +7243,45 @@ async function fetchNHLStats() {
     console.log('NHL stats OK');
   } catch(e){console.log('NHL stats err',e);window.__NHL_STATS_LOADED__=false;}
 }
-async function fetchLeagueStats(lg) {
+async function f
+
+  if (lg === 'NFL') {
+    try {
+      var nflCats = [
+        {cat:'passingYards',label:'Yards passés'},
+        {cat:'passingTouchdowns',label:'TD passés'},
+        {cat:'rushingYards',label:'Yards course'},
+        {cat:'rushingTouchdowns',label:'TD course'},
+        {cat:'receivingYards',label:'Yards réception'},
+        {cat:'receivingTouchdowns',label:'TD réception'},
+        {cat:'sacks',label:'Sacks'},
+        {cat:'interceptions',label:'Interceptions déf.'}
+      ];
+      var results = await Promise.all(nflCats.map(function(c) {
+        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026&_='+Date.now())
+          .then(function(r){return r.json();}).catch(function(){return null;});
+      }));
+      var players = nflCats.map(function(c,i) {
+        var d = results[i];
+        if (!d || !d.leaders) return null;
+        var data = d.leaders.slice(0,5).map(function(e) {
+          return {name:e.name||'',ab:e.teamAb||'',val:e.displayValue||String(e.value||0)};
+        }).filter(function(e){return e.name;});
+        return data.length ? {label:c.label,data:data} : null;
+      }).filter(Boolean);
+      console.log('NFL DEBUG players[0]:', players.length > 0 ? players[0].data[0].name : 'VIDE');
+      if (players.length > 0) {
+        window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
+        window.STATS_PAGES.NFL.players = players;
+        syncGSTATS('NFL');
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
+      }
+      console.log('NFL stats OK - '+players.length+' cats');
+    } catch(e) { console.error('NFL stats ERREUR:', e.message, e.stack); window.__STATS_LOADED__.NFL=false; }
+    return;
+  }
+}etchLeagueStats(lg) {
   if (lg !== 'NFL' && window.__STATS_LOADED__[lg]) return;
   window.__STATS_LOADED__[lg] = true;
   var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
