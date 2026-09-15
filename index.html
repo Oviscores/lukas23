@@ -3976,23 +3976,24 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
     
   // NFL roster
   if (liveRoster && liveRoster.roster && lg === 'NFL') {
+    var nflLc = lc || (LG['NFL'] && LG['NFL'].color) || '#e30613';
     var nflGroups = {};
     (liveRoster.roster||[]).forEach(function(p) {
       var grp = p.pos || 'Joueurs';
-      var grpLabel = ['QB','WR','TE'].indexOf(grp) >= 0 ? 'ATTAQUE' :
-                     ['DE','DT','LB','CB','S','DB'].indexOf(grp) >= 0 ? 'DEFENSE' :
+      var grpLabel = ['QB','WR','TE','RB','FB','OL','OT','OG','C'].indexOf(grp) >= 0 ? 'ATTAQUE' :
+                     ['DE','DT','NT','LB','OLB','ILB','MLB','CB','S','SS','FS','DB'].indexOf(grp) >= 0 ? 'DEFENSE' :
                      ['K','P','LS'].indexOf(grp) >= 0 ? 'UNITES SPECIALES' : 'AUTRES';
       if (!nflGroups[grpLabel]) nflGroups[grpLabel] = [];
       nflGroups[grpLabel].push(p);
     });
     return React.createElement("div", { style: { background: "rgba(200,200,200,0.12)", borderRadius: 6, overflow: "hidden", marginTop: 8 } },
-      React.createElement("div", { style: { background: lc, padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.1em" } }, "EFFECTIF NFL"),
+      React.createElement("div", { style: { background: nflLc, padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.1em" } }, "EFFECTIF NFL"),
       Object.keys(nflGroups).map(function(grp) {
         return React.createElement("div", { key: grp },
           React.createElement("div", { style: { background: "rgba(0,0,0,0.3)", padding: "4px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.7)", letterSpacing: "0.08em" } }, grp),
           nflGroups[grp].map(function(p, i) {
             return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "6px 14px", borderBottom: "1px solid rgba(255,255,255,0.05)", background: i%2===0?"rgba(255,255,255,0.03)":"transparent" } },
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: lc, minWidth: 28, textAlign: "center" } }, "#" + (p.number||"—")),
+              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: nflLc, minWidth: 28, textAlign: "center" } }, "#" + (p.number||"—")),
               React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#fff", flex: 1 } }, p.name),
               React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.08)", borderRadius: 3, padding: "1px 6px" } }, p.pos)
             );
