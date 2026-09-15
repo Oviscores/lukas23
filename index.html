@@ -4748,9 +4748,7 @@ function MatchPage({ match, onBack }) {
       /* Bloc stats du match */
       (match.status === 'FINAL' || match.status === 'LIVE') && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } },
         /* Header */
-        /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, match.lg === 'MLB' ? "RÉSUMÉ DU MATCH" : "STATISTIQUES DU MATCH")
-        ),
+        
         /* Loading */
         bxLoading && /* @__PURE__ */ React.createElement("div", { style: { padding: "16px", textAlign: "center", color: "#999", fontSize: 11 } }, "Chargement..."),
         /* MLB Linescore */
@@ -4994,6 +4992,9 @@ function MatchPage({ match, onBack }) {
               )
             );
           })
+        ),
+        /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, match.lg === 'MLB' ? "RÉSUMÉ DU MATCH" : "STATISTIQUES DU MATCH")
         ),
         /* NFL Stats */
         !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data.boxscore && boxscore.data.boxscore.players && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 14 } },
