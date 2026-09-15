@@ -4379,8 +4379,7 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
         }
         else if (lg === 'NFL') {
           var nflSlug = NFL_ESPN_TEAMS[teamId];
-          // NFL roster via ESPN direct
-          if (nflSlug) { setLiveRoster(null); setRosterLoading(false); return; }
+          if (nflSlug) endpoint = PROXY + '?league=nfl_roster&team=' + nflSlug;
         }
         if (endpoint) {
           var r = await fetch(endpoint);
