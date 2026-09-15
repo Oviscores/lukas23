@@ -2692,7 +2692,7 @@ async function fetchCalendarData(lg) {
             var htId = ht.team&&ht.team.id, atId = at.team&&at.team.id;
             return {id:'mlb_'+g.gamePk, away:at.team?(at.team.abbreviation==='AZ'?'ARI':at.team.abbreviation):'', home:ht.team?(ht.team.abbreviation==='AZ'?'ARI':ht.team.abbreviation):'',
               as:isLive||isFinal ? (at.score||0) : null, hs:isLive||isFinal ? (ht.score||0) : null, st:g.status?g.status.abstractGameState:'Preview', time:timeStr,
-              awayLogo:at.team&&at.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(at.team.abbreviation==='AZ'?'ARI':at.team.abbreviation)+'&lg=MLB':'', homeLogo:ht.team&&ht.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+(ht.team.abbreviation==='AZ'?'ARI':ht.team.abbreviation)+'&lg=MLB':''};
+              awayLogo:at.team&&at.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+at.team.abbreviation+'&lg=MLB':'', homeLogo:ht.team&&ht.team.abbreviation?'https://zoneus-proxy.vivienfrappier.workers.dev?logo='+ht.team.abbreviation+'&lg=MLB':''};
           })
         };
       });
@@ -3737,13 +3737,10 @@ function TeamHero({ team, lg, lc, dk, tc }) {
     return /* @__PURE__ */ React.createElement("div", { key: i }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.45)" } }, s.l), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#fff" } }, s.v));
   }))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "10px 16px", textAlign: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, lg === "NHL" ? team.season.w + "V-" + team.season.l + "D" : lg === "NFL" ? team.season.w + "V-" + team.season.l + "D" : lg === "NBA" ? team.season.pct : team.season.pct), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em" } }, lg === "NHL" ? team.season.pts + " PTS" : "SAISON")), team.lastCup && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "10px 16px", textAlign: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22 } }, "\u{1F3C6}"), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#fff" } }, team.lastCup), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.5)" } }, (team.cups || []).length + " titre" + ((team.cups || []).length > 1 ? "s" : ""))));
 }
-
-
 function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team }) {
   var _tab = React.useState('forwards'); var activeTab = _tab[0], setActiveTab = _tab[1];
   var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
   if (rosterLoading) return null;
-
   // Utiliser liveRoster NHL si dispo
   if (liveRoster && liveRoster.roster && lg === 'NHL') {
     var roster = liveRoster.roster;
@@ -3835,7 +3832,7 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
     );
   }
 
-  // NFL - roster simple
+  // NFL - return anticipé
   if (liveRoster && liveRoster.roster && lg === 'NFL') {
     var nflLc = lc || '#e30613';
     var nflGroups = { 'ATTAQUE': [], 'DEFENSE': [], 'UNITES SPECIALES': [] };
@@ -3862,7 +3859,6 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
       })
     );
   }
-
   // ─── MLB ROSTER ─────────────────────────────────────────
   if (liveRoster && liveRoster.roster && lg === 'MLB') {
     var mlbRoster = liveRoster.roster.roster || [];
@@ -4005,87 +4001,11 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
       rows.push({ n: p.n, name: p.name, pos: p.pos, sc: "#16a34a", status: "ACTIF" });
     });
     return rows.map(function(r, i) {
-    
-  // NFL roster
-  if (liveRoster && liveRoster.roster && lg === 'NFL') {
-    var nflLc = lc || (LG['NFL'] && LG['NFL'].color) || '#e30613';
-    var nflGroups = {};
-    (liveRoster.roster||[]).forEach(function(p) {
-      var grp = p.pos || 'Joueurs';
-      var grpLabel = ['QB','WR','TE','RB','FB','OL','OT','OG','C'].indexOf(grp) >= 0 ? 'ATTAQUE' :
-                     ['DE','DT','NT','LB','OLB','ILB','MLB','CB','S','SS','FS','DB'].indexOf(grp) >= 0 ? 'DEFENSE' :
-                     ['K','P','LS'].indexOf(grp) >= 0 ? 'UNITES SPECIALES' : 'AUTRES';
-      if (!nflGroups[grpLabel]) nflGroups[grpLabel] = [];
-      nflGroups[grpLabel].push(p);
-    });
-    return React.createElement("div", { style: { background: "rgba(200,200,200,0.12)", borderRadius: 6, overflow: "hidden", marginTop: 8 } },
-      React.createElement("div", { style: { background: nflLc, padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.1em" } }, "EFFECTIF NFL"),
-      Object.keys(nflGroups).map(function(grp) {
-        return React.createElement("div", { key: grp },
-          React.createElement("div", { style: { background: "rgba(0,0,0,0.3)", padding: "4px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.7)", letterSpacing: "0.08em" } }, grp),
-          nflGroups[grp].map(function(p, i) {
-            return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "6px 14px", borderBottom: "1px solid rgba(255,255,255,0.05)", background: i%2===0?"rgba(255,255,255,0.03)":"transparent" } },
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: nflLc, minWidth: 28, textAlign: "center" } }, "#" + (p.number||"—")),
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#fff", flex: 1 } }, p.name),
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.08)", borderRadius: 3, padding: "1px 6px" } }, p.pos)
-            );
-          })
-        );
-      })
-    );
-  }
-  return /* @__PURE__ */ React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } }, /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 12px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: lc } }, r.n), /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111" } }, r.name), /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 12px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#888" } }, r.pos), /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 12px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 900, color: r.sc, background: r.sc + "18", padding: "1px 6px", borderRadius: 2 } }, r.status)));
+      return /* @__PURE__ */ React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } }, /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 12px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: lc } }, r.n), /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111" } }, r.name), /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 12px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#888" } }, r.pos), /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 12px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 900, color: r.sc, background: r.sc + "18", padding: "1px 6px", borderRadius: 2 } }, r.status)));
     });
   })()))));
-
-  // NFL - return anticipé avec liveRoster
-  if (liveRoster && liveRoster.roster && lg === 'NFL') {
-    var nflLc = lc || '#e30613';
-    var nflGroups = { 'ATTAQUE': [], 'DEFENSE': [], 'UNITES SPECIALES': [], 'AUTRES': [] };
-    (liveRoster.roster||[]).forEach(function(p) {
-      var pos = p.pos || '';
-      var grp = ['QB','WR','TE','RB','FB','OL','OT','OG','C'].indexOf(pos) >= 0 ? 'ATTAQUE' :
-                ['DE','DT','NT','LB','OLB','ILB','MLB','CB','S','SS','FS','DB'].indexOf(pos) >= 0 ? 'DEFENSE' :
-                ['K','P','LS'].indexOf(pos) >= 0 ? 'UNITES SPECIALES' : 'AUTRES';
-      nflGroups[grp].push(p);
-    });
-    var grpKeys = Object.keys(nflGroups).filter(function(k){ return nflGroups[k].length > 0; });
-    return React.createElement("div", { style: { background: "rgba(200,200,200,0.12)", borderRadius: 6, overflow: "hidden", marginTop: 8 } },
-      React.createElement("div", { style: { background: nflLc, padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.1em" } }, "EFFECTIF NFL"),
-      grpKeys.map(function(grp) {
-        return React.createElement("div", { key: grp },
-          React.createElement("div", { style: { background: "rgba(0,0,0,0.4)", padding: "4px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.7)", letterSpacing: "0.08em" } }, grp),
-          nflGroups[grp].map(function(p, i) {
-            return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "6px 14px", borderBottom: "1px solid rgba(255,255,255,0.05)", background: i%2===0?"rgba(255,255,255,0.03)":"transparent" } },
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: nflLc, minWidth: 28, textAlign: "center" } }, "#" + (p.number||"—")),
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#fff", flex: 1 } }, p.name),
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.08)", borderRadius: 3, padding: "1px 6px" } }, p.pos)
-            );
-          })
-        );
-      })
-    );
-  }
 }
 function TeamMatchesStats({ upcomingMatches, recentMatches, teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }) {
-  var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" };
-  return /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: "PROCHAINS MATCHS" }), upcomingMatches.map(function(m, i) {
-    var isH = m.home === teamId;
-    var opp = isH ? m.away : m.home;
-    var oppcol = TC[opp + "_" + lg] || { bg: "#555", fg: "#fff" };
-    return /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        key: i,
-        style: { display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderBottom: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" },
-        onMouseEnter: function(e) {
-          e.currentTarget.style.background = lc + "10";
-        },
-        onMouseLeave: function(e) {
-          e.currentTarget.style.background = "transparent";
-        }
-      },
-      /* @__PURE__ */ getTeamLogo(opp, lg, 22)chesStats({ upcomingMatches, recentMatches, teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }) {
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" };
   return /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: "PROCHAINS MATCHS" }), upcomingMatches.map(function(m, i) {
     var isH = m.home === teamId;
@@ -4425,16 +4345,11 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
         }
         else if (lg === 'NFL') {
           var nflSlug = NFL_ESPN_TEAMS[teamId];
-          if (nflSlug) endpoint = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + nflSlug + '/roster';
+          if (nflSlug) endpoint = PROXY + '?league=nfl_roster&team=' + nflSlug;
         }
         if (endpoint) {
           var r = await fetch(endpoint);
           var d = await r.json();
-          if (lg === 'NFL' && d.athletes) {
-            var nflP = [];
-            (d.athletes||[]).forEach(function(g){(g.items||[]).forEach(function(p){nflP.push({name:p.displayName||'',pos:p.position&&p.position.abbreviation||'',number:p.jersey||'',group:g.position||g.displayName||''});});});
-            d = { roster: nflP };
-          }
           setLiveRoster(d);
         }
       } catch(e) { console.log('roster error:', e); }
@@ -7656,7 +7571,6 @@ async function fetchSanityArticles() {
     console.log('Sanity OK:', sanityArts.length, 'articles');
   } catch(e) { console.log('Sanity error:', e.message); }
 }
-
 var NFL_DIV = {
   'BUF':'AFC Est','MIA':'AFC Est','NE':'AFC Est','NYJ':'AFC Est',
   'BAL':'AFC Nord','CIN':'AFC Nord','CLE':'AFC Nord','PIT':'AFC Nord',
@@ -7667,7 +7581,6 @@ var NFL_DIV = {
   'ATL':'NFC Sud','CAR':'NFC Sud','NO':'NFC Sud','TB':'NFC Sud',
   'ARI':'NFC Ouest','LAR':'NFC Ouest','SF':'NFC Ouest','SEA':'NFC Ouest'
 };
-
 window.fetchStandings = async function(lg) {
   if (lg === 'MLB') {
     try {
@@ -7711,7 +7624,6 @@ window.fetchStandings = async function(lg) {
     } catch(e) { console.log('NFL standings error:', e.message); }
   }
 };
-
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
 setTimeout(function() {
