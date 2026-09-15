@@ -4103,7 +4103,7 @@ function TeamMatchesStats({ upcomingMatches, recentMatches, teamStats, allStatus
           e.currentTarget.style.background = "transparent";
         }
       },
-      /* @__PURE__ */ React.createElement("div", { style: { width: 22, height: 22, borderRadius: 2, background: oppcol.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 900, color: oppcol.fg } }, opp)),
+      /* @__PURE__ */ getTeamLogo(opp, lg, 22),
       /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#111" } }, (isH ? "vs" : "@") + " " + (TEAM_NAMES[opp + "_" + lg] || opp)), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, color: "#aaa" } }, m.dayLabel)),
       /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: lc, whiteSpace: "nowrap" } }, m.time)
     );
