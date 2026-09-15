@@ -4958,9 +4958,7 @@ function MatchPage({ match, onBack }) {
           )
         ),
         
-        /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, match.lg === 'MLB' ? "RÉSUMÉ DU MATCH" : "STATISTIQUES DU MATCH")
-        ),
+        
         /* NFL Scoring Plays */
         !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data.scoringPlays && boxscore.data.scoringPlays.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 14, background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
           React.createElement("div", { style: { background: "#111", padding: "8px 12px", fontFamily: "\'Barlow Condensed\',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "ACTIONS MARQUANTES"),
@@ -4986,6 +4984,9 @@ function MatchPage({ match, onBack }) {
               )
             );
           })
+        ),
+/* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, match.lg === 'MLB' ? "RÉSUMÉ DU MATCH" : "STATISTIQUES DU MATCH")
         ),
         /* NFL Stats */
         !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data.boxscore && boxscore.data.boxscore.players && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 14 } },
