@@ -3741,8 +3741,7 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
   var _tab = React.useState('forwards'); var activeTab = _tab[0], setActiveTab = _tab[1];
   var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
   if (rosterLoading) return null;
-  // NFL - attendre liveRoster
-  if (lg === 'NFL' && (!liveRoster || !liveRoster.roster)) return React.createElement('div', { style: { padding: 16, color: '#fff', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12 } }, 'Chargement effectif...');
+
   // Utiliser liveRoster NHL si dispo
   if (liveRoster && liveRoster.roster && lg === 'NHL') {
     var roster = liveRoster.roster;
