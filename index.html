@@ -155,7 +155,18 @@ function getTeamLogo(abbr, lg, sz) {
   // Fix ESPN abbreviations
   var abbrMap = { AZ: 'ARI', WSH: 'WSH', SD: 'SD', KC: 'KC', SF: 'SF' };
   if (lg === 'MLB' && abbrMap[abbr]) abbr = abbrMap[abbr];
-  var src = 'https://zoneus-proxy.vivienfrappier.workers.dev?logo=' + abbr + '&lg=' + lg;
+  var src;
+  if (lg === 'NFL') {
+    src = 'https://a.espncdn.com/i/teamlogos/nfl/500/' + abbr.toLowerCase() + '.png';
+  } else if (lg === 'NHL') {
+    src = 'https://a.espncdn.com/i/teamlogos/nhl/500/' + abbr.toLowerCase() + '.png';
+  } else if (lg === 'NBA') {
+    src = 'https://a.espncdn.com/i/teamlogos/nba/500/' + abbr.toLowerCase() + '.png';
+  } else if (lg === 'MLB') {
+    src = 'https://a.espncdn.com/i/teamlogos/mlb/500/' + abbr.toLowerCase() + '.png';
+  } else {
+    src = 'https://zoneus-proxy.vivienfrappier.workers.dev?logo=' + abbr + '&lg=' + lg;
+  }
   var actualSz = lg === 'NHL' ? Math.round(sz * 1.35) : sz;
   var s = { width: actualSz, height: actualSz, objectFit: 'contain', flexShrink: 0, display: 'block' };
   return React.createElement('img', { src: src, alt: abbr, style: s, onError: function(e){e.target.style.display='none';} });
