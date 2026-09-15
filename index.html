@@ -3737,6 +3737,35 @@ function TeamHero({ team, lg, lc, dk, tc }) {
     return /* @__PURE__ */ React.createElement("div", { key: i }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.45)" } }, s.l), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#fff" } }, s.v));
   }))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "10px 16px", textAlign: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, lg === "NHL" ? team.season.w + "V-" + team.season.l + "D" : lg === "NFL" ? team.season.w + "V-" + team.season.l + "D" : lg === "NBA" ? team.season.pct : team.season.pct), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em" } }, lg === "NHL" ? team.season.pts + " PTS" : "SAISON")), team.lastCup && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "10px 16px", textAlign: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22 } }, "\u{1F3C6}"), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#fff" } }, team.lastCup), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.5)" } }, (team.cups || []).length + " titre" + ((team.cups || []).length > 1 ? "s" : ""))));
 }
+
+function NFLRoster({ roster, lc }) {
+  var _t = React.useState('ATTAQUE'); var tab = _t[0], setTab = _t[1];
+  var groups = { 'ATTAQUE': [], 'DEFENSE': [], 'UNITES SPECIALES': [] };
+  (roster||[]).forEach(function(p) {
+    var pos = p.pos || '';
+    var grp = ['QB','WR','TE','RB','FB','OL','OT','OG','C','G','T'].indexOf(pos) >= 0 ? 'ATTAQUE' :
+              ['DE','DT','NT','LB','OLB','ILB','MLB','CB','S','SS','FS','DB'].indexOf(pos) >= 0 ? 'DEFENSE' : 'UNITES SPECIALES';
+    groups[grp].push(p);
+  });
+  var tabs = ['ATTAQUE','DEFENSE','UNITES SPECIALES'].filter(function(t){ return groups[t].length > 0; });
+  var curTab = groups[tab] && groups[tab].length ? tab : tabs[0];
+  return React.createElement("div", { style: { background: "rgba(200,200,200,0.12)", borderRadius: 6, overflow: "hidden", marginTop: 8 } },
+    React.createElement("div", { style: { background: lc, padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.1em" } }, "EFFECTIF — " + roster.length + " JOUEURS"),
+    React.createElement("div", { style: { display: "flex", background: "rgba(0,0,0,0.3)" } },
+      tabs.map(function(t) {
+        return React.createElement("button", { key: t, onClick: function(){ setTab(t); }, style: { flex: 1, padding: "8px 4px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.06em", color: curTab===t?"#fff":"rgba(255,255,255,0.4)", background: curTab===t?lc:"transparent", border: "none", cursor: "pointer" } }, t + " (" + groups[t].length + ")" );
+      })
+    ),
+    (groups[curTab]||[]).map(function(p, i) {
+      return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 12, padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: i%2===0?"rgba(255,255,255,0.03)":"transparent" } },
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: lc, minWidth: 32, textAlign: "center" } }, "#" + (p.number||"—")),
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 700, color: "#fff", flex: 1 } }, p.name),
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: lc, background: "rgba(255,255,255,0.08)", borderRadius: 3, padding: "2px 8px", minWidth: 30, textAlign: "center" } }, p.pos)
+      );
+    })
+  );
+}
+
 function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team }) {
   var _tab = React.useState('forwards'); var activeTab = _tab[0], setActiveTab = _tab[1];
   var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
@@ -3832,32 +3861,9 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
     );
   }
 
-  // NFL - return anticipé
+  // NFL - composant séparé (évite erreur hooks #310)
   if (liveRoster && liveRoster.roster && lg === 'NFL') {
-    var nflLc = lc || '#e30613';
-    var nflGroups = { 'ATTAQUE': [], 'DEFENSE': [], 'UNITES SPECIALES': [] };
-    (liveRoster.roster||[]).forEach(function(p) {
-      var pos = p.pos || '';
-      var grp = ['QB','WR','TE','RB','FB','OL','OT','OG','C','G','T'].indexOf(pos) >= 0 ? 'ATTAQUE' :
-                ['DE','DT','NT','LB','OLB','ILB','MLB','CB','S','SS','FS','DB'].indexOf(pos) >= 0 ? 'DEFENSE' : 'UNITES SPECIALES';
-      nflGroups[grp].push(p);
-    });
-    var nflKeys = Object.keys(nflGroups).filter(function(k){ return nflGroups[k].length > 0; });
-    return React.createElement("div", { style: { background: "rgba(200,200,200,0.12)", borderRadius: 6, overflow: "hidden", marginTop: 8 } },
-      React.createElement("div", { style: { background: nflLc, padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.1em" } }, "EFFECTIF — " + liveRoster.roster.length + " JOUEURS"),
-      nflKeys.map(function(grp) {
-        return React.createElement("div", { key: grp },
-          React.createElement("div", { style: { background: "rgba(0,0,0,0.4)", padding: "4px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.7)", letterSpacing: "0.08em" } }, grp),
-          nflGroups[grp].map(function(p, i) {
-            return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 12, padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: i%2===0?"rgba(255,255,255,0.03)":"transparent" } },
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: nflLc, minWidth: 32, textAlign: "center" } }, "#" + (p.number||"—")),
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 700, color: "#fff", flex: 1 } }, p.name),
-              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: nflLc, background: "rgba(255,255,255,0.08)", borderRadius: 3, padding: "2px 8px", minWidth: 30, textAlign: "center" } }, p.pos)
-            );
-          })
-        );
-      })
-    );
+    return React.createElement(NFLRoster, { roster: liveRoster.roster, lc: lc || '#e30613' });
   }
   // ─── MLB ROSTER ─────────────────────────────────────────
   if (liveRoster && liveRoster.roster && lg === 'MLB') {
