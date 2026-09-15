@@ -4743,27 +4743,7 @@ function MatchPage({ match, onBack }) {
       { l: "V", v: stand.w },
       { l: "D", v: stand.l }
     ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "#bbb" } }, s.l), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: i === 0 ? col.bg : "#111" } }, s.v)))),
-          /* Scorers NFL */
-          boxscore && boxscore.type === 'NFL' && boxscore.data && boxscore.data.scoringPlays && (function() {
-            var teamScorers = (boxscore.data.scoringPlays || []).filter(function(p) {
-              return p.team && p.team.abbreviation === teamAb;
-            });
-            if (!teamScorers.length) return null;
-            return React.createElement("div", { style: { padding: "6px 14px 8px", borderTop: "1px solid rgba(0,0,0,0.06)" } },
-              teamScorers.map(function(p, i) {
-                var abbr = p.type && p.type.abbreviation || '';
-                var badgeBg = abbr === 'TD' ? '#e30613' : abbr === 'FG' ? '#2563eb' : '#555';
-                var playerName = (p.text || '').split(' ').slice(0, 2).join(' ');
-                var clock = p.clock && p.clock.displayValue || '';
-                var quarter = p.period && p.period.number || '';
-                return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 6, padding: "2px 0", borderBottom: i < teamScorers.length-1 ? "1px solid rgba(0,0,0,0.04)" : "none" } },
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: "#fff", background: badgeBg, borderRadius: 2, padding: "1px 4px" } }, abbr),
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", flex: 1 } }, playerName),
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#999" } }, "Q" + quarter + " " + clock)
-                );
-              })
-            );
-          })(),
+          
           /* Scorers NFL */
           boxscore && boxscore.type === 'NFL' && boxscore.data && boxscore.data.scoringPlays && (function() {
             var teamScorers = (boxscore.data.scoringPlays || []).filter(function(p) {
