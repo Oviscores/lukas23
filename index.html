@@ -4379,7 +4379,8 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
         }
         else if (lg === 'NFL') {
           var nflSlug = NFL_ESPN_TEAMS[teamId];
-          if (nflSlug) endpoint = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + nflSlug + '/roster';
+          // NFL roster via ESPN direct
+          if (nflSlug) { setLiveRoster(null); setRosterLoading(false); return; }
         }
         if (endpoint) {
           var r = await fetch(endpoint);
