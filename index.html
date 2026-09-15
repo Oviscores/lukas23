@@ -4379,11 +4379,20 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
         }
         else if (lg === 'NFL') {
           var nflSlug = NFL_ESPN_TEAMS[teamId];
-          if (nflSlug) endpoint = PROXY + '?league=nfl_roster&team=' + nflSlug;
+          if (nflSlug) endpoint = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + nflSlug + '/roster';
         }
         if (endpoint) {
           var r = await fetch(endpoint);
           var d = await r.json();
+          if (d.athletes && !d.roster) {
+            var allPlayers = [];
+            (d.athletes || []).forEach(function(group) {
+              (group.items || []).forEach(function(p) {
+                allPlayers.push({ name: p.displayName||'', pos: p.position&&p.position.abbreviation||'', number: p.jersey||'' });
+              });
+            });
+            d = { roster: allPlayers };
+          }
           setLiveRoster(d);
         }
       } catch(e) { console.log('roster error:', e); }
