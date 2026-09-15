@@ -3740,6 +3740,7 @@ function TeamHero({ team, lg, lc, dk, tc }) {
 function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team }) {
   var _tab = React.useState('forwards'); var activeTab = _tab[0], setActiveTab = _tab[1];
   var _tab2 = React.useState('batters'); var activeTab2 = _tab2[0], setActiveTab2 = _tab2[1];
+  var _nflTab = React.useState('ATTAQUE'); var nflActiveTab = _nflTab[0], setNflActiveTab = _nflTab[1];
   if (rosterLoading) return null;
 
   // Utiliser liveRoster NHL si dispo
