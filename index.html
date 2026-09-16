@@ -7780,6 +7780,12 @@ window.fetchStandings = async function(lg) {
 };
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
+// Forcer la lecture des params URL après chargement
+setTimeout(function() {
+  if (new URLSearchParams(window.location.search).get('match')) {
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }
+}, 500);
 setTimeout(function() { if (window.fetchLeagueStats) { if (window.__STATS_LOADED__) window.__STATS_LOADED__.NFL = false; window.fetchLeagueStats('NFL'); } }, 2000);
 </script>
 </body>
