@@ -4381,8 +4381,8 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
           var time = ev.date ? new Date(ev.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
           var label = ev.week && ev.week.text ? ev.week.text : evDate;
           if (completed) {
-            var homeScore = home.score !== undefined && home.score !== '' ? parseInt(home.score) : null;
-            var awayScore = away.score !== undefined && away.score !== '' ? parseInt(away.score) : null;
+            var homeScore = home.score ? (home.score.value !== undefined ? home.score.value : parseInt(home.score)) : null;
+            var awayScore = away.score ? (away.score.value !== undefined ? away.score.value : parseInt(away.score)) : null;
             recent.push({ id: ev.id, eventId: ev.id, home: homeAb, away: awayAb, hs: homeScore, as: awayScore, st: 'Final', time: time, dayLabel: label, lg: lg });
           } else if (evDate >= today) {
             upcoming.push({ id: ev.id, eventId: ev.id, home: homeAb, away: awayAb, hs: null, as: null, st: 'Preview', time: time, dayLabel: label, lg: lg });
