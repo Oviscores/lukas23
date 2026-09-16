@@ -4364,9 +4364,11 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
       if (st) setLiveBilan({ w: st.w, l: st.l });
     }
     updateBilan();
-    window.__setStandingsTeam__ = updateBilan;
+    if (lg === 'NFL' && window.fetchStandings) {
+      window.fetchStandings('NFL').then(function() { updateBilan(); });
+    }
     var timer = setInterval(updateBilan, 30000);
-    return function() { clearInterval(timer); window.__setStandingsTeam__ = null; };
+    return function() { clearInterval(timer); };
   }, [teamId, lg]);
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
   var schedule = CAL_SCHEDULE[lg];
