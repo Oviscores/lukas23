@@ -4404,6 +4404,42 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
     return function() { clearInterval(timer); };
   }, [teamId, lg]);
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
+  // MLB schedule
+  var _mlbSched = React.useState(null); var mlbSched = _mlbSched[0], setMlbSched = _mlbSched[1];
+  React.useEffect(function() {
+    if (lg !== 'MLB') return;
+    var mlbId = MLB_TEAM_IDS && MLB_TEAM_IDS[teamId];
+    if (!mlbId) return;
+    fetch('https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=' + mlbId + '&season=2026&gameType=R&hydrate=linescore,team')
+      .then(function(r){ return r.json(); })
+      .then(function(d) {
+        var today = new Date().toISOString().split('T')[0];
+        var upcoming = [], recent = [];
+        (d.dates || []).forEach(function(dateObj) {
+          (dateObj.games || []).forEach(function(game) {
+            var homeTeam = game.teams && game.teams.home && game.teams.home.team;
+            var awayTeam = game.teams && game.teams.away && game.teams.away.team;
+            if (!homeTeam || !awayTeam) return;
+            var homeAb = homeTeam.abbreviation === 'AZ' ? 'ARI' : homeTeam.abbreviation;
+            var awayAb = awayTeam.abbreviation === 'AZ' ? 'ARI' : awayTeam.abbreviation;
+            var gameDate = dateObj.date;
+            var status = game.status && game.status.abstractGameState;
+            var isTeamHome = homeAb === teamId;
+            var opp = isTeamHome ? awayAb : homeAb;
+            var time = game.gameDate ? new Date(game.gameDate).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+            if (status === 'Final') {
+              var homeScore = game.teams.home.score !== undefined ? game.teams.home.score : null;
+              var awayScore = game.teams.away.score !== undefined ? game.teams.away.score : null;
+              recent.push({ id: game.gamePk, eventId: game.gamePk, home: homeAb, away: awayAb, hs: homeScore, as: awayScore, st: 'Final', time: time, dayLabel: gameDate, lg: lg });
+            } else if (gameDate >= today) {
+              upcoming.push({ id: game.gamePk, eventId: game.gamePk, home: homeAb, away: awayAb, hs: null, as: null, st: 'Preview', time: time, dayLabel: gameDate, lg: lg });
+            }
+          });
+        });
+        setMlbSched({ upcoming: upcoming.slice(0, 5), recent: recent.slice(-5).reverse() });
+      }).catch(function(e){ console.log('MLB schedule error:', e); });
+  }, [teamId, lg]);
+
   var schedule = CAL_SCHEDULE[lg];
   var upcomingMatches = [];
   var recentMatches = [];
@@ -4453,7 +4489,7 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
     if (a.league === lg && (a.franchise === teamId || a.title.toLowerCase().includes(pLast) || (a.chapo || "").toLowerCase().includes(pLast))) relatedArts.push(a);
   }
   var allStatus = (PLAYER_STATUS[lg] || []).slice(0, 6);
-  return /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(245,243,240,0.05)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg + " \xB7 " + team.name)), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "16px 20px 30px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(TeamHero, { team, lg, lc, dk, tc }),  /* @__PURE__ */ React.createElement(TeamRoster, { rosterData: liveRoster || rosterData, liveRoster, rosterLoading, lg, lc, tc, team }), /* @__PURE__ */ React.createElement(TeamMatchesStats, { upcomingMatches: (lg === 'NFL' && espnSched ? espnSched.upcoming : upcomingMatches), recentMatches: (lg === 'NFL' && espnSched ? espnSched.recent : recentMatches), teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamNews, { relatedArts, team, lg, lc, onArticleClick })));
+  return /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(245,243,240,0.05)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg + " \xB7 " + team.name)), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "16px 20px 30px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(TeamHero, { team, lg, lc, dk, tc }),  /* @__PURE__ */ React.createElement(TeamRoster, { rosterData: liveRoster || rosterData, liveRoster, rosterLoading, lg, lc, tc, team }), /* @__PURE__ */ React.createElement(TeamMatchesStats, { upcomingMatches: (lg === 'NFL' && espnSched ? espnSched.upcoming : lg === 'MLB' && mlbSched ? mlbSched.upcoming : upcomingMatches), recentMatches: (lg === 'NFL' && espnSched ? espnSched.recent : lg === 'MLB' && mlbSched ? mlbSched.recent : recentMatches), teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamNews, { relatedArts, team, lg, lc, onArticleClick })));
 }
 function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatchClick, onTeamClick = () => {
 }, onStandingsClick = () => {
