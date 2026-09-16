@@ -4412,13 +4412,19 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
       if ((m.home === teamId || m.away === teamId) && upcomingMatches.length < 5) upcomingMatches.push(Object.assign({}, m, { dayLabel: schedule.days[i].label }));
     });
   }
-  var fkO = ["BOS", "NYR", "PIT", "WSH", "PHI", "CBJ", "NJD", "NYI", "CAR", "FLA"];
+  var _fkByLg = {
+    NHL: ["BOS", "NYR", "PIT", "WSH", "PHI", "CBJ", "NJD", "NYI", "CAR", "FLA"],
+    NFL: ["KC", "DAL", "SF", "BUF", "PHI", "BAL", "MIA", "GB", "LAR", "DEN"],
+    NBA: ["LAL", "BOS", "GSW", "MIL", "PHX", "MIA", "DAL", "DEN", "PHI", "NYK"],
+    MLB: ["NYY", "LAD", "BOS", "HOU", "ATL", "CHC", "SF", "SD", "STL", "SEA"]
+  };
+  var fkO = _fkByLg[lg] || _fkByLg.NHL;
   var fkT = ["19h00", "19h30", "20h00", "21h00", "22h00"];
   var _safeCount = 0;
   while (upcomingMatches.length < 5 && _safeCount < 50) {
     _safeCount++;
     var fo = fkO[_safeCount % fkO.length];
-    if (fo !== teamId) upcomingMatches.push({ id: "fu-" + upcomingMatches.length, home: teamId, away: fo, hs: null, as: null, st: "\xC0 venir", time: fkT[upcomingMatches.length % fkT.length], dayLabel: "J+" + (upcomingMatches.length + 1) });
+    if (fo !== teamId) upcomingMatches.push({ id: "fu-" + upcomingMatches.length, home: teamId, away: fo, hs: null, as: null, st: "\xC0 venir", time: fkT[upcomingMatches.length % fkT.length], dayLabel: "J+" + (upcomingMatches.length + 1), lg: lg });
   }
   for (var j = schedule.todayIdx - 1; j >= 0; j--) {
     schedule.days[j].matches.forEach(function(m) {
