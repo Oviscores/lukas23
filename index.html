@@ -6385,7 +6385,19 @@ function ZoneUS() {
     if (artSlug && arts.length > 1) { var found = arts.find(function(a) { var s = a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); return s === artSlug; }); if (found) setSelArticle(found); }
     if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
     if (equipeParam && ligueParam) setSelTeam({ teamId: equipeParam.toUpperCase(), lg: ligueParam.toUpperCase() });
-    var onPop = function() { var p = new URLSearchParams(window.location.search); if (!p.get('article')) setSelArticle(null); if (!p.get('equipe')) setSelTeam(null); if (!p.get('match')) setSelMatch(null); var pg2 = p.get('page'); if (pg2) _setPage(pg2.toUpperCase().replace('-', ' ')); else if (!p.get('article') && !p.get('equipe') && !p.get('match')) _setPage('home'); };
+    var matchParam = params.get('match');
+    if (matchParam && ligueParam) setSelMatch({ id: matchParam, eventId: matchParam, lg: ligueParam.toUpperCase(), away: '', home: '' });
+    var onPop = function() {
+      var p = new URLSearchParams(window.location.search);
+      if (!p.get('article')) setSelArticle(null);
+      if (!p.get('equipe')) setSelTeam(null);
+      var mp = p.get('match'); var lp = p.get('ligue');
+      if (mp && lp) setSelMatch({ id: mp, eventId: mp, lg: lp.toUpperCase(), away: '', home: '' });
+      else setSelMatch(null);
+      var pg2 = p.get('page');
+      if (pg2) _setPage(pg2.toUpperCase().replace('-', ' '));
+      else if (!p.get('article') && !p.get('equipe') && !p.get('match')) _setPage('home');
+    };
     window.addEventListener('popstate', onPop);
     return function() { window.removeEventListener('popstate', onPop); };
   }, [arts]);
