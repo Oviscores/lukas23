@@ -4354,6 +4354,44 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
   var dk = LG[lg].dark || "#111";
   var tc = TC[teamId + "_" + lg] || { bg: lc, fg: "#fff" };
   var _liveBilan = React.useState(null); var liveBilan = _liveBilan[0], setLiveBilan = _liveBilan[1];
+  var _espnSched = React.useState(null); var espnSched = _espnSched[0], setEspnSched = _espnSched[1];
+  React.useEffect(function() {
+    if (lg !== 'NFL') return;
+    var nflSlug = NFL_ESPN_TEAMS && NFL_ESPN_TEAMS[teamId];
+    if (!nflSlug) return;
+    fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + nflSlug + '/schedule')
+      .then(function(r){ return r.json(); })
+      .then(function(d) {
+        var today = new Date().toISOString().split('T')[0];
+        var upcoming = [], recent = [];
+        (d.events || []).forEach(function(ev) {
+          var comp = ev.competitions && ev.competitions[0];
+          if (!comp) return;
+          var home = comp.competitors.find(function(c){ return c.homeAway === 'home'; });
+          var away = comp.competitors.find(function(c){ return c.homeAway === 'away'; });
+          if (!home || !away) return;
+          var homeAb = home.team && home.team.abbreviation || '';
+          var awayAb = away.team && away.team.abbreviation || '';
+          var evDate = ev.date ? ev.date.split('T')[0] : '';
+          var status = comp.status && comp.status.type;
+          var completed = status && status.completed;
+          var isTeamHome = homeAb === teamId;
+          var opp = isTeamHome ? awayAb : homeAb;
+          var time = ev.date ? new Date(ev.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+          var label = ev.week && ev.week.text ? ev.week.text : evDate;
+          if (completed) {
+            var homeScore = parseInt(home.score || 0);
+            var awayScore = parseInt(away.score || 0);
+            var teamScore = isTeamHome ? homeScore : awayScore;
+            var oppScore = isTeamHome ? awayScore : homeScore;
+            recent.push({ id: ev.id, eventId: ev.id, home: homeAb, away: awayAb, hs: homeScore, as: awayScore, st: 'Final', time: time, dayLabel: label, lg: lg });
+          } else if (evDate >= today) {
+            upcoming.push({ id: ev.id, eventId: ev.id, home: homeAb, away: awayAb, hs: null, as: null, st: 'Preview', time: time, dayLabel: label, lg: lg });
+          }
+        });
+        setEspnSched({ upcoming: upcoming.slice(0, 5), recent: recent.slice(-5).reverse() });
+      }).catch(function(e){ console.log('Schedule error:', e); });
+  }, [teamId, lg]);
   React.useEffect(function() {
     function updateBilan() {
       var st = Object.values(((window.__CONF_STANDINGS__||{})[lg])||{}).flat().find(function(s){return s.ab===teamId;});
@@ -4416,7 +4454,7 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
     if (a.league === lg && (a.franchise === teamId || a.title.toLowerCase().includes(pLast) || (a.chapo || "").toLowerCase().includes(pLast))) relatedArts.push(a);
   }
   var allStatus = (PLAYER_STATUS[lg] || []).slice(0, 6);
-  return /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(245,243,240,0.05)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg + " \xB7 " + team.name)), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "16px 20px 30px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(TeamHero, { team, lg, lc, dk, tc }),  /* @__PURE__ */ React.createElement(TeamRoster, { rosterData: liveRoster || rosterData, liveRoster, rosterLoading, lg, lc, tc, team }), /* @__PURE__ */ React.createElement(TeamMatchesStats, { upcomingMatches, recentMatches, teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamNews, { relatedArts, team, lg, lc, onArticleClick })));
+  return /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(245,243,240,0.05)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg + " \xB7 " + team.name)), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "16px 20px 30px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(TeamHero, { team, lg, lc, dk, tc }),  /* @__PURE__ */ React.createElement(TeamRoster, { rosterData: liveRoster || rosterData, liveRoster, rosterLoading, lg, lc, tc, team }), /* @__PURE__ */ React.createElement(TeamMatchesStats, { upcomingMatches: (lg === 'NFL' && espnSched ? espnSched.upcoming : upcomingMatches), recentMatches: (lg === 'NFL' && espnSched ? espnSched.recent : recentMatches), teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamNews, { relatedArts, team, lg, lc, onArticleClick })));
 }
 function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatchClick, onTeamClick = () => {
 }, onStandingsClick = () => {
