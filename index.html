@@ -4774,7 +4774,7 @@ function MatchPage({ match, onBack }) {
       } catch(e) { console.log('boxscore error:', e); }
       setBxLoading(false);
     })();
-  }, [match.id, match.eventId, match.status]);
+  }, [match.id, match.eventId, match.lg]);
   const lc = LG[match.lg].color;
   const dk = LG[match.lg].dark;
   const hk = match.homeTeam + "_" + match.lg;
