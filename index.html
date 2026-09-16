@@ -4755,7 +4755,8 @@ function MatchPage({ match, onBack }) {
   React.useEffect(function() {
     setBoxscore(null);
     console.log('boxscore fetch:', match.lg, match.status, match.id);
-    if (match.status !== 'FINAL' && match.status !== 'LIVE' && match.lg !== 'NFL') return;
+    if (match.lg !== 'NFL' && match.lg !== 'NHL' && match.lg !== 'NBA' && match.lg !== 'MLB') return;
+    if (match.lg !== 'NFL' && match.status !== 'FINAL' && match.status !== 'LIVE') return;
     setBxLoading(true);
     (async function() {
       try {
