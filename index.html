@@ -2572,7 +2572,7 @@ async function fetchLiveScores() {
       const isLive = status && (status.state === 'in');
       const isFinal = status && status.completed;
       if (isFinal) continue;
-      results.push({ id: 'nfl_' + g.id, lg: 'NFL', status: isLive ? 'LIVE' : 'UPCOMING', period: comp.status && comp.status.period ? 'Q' + comp.status.period : '', homeTeam: home.team ? home.team.abbreviation : '', awayTeam: away.team ? away.team.abbreviation : '', homeScore: isLive ? parseInt(home.score || 0) : null, awayScore: isLive ? parseInt(away.score || 0) : null, time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '', homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + home.team.abbreviation.toLowerCase() + '.png' : '', awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + away.team.abbreviation.toLowerCase() + '.png' : '' });
+      results.push({ id: 'nfl_' + g.id, eventId: g.id, lg: 'NFL', status: isLive ? 'LIVE' : 'UPCOMING', period: comp.status && comp.status.period ? 'Q' + comp.status.period : '', homeTeam: home.team ? home.team.abbreviation : '', awayTeam: away.team ? away.team.abbreviation : '', homeScore: isLive ? parseInt(home.score || 0) : null, awayScore: isLive ? parseInt(away.score || 0) : null, time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '', homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + home.team.abbreviation.toLowerCase() + '.png' : '', awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + away.team.abbreviation.toLowerCase() + '.png' : '' });
     }
   } catch(e) { console.log('NFL livebar error:', e.message); }
   return results;
@@ -4717,7 +4717,8 @@ function MatchPage({ match, onBack }) {
           data = await r.json();
           if (data && data.liveData) setBoxscore({ type: 'MLB', data: data.liveData });
         } else if (match.lg === 'NFL' && match.eventId) {
-          var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + match.eventId);
+          var _cleanId = (match.eventId+'').replace('nfl_','');
+          var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId);
           data = await r2.json();
           if (data && data.boxscore) setBoxscore({ type: 'NFL', data: data });
         }
@@ -6502,8 +6503,9 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     setCalLg(null);
   }
   function goScore(g, lg) {
+    var _eid = g.eventId || (lg === 'NFL' ? (g.id||'').replace('nfl_','') : null) || null;
     goMatch({
-      eventId: g.eventId || (lg === 'NFL' ? g.id : null) || null,
+      eventId: _eid,
       id: g.id || (g.away + "-" + g.home),
       lg,
       status: g.st === "Final" ? "FINAL" : g.st === "Live" ? "LIVE" : (g.st || "FINAL"),
