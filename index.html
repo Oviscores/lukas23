@@ -4739,6 +4739,7 @@ function RosterSection({ match, hc, ac }) {
 }
 function MatchPage({ match, onBack }) {
   var _bx = React.useState(null); var boxscore = _bx[0], setBoxscore = _bx[1];
+  var _tk = React.useState(0); var setTick = _tk[1];
   var _bl = React.useState(false); var bxLoading = _bl[0], setBxLoading = _bl[1];
   var _pv = React.useState(null); var previewData = _pv[0], setPreviewData = _pv[1];
   React.useEffect(function() {
@@ -4769,7 +4770,7 @@ function MatchPage({ match, onBack }) {
         } else if (match.lg === 'NFL') {
           var _rawId = match.eventId || match.id || '';
           var _cleanId = (_rawId+'').replace('nfl_','');
-          if (_cleanId) { var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId); data = await r2.json(); if (data) { setBoxscore({ type: 'NFL', data: data }); } }
+          if (_cleanId) { var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId); data = await r2.json(); if (data) { setBoxscore({ type: 'NFL', data: data }); setTick(function(t){return t+1;}); } }
         }
       } catch(e) { console.log('boxscore error:', e); }
       setBxLoading(false);
@@ -5073,7 +5074,6 @@ function MatchPage({ match, onBack }) {
         )
       ,
         /* NFL AVANT-MATCH */
-        !bxLoading && boxscore && console.log('RENDER CHECK:', bxLoading, !!boxscore, boxscore&&boxscore.type) && false,
         !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data && !(boxscore.data.boxscore && boxscore.data.boxscore.players && boxscore.data.boxscore.players.length) && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 14 } },
           /* COTES */
           boxscore.data.pickcenter && boxscore.data.pickcenter[0] && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
