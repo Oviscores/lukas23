@@ -4004,49 +4004,48 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team })
   })()))));
 }
 function TeamMatchesStats({ upcomingMatches, recentMatches, teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }) {
-  var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" };
-  return React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, alignItems: "flex-start" } },
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } },
-      React.createElement("div", { style: bs },
-        React.createElement(HdGlobal, { label: "DERNIERS R\xC9SULTATS" }),
-        recentMatches.map(function(m, i) {
-          var isH = m.home === teamId;
-          var opp = isH ? m.away : m.home;
-          var ts = isH ? m.hs : m.as;
-          var os2 = isH ? m.as : m.hs;
-          var won = ts > os2;
-          return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderBottom: "1px solid rgba(0,0,0,0.04)", borderLeft: "3px solid " + (won ? lc : "#ef4444") } },
-            React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: won ? lc : "#ef4444", width: 16 } }, won ? "V" : "D"),
-            getTeamLogo(opp, lg, 22),
-            React.createElement("div", { style: { flex: 1 } },
-              React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#fff" } }, (isH ? "vs " : "@ ") + opp),
-              React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "rgba(255,255,255,0.4)" } }, m.dayLabel || "")
-            ),
-            React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: won ? 900 : 400, color: won ? lc : "#aaa" } }, ts + "\u2013" + os2)
-          );
-        })
-      )
+  var bs = { background: "rgba(0,0,0,0.3)", borderRadius: 6, overflow: "hidden", backdropFilter: "blur(8px)" };
+  return React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignItems: "flex-start" } },
+    /* DERNIERS RÉSULTATS */
+    React.createElement("div", { style: bs },
+      React.createElement("div", { style: { background: "rgba(255,255,255,0.08)", padding: "10px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: "#fff", letterSpacing: "0.1em" } }, "DERNIERS R\xC9SULTATS"),
+      recentMatches.map(function(m, i) {
+        var isH = m.home === teamId;
+        var opp = isH ? m.away : m.home;
+        var ts = isH ? m.hs : m.as;
+        var os2 = isH ? m.as : m.hs;
+        var won = ts !== null && os2 !== null && ts > os2;
+        var scoreStr = (ts !== null && os2 !== null) ? ts + " - " + os2 : "";
+        return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: i%2===0?"rgba(255,255,255,0.03)":"transparent", borderLeft: "3px solid " + (won ? lc : "#ef4444") } },
+          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: won ? lc : "#ef4444", width: 14 } }, won ? "V" : "D"),
+          getTeamLogo(opp, lg, 28),
+          React.createElement("div", { style: { flex: 1, marginLeft: 4 } },
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: "#fff" } }, (isH ? "vs " : "@ ") + opp),
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "rgba(255,255,255,0.4)" } }, m.dayLabel || "")
+          ),
+          scoreStr && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: won ? 900 : 600, color: won ? lc : "rgba(255,255,255,0.5)" } }, scoreStr)
+        );
+      })
     ),
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } },
-      React.createElement("div", { style: bs },
-        React.createElement(HdGlobal, { label: "PROCHAINS MATCHS" }),
-        upcomingMatches.map(function(m, i) {
-          var isH = m.home === teamId;
-          var opp = isH ? m.away : m.home;
-          return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderBottom: "1px solid rgba(0,0,0,0.04)", cursor: "pointer" },
-            onClick: function() { if (onMatchClick) onMatchClick(m, lg); },
-            onMouseEnter: function(e) { e.currentTarget.style.background = lc + "10"; },
-            onMouseLeave: function(e) { e.currentTarget.style.background = "transparent"; }
-          },
-            getTeamLogo(opp, lg, 22),
-            React.createElement("div", { style: { flex: 1 } },
-              React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#fff" } }, (isH ? "vs " : "@ ") + opp),
-              React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "rgba(255,255,255,0.4)" } }, m.dayLabel || "")
-            ),
-            React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: lc, whiteSpace: "nowrap" } }, m.time)
-          );
-        })
-      )
+    /* PROCHAINS MATCHS */
+    React.createElement("div", { style: bs },
+      React.createElement("div", { style: { background: "rgba(255,255,255,0.08)", padding: "10px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: "#fff", letterSpacing: "0.1em" } }, "PROCHAINS MATCHS"),
+      upcomingMatches.map(function(m, i) {
+        var isH = m.home === teamId;
+        var opp = isH ? m.away : m.home;
+        return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: i%2===0?"rgba(255,255,255,0.03)":"transparent", cursor: "pointer" },
+          onClick: function() { if (onMatchClick) onMatchClick(m, lg); },
+          onMouseEnter: function(e) { e.currentTarget.style.background = lc + "22"; },
+          onMouseLeave: function(e) { e.currentTarget.style.background = i%2===0?"rgba(255,255,255,0.03)":"transparent"; }
+        },
+          getTeamLogo(opp, lg, 28),
+          React.createElement("div", { style: { flex: 1, marginLeft: 4 } },
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: "#fff" } }, (isH ? "vs " : "@ ") + opp),
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "rgba(255,255,255,0.4)" } }, m.dayLabel || "")
+          ),
+          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 700, color: lc, whiteSpace: "nowrap" } }, m.time)
+        );
+      })
     )
   );
 }
@@ -4380,10 +4379,8 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
           var time = ev.date ? new Date(ev.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
           var label = ev.week && ev.week.text ? ev.week.text : evDate;
           if (completed) {
-            var homeScore = parseInt(home.score || 0);
-            var awayScore = parseInt(away.score || 0);
-            var teamScore = isTeamHome ? homeScore : awayScore;
-            var oppScore = isTeamHome ? awayScore : homeScore;
+            var homeScore = home.score !== undefined && home.score !== '' ? parseInt(home.score) : null;
+            var awayScore = away.score !== undefined && away.score !== '' ? parseInt(away.score) : null;
             recent.push({ id: ev.id, eventId: ev.id, home: homeAb, away: awayAb, hs: homeScore, as: awayScore, st: 'Final', time: time, dayLabel: label, lg: lg });
           } else if (evDate >= today) {
             upcoming.push({ id: ev.id, eventId: ev.id, home: homeAb, away: awayAb, hs: null, as: null, st: 'Preview', time: time, dayLabel: label, lg: lg });
