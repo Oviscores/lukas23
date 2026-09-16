@@ -5072,7 +5072,7 @@ function MatchPage({ match, onBack }) {
         )
       ,
         /* NFL AVANT-MATCH */
-        boxscore && boxscore.type === 'NFL' && boxscore.data && !(boxscore.data.boxscore && boxscore.data.boxscore.players && boxscore.data.boxscore.players.length) && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 14 } },
+        !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data && !(boxscore.data.boxscore && boxscore.data.boxscore.players && boxscore.data.boxscore.players.length) && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 14 } },
           /* COTES */
           boxscore.data.pickcenter && boxscore.data.pickcenter[0] && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
             React.createElement("div", { style: { background: "#111", padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "COTES & PRONO"),
