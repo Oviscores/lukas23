@@ -3593,7 +3593,7 @@ function MatchScoreInArticle({ matchId, matchLg }) {
 function TeamCardInArticle({ teamId, teamLg, onTeamClick }) {
   var lc = LG[teamLg] ? LG[teamLg].color : '#e30613';
   var teamData = TEAMS_DB && TEAMS_DB[teamLg] && TEAMS_DB[teamLg].find(function(t){ return t.id === teamId; });
-  var fullName = teamData ? (teamData.city ? teamData.city + ' ' + teamData.name : teamData.name) : teamId;
+  var fullName = teamData ? teamData.name : teamId;
   return React.createElement("div", { onClick: function() { if (onTeamClick) onTeamClick(teamId, teamLg); }, style: { background: 'linear-gradient(135deg, #111 0%, #1a1a2e 100%)', borderRadius: 10, overflow: 'hidden', marginTop: 24, cursor: 'pointer' } },
     React.createElement("div", { style: { background: lc, padding: '6px 16px', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: '#fff' } }, "FICHE EQUIPE - " + teamLg),
     React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 16, padding: '16px' } },
