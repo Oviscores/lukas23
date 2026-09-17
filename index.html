@@ -4374,7 +4374,9 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
   const [showAllNews, setShowAllNews] = useState(false);
   const [showAllPlayers, setShowAllPlayers] = useState(false);
   const [statExpanded, setStatExpanded] = useState({});
-  const lgArts = articles.filter((a) => a.league === lg);
+  const lgArts = articles.filter((a) => a.league === lg).filter(function(a, i, arr) {
+    return arr.findIndex(function(b) { return b.title === a.title; }) === i;
+  });
   React.useEffect(function() {
     if (!window.__CAL_CACHE__ || !window.__CAL_CACHE__[lg]) {
       if (window.fetchCalendarData) window.fetchCalendarData(lg);
