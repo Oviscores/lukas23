@@ -3622,7 +3622,7 @@ function TeamCardInArticle({ teamId, teamLg, onTeamClick }) {
   );
 }
 
-function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick }) {
+function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick, onArticleClick }) {
   const lc = LG[article.league] && LG[article.league].color || "#D50A0A";
   const lg = article.league;
   const related = (articles || []).filter(function(a) {
