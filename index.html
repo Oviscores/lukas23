@@ -4374,9 +4374,7 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
   const [showAllNews, setShowAllNews] = useState(false);
   const [showAllPlayers, setShowAllPlayers] = useState(false);
   const [statExpanded, setStatExpanded] = useState({});
-  const lgArts = articles.filter((a) => a.league === lg).filter(function(a, i, arr) {
-    return arr.findIndex(function(b) { return b.title === a.title; }) === i;
-  });
+  const lgArts = articles.filter((a) => a.league === lg).filter(function(a, i, arr) { return arr.findIndex(function(b) { return b.title === a.title || b.id === a.id; }) === i; });
   React.useEffect(function() {
     if (!window.__CAL_CACHE__ || !window.__CAL_CACHE__[lg]) {
       if (window.fetchCalendarData) window.fetchCalendarData(lg);
@@ -7542,6 +7540,7 @@ async function fetchSanityArticles() {
     var sl = sanityArts.map(function(a) { return a.league; });
     var staticFiltered = (window.ARTICLES||[]).filter(function(a) { return sl.indexOf(a.league) === -1; });
     var merged = sanityArts.length >= 6 ? sanityArts : sanityArts.concat(staticFiltered);
+    merged = merged.filter(function(a, i, arr) { return arr.findIndex(function(b) { return b.title === a.title; }) === i; });
     if (window.__setArts__) window.__setArts__(merged);
     else setTimeout(function() { if(window.__setArts__) window.__setArts__(merged); }, 3000);
   } catch(e) { console.log('Sanity error:', e.message); }
