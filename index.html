@@ -3718,7 +3718,7 @@ function TeamHero({ team, lg, lc, dk, tc }) {
   var bilanL = _stand ? _stand.l : (team.season ? team.season.l : 0);
   return /* @__PURE__ */ React.createElement("div", { style: { background: "linear-gradient(135deg," + tc.bg + " 0%," + dk + " 100%)", borderRadius: 6, padding: "20px 28px", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 56, height: 56, borderRadius: 6, background: "rgba(255,255,255,0.15)", border: "2px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ getTeamLogo(team.id, lg, 36)), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "0.1em", marginBottom: 3 } }, (team.conference || "") + " \xB7 " + (team.division || "") + " \xB7 " + lg), /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#fff", lineHeight: 1, marginBottom: 6 } }, team.name), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 16, flexWrap: "wrap" } }, [{ l: "Coach", v: team.coach }, { l: "GM", v: team.gm }, { l: "Fond\xE9", v: team.founded }, { l: "Arena", v: team.arena }].map(function(s, i) {
     return /* @__PURE__ */ React.createElement("div", { key: i }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.45)" } }, s.l), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#fff" } }, s.v));
-  }))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "10px 16px", textAlign: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, lg === "NHL" ? team.season.w + "V-" + team.season.l + "D" : lg === "NFL" ? bilanW + "V-" + bilanL + "D" : lg === "NBA" ? team.season.pct : team.season.pct), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em" } }, lg === "NHL" ? team.season.pts + " PTS" : "SAISON")), team.lastCup && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "10px 16px", textAlign: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22 } }, "\u{1F3C6}"), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#fff" } }, team.lastCup), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.5)" } }, (team.cups || []).length + " titre" + ((team.cups || []).length > 1 ? "s" : ""))));
+  }))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "10px 16px", textAlign: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, lg === "NHL" ? team.season.w + "V-" + team.season.l + "D" : lg === "NFL" ? team.season.w + "V-" + team.season.l + "D" : lg === "NBA" ? team.season.pct : team.season.pct), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em" } }, lg === "NHL" ? team.season.pts + " PTS" : "SAISON")), team.lastCup && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "10px 16px", textAlign: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22 } }, "\u{1F3C6}"), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#fff" } }, team.lastCup), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.5)" } }, (team.cups || []).length + " titre" + ((team.cups || []).length > 1 ? "s" : ""))));
 }
 
 function NFLRoster({ roster, lc }) {
@@ -4334,16 +4334,11 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
         }
         else if (lg === 'NFL') {
           var nflSlug = NFL_ESPN_TEAMS[teamId];
-          if (nflSlug) endpoint = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + nflSlug + '/roster';
+          if (nflSlug) endpoint = PROXY + '?league=nfl_roster&team=' + nflSlug;
         }
         if (endpoint) {
           var r = await fetch(endpoint);
           var d = await r.json();
-          if (lg === 'NFL' && d.athletes) {
-            var nflP = [];
-            (d.athletes||[]).forEach(function(g){(g.items||[]).forEach(function(p){nflP.push({name:p.displayName||'',pos:p.position&&p.position.abbreviation||'',number:p.jersey||''});});});
-            d = { roster: nflP };
-          }
           setLiveRoster(d);
         }
       } catch(e) { console.log('roster error:', e); }
@@ -4354,7 +4349,13 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
   var lc = LG[lg].color;
   var dk = LG[lg].dark || "#111";
   var tc = TC[teamId + "_" + lg] || { bg: lc, fg: "#fff" };
-  var _liveBilan = React.useState(null); var liveBilan = _liveBilan[0], setLiveBilan = _liveBilan[1];
+  React.useEffect(function() {
+    if (lg === 'NFL' && window.fetchStandings) {
+      window.fetchStandings('NFL');
+    }
+  }, [teamId, lg]);
+  var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
+  // NFL schedule ESPN
   var _espnSched = React.useState(null); var espnSched = _espnSched[0], setEspnSched = _espnSched[1];
   React.useEffect(function() {
     if (lg !== 'NFL') return;
@@ -4374,10 +4375,8 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
           var homeAb = home.team && home.team.abbreviation || '';
           var awayAb = away.team && away.team.abbreviation || '';
           var evDate = ev.date ? ev.date.split('T')[0] : '';
-          var status = comp.status && comp.status.type;
-          var completed = status && status.completed;
+          var completed = comp.status && comp.status.type && comp.status.type.completed;
           var isTeamHome = homeAb === teamId;
-          var opp = isTeamHome ? awayAb : homeAb;
           var time = ev.date ? new Date(ev.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
           var label = ev.week && ev.week.text ? ev.week.text : evDate;
           if (completed) {
@@ -4389,21 +4388,9 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
           }
         });
         setEspnSched({ upcoming: upcoming.slice(0, 5), recent: recent.slice(-5).reverse() });
-      }).catch(function(e){ console.log('Schedule error:', e); });
+      }).catch(function(e){ console.log('NFL schedule error:', e); });
   }, [teamId, lg]);
-  React.useEffect(function() {
-    function updateBilan() {
-      var st = Object.values(((window.__CONF_STANDINGS__||{})[lg])||{}).flat().find(function(s){return s.ab===teamId;});
-      if (st) setLiveBilan({ w: st.w, l: st.l });
-    }
-    updateBilan();
-    if (lg === 'NFL' && window.fetchStandings) {
-      window.fetchStandings('NFL').then(function() { updateBilan(); });
-    }
-    var timer = setInterval(updateBilan, 30000);
-    return function() { clearInterval(timer); };
-  }, [teamId, lg]);
-  var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
+
   // MLB schedule
   var _mlbSched = React.useState(null); var mlbSched = _mlbSched[0], setMlbSched = _mlbSched[1];
   React.useEffect(function() {
@@ -4425,7 +4412,6 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
             var gameDate = dateObj.date;
             var status = game.status && game.status.abstractGameState;
             var isTeamHome = homeAb === teamId;
-            var opp = isTeamHome ? awayAb : homeAb;
             var time = game.gameDate ? new Date(game.gameDate).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
             if (status === 'Final') {
               var homeScore = game.teams.home.score !== undefined ? game.teams.home.score : null;
@@ -4739,24 +4725,11 @@ function RosterSection({ match, hc, ac }) {
 }
 function MatchPage({ match, onBack }) {
   var _bx = React.useState(null); var boxscore = _bx[0], setBoxscore = _bx[1];
-  var _tk = React.useState(0); var setTick = _tk[1];
   var _bl = React.useState(false); var bxLoading = _bl[0], setBxLoading = _bl[1];
-  var _pv = React.useState(null); var previewData = _pv[0], setPreviewData = _pv[1];
-  React.useEffect(function() {
-    setPreviewData(null);
-    if (match.lg !== 'NFL') return;
-    var _rawId = match.eventId || match.id || '';
-    var _cleanId = (_rawId+'').replace('nfl_','');
-    if (!_cleanId) return;
-    fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId)
-      .then(function(r){ return r.json(); })
-      .then(function(d) { setPreviewData(d); })
-      .catch(function(e){ console.log('preview error:', e); });
-  }, [match.id, match.eventId]);
+  var _tk = React.useState(0); var setTick = _tk[1];
   React.useEffect(function() {
     setBoxscore(null);
     console.log('boxscore fetch:', match.lg, match.status, match.id);
-    if (match.lg !== 'NFL' && match.lg !== 'NHL' && match.lg !== 'NBA' && match.lg !== 'MLB') return;
     if (match.lg !== 'NFL' && match.status !== 'FINAL' && match.status !== 'LIVE') return;
     setBxLoading(true);
     (async function() {
@@ -4770,7 +4743,7 @@ function MatchPage({ match, onBack }) {
         } else if (match.lg === 'NFL') {
           var _rawId = match.eventId || match.id || '';
           var _cleanId = (_rawId+'').replace('nfl_','');
-          if (_cleanId) { var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId); data = await r2.json(); if (data) { setBoxscore({ type: 'NFL', data: data }); setTick(function(t){return t+1;}); } }
+          if (_cleanId) { var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId); data = await r2.json(); if (data && data.boxscore) setBoxscore({ type: 'NFL', data: data }); }
         }
       } catch(e) { console.log('boxscore error:', e); }
       setBxLoading(false);
@@ -4813,7 +4786,10 @@ function MatchPage({ match, onBack }) {
       /* Bloc stats du match */
       (match.status === 'FINAL' || match.status === 'LIVE') && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } },
         /* Header */
-                /* Loading */
+        /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, match.lg === 'MLB' ? "RÉSUMÉ DU MATCH" : "STATISTIQUES DU MATCH")
+        ),
+        /* Loading */
         bxLoading && /* @__PURE__ */ React.createElement("div", { style: { padding: "16px", textAlign: "center", color: "#999", fontSize: 11 } }, "Chargement..."),
         /* MLB Linescore */
         !bxLoading && boxscore && boxscore.type === 'MLB' && boxscore.data.linescore && /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 16px" } },
@@ -5074,38 +5050,36 @@ function MatchPage({ match, onBack }) {
         )
       ,
         /* NFL AVANT-MATCH */
-        !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data && !(boxscore.data.boxscore && boxscore.data.boxscore.players && boxscore.data.boxscore.players.length) && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 14 } },
-          /* COTES */
-          boxscore.data.pickcenter && boxscore.data.pickcenter[0] && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
+        !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data && !(boxscore.data.boxscore && boxscore.data.boxscore.players && boxscore.data.boxscore.players.length) && React.createElement("div", { style: { marginBottom: 14 } },
+          boxscore.data.pickcenter && boxscore.data.pickcenter[0] && React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
             React.createElement("div", { style: { background: "#111", padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "COTES & PRONO"),
             React.createElement("div", { style: { display: "flex", justifyContent: "space-around", padding: "12px 16px", gap: 8 } },
               React.createElement("div", { style: { textAlign: "center" } },
                 React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#999", letterSpacing: "0.08em" } }, "SPREAD"),
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#111" } }, boxscore.data.pickcenter[0].spread || "—")
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#111" } }, boxscore.data.pickcenter[0].spread || "\u2014")
               ),
               React.createElement("div", { style: { textAlign: "center" } },
                 React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#999", letterSpacing: "0.08em" } }, "OVER/UNDER"),
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#111" } }, boxscore.data.pickcenter[0].overUnder || "—")
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#111" } }, boxscore.data.pickcenter[0].overUnder || "\u2014")
               ),
               boxscore.data.pickcenter[0].homeTeamOdds && React.createElement("div", { style: { textAlign: "center" } },
                 React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#999", letterSpacing: "0.08em" } }, hc.ab + " ML"),
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#111" } }, boxscore.data.pickcenter[0].homeTeamOdds.moneyLine || "—")
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#111" } }, boxscore.data.pickcenter[0].homeTeamOdds.moneyLine || "\u2014")
               ),
               boxscore.data.pickcenter[0].awayTeamOdds && React.createElement("div", { style: { textAlign: "center" } },
                 React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#999", letterSpacing: "0.08em" } }, ac.ab + " ML"),
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#111" } }, boxscore.data.pickcenter[0].awayTeamOdds.moneyLine || "—")
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: "#111" } }, boxscore.data.pickcenter[0].awayTeamOdds.moneyLine || "\u2014")
               )
             )
           ),
-          /* LAST 5 MATCHES */
-          boxscore.data.lastFiveGames && boxscore.data.lastFiveGames.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
+          boxscore.data.lastFiveGames && boxscore.data.lastFiveGames.length > 0 && React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
             React.createElement("div", { style: { background: "#111", padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "5 DERNIERS MATCHS"),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 } },
               boxscore.data.lastFiveGames.map(function(teamGames, ti) {
                 var teamAb = teamGames.team && teamGames.team.abbreviation || '';
                 var teamColor = ti === 0 ? ac.bg : hc.bg;
                 return React.createElement("div", { key: ti },
-                  React.createElement("div", { style: { background: teamColor, padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.08em" } }, teamAb),
+                  React.createElement("div", { style: { background: teamColor, padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff" } }, teamAb),
                   (teamGames.events || []).map(function(ev, i) {
                     var res = ev.gameResult || '';
                     var won = res === 'W';
@@ -5121,8 +5095,7 @@ function MatchPage({ match, onBack }) {
               })
             )
           ),
-          /* BLESSÉS */
-          boxscore.data.injuries && boxscore.data.injuries.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
+          boxscore.data.injuries && boxscore.data.injuries.length > 0 && React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", marginBottom: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
             React.createElement("div", { style: { background: "#111", padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "BLESS\xC9S / INCERTAINS"),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 } },
               boxscore.data.injuries.map(function(teamInj, ti) {
@@ -5145,8 +5118,7 @@ function MatchPage({ match, onBack }) {
               })
             )
           ),
-          /* LEADERS */
-          boxscore.data.leaders && boxscore.data.leaders.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
+          boxscore.data.leaders && boxscore.data.leaders.length > 0 && React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
             React.createElement("div", { style: { background: "#111", padding: "8px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "LEADERS SAISON"),
             React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 } },
               boxscore.data.leaders.map(function(teamLeaders, ti) {
@@ -5175,7 +5147,16 @@ function MatchPage({ match, onBack }) {
         )), h2h.last5.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "FACE-\xC0-FACE"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 700, color: "rgba(255,255,255,0.5)" } }, "5 derni\xE8res rencontres")), /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 0, borderRadius: 4, overflow: "hidden", height: 28, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: h2h.wins[1] || 0, background: hc.bg, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: hc.fg } }, h2h.wins[1])), /* @__PURE__ */ React.createElement("div", { style: { width: 2, background: "#fff" } }), /* @__PURE__ */ React.createElement("div", { style: { flex: h2h.wins[0] || 0, background: ac.bg, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: ac.fg } }, h2h.wins[0]))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 700, color: hc.bg } }, hName), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 700, color: "#aaa" } }, "VICTOIRES"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 700, color: ac.bg } }, aName)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 4 } }, h2h.last5.map((r, i) => {
     const isH = r.startsWith(match.homeTeam);
     return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", background: i % 2 === 0 ? "#fafafa" : "transparent", borderRadius: 3 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 8, height: 8, borderRadius: "50%", background: isH ? hc.bg : ac.bg, flexShrink: 0 } }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#111", flex: 1 } }, r), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 700, color: isH ? hc.bg : ac.bg } }, isH ? match.homeTeam + " WIN" : match.awayTeam + " WIN"));
-  })))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px" } }, }
+  })))), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "10px 16px" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "STATISTIQUES SAISON")), /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: hc.bg } }, match.homeTeam), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: ac.bg } }, match.awayTeam)), match.lg === "NHL" && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(StatBar, { label: "Buts/match", home: 3.4, away: 2.9 }), /* @__PURE__ */ React.createElement(StatBar, { label: "Buts conc\xE9d\xE9s", home: 2.6, away: 3.1 }), /* @__PURE__ */ React.createElement(StatBar, { label: "Power Play %", home: 24, away: 19, unit: "%" }), /* @__PURE__ */ React.createElement(StatBar, { label: "Victoires", home: hStand && hStand.w || 0, away: aStand && aStand.w || 0 })), match.lg === "NBA" && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(StatBar, { label: "Points/match", home: 120, away: 118 }), /* @__PURE__ */ React.createElement(StatBar, { label: "Rebonds", home: 46, away: 43 }), /* @__PURE__ */ React.createElement(StatBar, { label: "Passes", home: 28, away: 25 }), /* @__PURE__ */ React.createElement(StatBar, { label: "Victoires", home: hStand && hStand.w || 0, away: aStand && aStand.w || 0 })), match.lg === "NFL" && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(StatBar, { label: "Points/match", home: 28, away: 26 }), /* @__PURE__ */ React.createElement(StatBar, { label: "Yards/match", home: 380, away: 350 }), /* @__PURE__ */ React.createElement(StatBar, { label: "TD/match", home: 3.2, away: 2.8 }), /* @__PURE__ */ React.createElement(StatBar, { label: "Victoires", home: hStand && hStand.w || 0, away: aStand && aStand.w || 0 })), match.lg === "MLB" && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(StatBar, { label: "Moyenne \xE9q.", home: 0.268, away: 0.251 }), /* @__PURE__ */ React.createElement(StatBar, { label: "HR saison", home: hStand ? parseInt(hStand.w * 1.1) : 8, away: aStand ? parseInt(aStand.w * 0.9) : 6 }), /* @__PURE__ */ React.createElement(StatBar, { label: "ERA \xE9quipe", home: 3.8, away: 4.1 }), /* @__PURE__ */ React.createElement(StatBar, { label: "Victoires", home: hStand && hStand.w || 0, away: aStand && aStand.w || 0 })))), Object.entries(CONF_STANDINGS[match.lg] || {}).map(([div, teams]) => {
+    const relevant = teams.some((t) => t.ab === match.homeTeam || t.ab === match.awayTeam);
+    if (!relevant) return null;
+    return /* @__PURE__ */ React.createElement("div", { key: div, style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "#111", padding: "8px 16px", display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 3, height: 14, background: lc, borderRadius: 2 } }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, div)), teams.map((s, i) => {
+      const isPlaying = s.ab === match.homeTeam || s.ab === match.awayTeam;
+      const isH = s.ab === match.homeTeam;
+      return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", padding: "6px 16px", gap: 8, borderBottom: "1px solid #f8f8f8", background: isPlaying ? isH ? hc.bg + "12" : ac.bg + "12" : "transparent" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: i === 0 ? lc : "#ccc", width: 14, textAlign: "center" } }, s.r), /* @__PURE__ */ getTeamLogo(s.ab, match.lg, 22), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: isPlaying ? 900 : 600, color: isPlaying ? "#111" : "#555", flex: 1 } }, TEAM_NAMES[s.ab + "_" + match.lg] || s.ab), isPlaying && /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 900, color: isH ? hc.bg : ac.bg, background: (isH ? hc.bg : ac.bg) + "18", padding: "1px 5px", borderRadius: 2 } }, isH ? "DOM" : "VIS"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: i === 0 ? lc : "#333" } }, match.lg === "NFL" ? s.w + "-" + s.l : match.lg === "NBA" || match.lg === "MLB" ? s.pct : s.pts));
+    }));
+  })));
+}
 function MatchCard({ m, lc, lg, onMatchClick }) {
   const isFinal = m.st === "Final" || m.st.includes("Final") || m.st.includes("OT") || m.st.includes("P. Sup.");
   const isLive = m.as !== null && !isFinal;
@@ -6524,9 +6505,8 @@ function ZoneUS() {
   React.useEffect(function() { var titles = { home: "Zone US", NHL: "NHL | Zone US", NFL: "NFL | Zone US", NBA: "NBA | Zone US", MLB: "MLB | Zone US" }; document.title = titles[page] || "Zone US"; }, [page]);
   const setPage = function(p) {
     _setPage(p);
-    var url, can = document.querySelector('link[rel="canonical"]');
-    if (p === 'home') { history.pushState({}, '', window.location.pathname); if (can) can.setAttribute('href', 'https://zoneus.fr/'); }
-    else { url = '?page=' + p.toLowerCase().replace(' ', '-'); history.pushState({}, '', url); if (can) can.setAttribute('href', 'https://zoneus.fr/' + url); }
+    if (p === 'home') history.pushState({}, '', window.location.pathname);
+    else history.pushState({}, '', '?page=' + p.toLowerCase().replace(' ', '-'));
   };
   const [prevPage, setPrevPage] = useState("home");
   const [statFull, setStatFull] = useState(null);
@@ -6534,8 +6514,8 @@ function ZoneUS() {
   const [selArticle, setSelArticle] = useState(null);
   const slugify = function(str) { return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); };
   const goArticle = function(a) {
-    if (a) { var slug = slugify(a.title); var url = '?article=' + slug; history.pushState({}, '', url); document.title = a.title + ' | Zone US'; var can = document.querySelector('link[rel="canonical"]'); if (can) can.setAttribute('href', 'https://zoneus.fr/' + url); }
-    else { history.pushState({}, '', window.location.pathname); var can2 = document.querySelector('link[rel="canonical"]'); if (can2) can2.setAttribute('href', 'https://zoneus.fr/'); }
+    if (a) { var slug = slugify(a.title); history.pushState({}, '', '?article=' + slug); document.title = a.title + ' | Zone US'; }
+    else { history.pushState({}, '', window.location.pathname); }
     setSelArticle(a);
   };
   const [selPlayer, setSelPlayer] = useState(null);
@@ -6617,13 +6597,11 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   }
   function goMatch(m) {
     setSelMatch(m); setSelArticle(null); setSelPlayer(null); setSelTeam(null); setPlayersList(null);
-    if (m && m.id) { var _matchUrl = '?match=' + (m.eventId||m.id) + '&ligue=' + (m.lg||'').toLowerCase(); history.pushState({}, '', _matchUrl); var _can2 = document.querySelector('link[rel="canonical"]'); if (_can2) _can2.setAttribute('href', 'https://zoneus.fr/' + _matchUrl); }
+    if (m && m.id) history.pushState({}, '', '?match=' + (m.eventId||m.id) + '&ligue=' + (m.lg||'').toLowerCase());
   }
   function goTeam(id, lg) {
     setSelTeam({ teamId: id, lg }); setSelArticle(null); setSelPlayer(null); setPlayersList(null);
-    var _teamUrl = '?equipe=' + id.toLowerCase() + '&ligue=' + (lg||'').toLowerCase();
-    history.pushState({}, '', _teamUrl);
-    var _can = document.querySelector('link[rel="canonical"]'); if (_can) _can.setAttribute('href', 'https://zoneus.fr/' + _teamUrl);
+    history.pushState({}, '', '?equipe=' + id.toLowerCase() + '&ligue=' + (lg||'').toLowerCase());
   }
   function goBack() {
     setSelArticle(null);
@@ -7776,7 +7754,6 @@ window.fetchStandings = async function(lg) {
 };
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
-// Forcer la lecture des params URL après chargement
 setTimeout(function() {
   if (new URLSearchParams(window.location.search).get('match')) {
     window.dispatchEvent(new PopStateEvent('popstate'));
