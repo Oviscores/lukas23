@@ -4380,7 +4380,13 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
     if (relatedArts.length >= 6) break;
     if (a.league === lg && (a.franchise === teamId || a.title.toLowerCase().includes(pLast) || (a.chapo || "").toLowerCase().includes(pLast))) relatedArts.push(a);
   }
-  var allStatus = (PLAYER_STATUS[lg] || []).slice(0, 6);
+  var _injTick = React.useState(0); var setInjTick = _injTick[1];
+  React.useEffect(function() {
+    window.__setInjuries__ = function() { setInjTick(function(t){return t+1;}); };
+    return function() { window.__setInjuries__ = null; };
+  }, []);
+  var _liveInj = (window.__INJURIES__ && window.__INJURIES__[lg] && window.__INJURIES__[lg].length > 0) ? window.__INJURIES__[lg] : (PLAYER_STATUS[lg] || []);
+  var allStatus = _liveInj.slice(0, 6);
   return /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(245,243,240,0.05)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg + " \xB7 " + team.name)), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "16px 20px 30px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(TeamHero, { team, lg, lc, dk, tc }),  /* @__PURE__ */ React.createElement(TeamRoster, { rosterData: liveRoster || rosterData, liveRoster, rosterLoading, lg, lc, tc, team }), /* @__PURE__ */ React.createElement(TeamMatchesStats, { upcomingMatches: (lg==='NFL'&&espnSched?espnSched.upcoming:lg==='MLB'&&mlbSched?mlbSched.upcoming:upcomingMatches), recentMatches: (lg==='NFL'&&espnSched?espnSched.recent:lg==='MLB'&&mlbSched?mlbSched.recent:recentMatches), teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamNews, { relatedArts, team, lg, lc, onArticleClick })));
 }
 function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatchClick, onTeamClick = () => {
@@ -7594,6 +7600,43 @@ window.fetchStandings = async function(lg) {
 };
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
+
+// Fetch injuries ESPN pour les 4 ligues
+window.__INJURIES__ = { NHL: [], NFL: [], NBA: [], MLB: [] };
+var INJURY_URLS = {
+  NFL: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries',
+  NHL: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/injuries',
+  NBA: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/injuries',
+  MLB: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/injuries'
+};
+async function fetchInjuries() {
+  for (var lg of ['NFL','NHL','NBA','MLB']) {
+    try {
+      var r = await fetch(INJURY_URLS[lg]);
+      var d = await r.json();
+      var players = [];
+      (d.injuries||[]).forEach(function(team) {
+        var ab = team.abbreviation || (team.displayName||'').split(' ').pop();
+        (team.injuries||[]).slice(0,3).forEach(function(inj) {
+          var status = inj.status || 'INCERTAIN';
+          var statusFr = status === 'Out' ? 'ABSENT' : status === 'Questionable' ? 'INCERTAIN' : status === 'Probable' ? 'PROBABLE' : 'INCERTAIN';
+          var color = status === 'Out' ? '#dc2626' : status === 'Probable' ? '#16a34a' : '#d97706';
+          players.push({
+            name: inj.athlete && inj.athlete.displayName || '',
+            team: ab,
+            status: statusFr,
+            color: color,
+            note: inj.shortComment || ''
+          });
+        });
+      });
+      window.__INJURIES__[lg] = players.slice(0, 10);
+    } catch(e) { console.log('Injuries error', lg, e.message); }
+  }
+  if (window.__setInjuries__) window.__setInjuries__();
+}
+fetchInjuries();
+setInterval(fetchInjuries, 10*60*1000);
 setTimeout(function() { if (new URLSearchParams(window.location.search).get('match')) window.dispatchEvent(new PopStateEvent('popstate')); }, 500);
 
 // Canonique dynamique
