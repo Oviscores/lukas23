@@ -7573,9 +7573,9 @@ window.fetchStandings = async function(lg) {
     try {
       var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_standings');
       var data = await resp.json();
-      var divMap = {201:'AL Est',202:'AL Central',203:'AL Ouest',204:'NL Est',205:'NL Central',206:'NL Ouest'};
+      var divMap = {200:'NL Ouest',201:'AL Est',202:'AL Central',203:'AL Ouest',204:'NL Est',205:'NL Central',206:'NL Ouest'};
       var result = {};
-      (data.records||[]).forEach(function(div) { var divName = divMap[div.division.id]; if (!divName) return; result[divName] = div.teamRecords.map(function(t,i) { return { r:i+1, ab:t.team.abbreviation==='AZ'?'ARI':t.team.abbreviation, w:t.wins, l:t.losses, pct:t.winningPercentage, gb:t.gamesBack==='-'?'-':t.gamesBack }; }); });
+      (data.records||[]).forEach(function(div) { result[divMap[div.division.id]||'Div'+div.division.id] = div.teamRecords.map(function(t,i) { return { r:i+1, ab:t.team.abbreviation==='AZ'?'ARI':t.team.abbreviation, w:t.wins, l:t.losses, pct:t.winningPercentage, gb:t.gamesBack==='-'?'-':t.gamesBack }; }); });
       window.__CONF_STANDINGS__.MLB = result; CONF_STANDINGS.MLB = result;
       if (window.__setStandings__) window.__setStandings__('MLB', result);
     } catch(e) { console.log('MLB standings error:', e.message); }
