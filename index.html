@@ -3610,15 +3610,20 @@ function MatchScoreInArticle({ matchId, matchLg }) {
 
 function TeamCardInArticle({ teamId, teamLg, onTeamClick }) {
   var lc = LG[teamLg] ? LG[teamLg].color : '#e30613';
-  var teamData = TEAMS_DB && TEAMS_DB[teamLg] && TEAMS_DB[teamLg].find(function(t){ return t.id === teamId; });
-  var fullName = teamData ? teamData.name : teamId;
-  return React.createElement("div", { onClick: function() { if (onTeamClick) onTeamClick(teamId, teamLg); }, style: { background: 'linear-gradient(135deg, #111 0%, #1a1a2e 100%)', borderRadius: 10, overflow: 'hidden', marginTop: 24, cursor: 'pointer' } },
-    React.createElement("div", { style: { background: lc, padding: '6px 16px', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: '#fff' } }, "FICHE EQUIPE - " + teamLg),
-    React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 16, padding: '16px' } },
-      getTeamLogo(teamId, teamLg, 48),
-      React.createElement("div", { style: { flex: 1, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, fontWeight: 900, color: '#fff' } }, fullName),
-      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: '#fff', background: lc, borderRadius: 4, padding: '4px 10px' } }, "VOIR LA FICHE")
-    )
+  var ids = (teamId||'').split(/[,\s]+/).map(function(s){return s.trim();}).filter(Boolean);
+  return React.createElement("div", { style: { marginTop: 24 } },
+    ids.map(function(tid) {
+      var teamData = TEAMS_DB && TEAMS_DB[teamLg] && TEAMS_DB[teamLg].find(function(t){ return t.id === tid; });
+      var fullName = teamData ? teamData.name : tid;
+      return React.createElement("div", { key: tid, onClick: function() { if (onTeamClick) onTeamClick(tid, teamLg); }, style: { background: 'linear-gradient(135deg, #111 0%, #1a1a2e 100%)', borderRadius: 10, overflow: 'hidden', marginBottom: 8, cursor: 'pointer' } },
+        React.createElement("div", { style: { background: lc, padding: '6px 16px', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: '#fff' } }, "FICHE EQUIPE - " + teamLg),
+        React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 16, padding: '16px' } },
+          getTeamLogo(tid, teamLg, 48),
+          React.createElement("div", { style: { flex: 1, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, fontWeight: 900, color: '#fff' } }, fullName),
+          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: '#fff', background: lc, borderRadius: 4, padding: '4px 10px' } }, "VOIR LA FICHE")
+        )
+      );
+    })
   );
 }
 
