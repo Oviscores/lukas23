@@ -7592,6 +7592,24 @@ window.fetchStandings = async function(lg) {
 fetchSanityArticles();
 setInterval(fetchSanityArticles, 5*60*1000);
 setTimeout(function() { if (new URLSearchParams(window.location.search).get('match')) window.dispatchEvent(new PopStateEvent('popstate')); }, 500);
+
+// Canonique dynamique
+function updateCanonical() {
+  var can = document.querySelector('link[rel="canonical"]');
+  if (!can) return;
+  var params = new URLSearchParams(window.location.search);
+  var base = 'https://zoneus.fr/';
+  var search = window.location.search;
+  can.setAttribute('href', search ? base + search : base);
+}
+updateCanonical();
+window.addEventListener('popstate', updateCanonical);
+// Observer les pushState
+var _origPush = history.pushState;
+history.pushState = function() {
+  _origPush.apply(history, arguments);
+  updateCanonical();
+};
 setTimeout(function() { if (window.fetchLeagueStats) { if (window.__STATS_LOADED__) window.__STATS_LOADED__.NFL = false; window.fetchLeagueStats('NFL'); } }, 2000);
 </script>
 </body>
