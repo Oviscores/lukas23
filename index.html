@@ -6359,6 +6359,8 @@ function ZoneUS() {
   const goArticle = function(a) {
     if (a) { var slug = slugify(a.title); history.pushState({}, '', '?article=' + slug); document.title = a.title + ' | Zone US'; }
     else { history.pushState({}, '', window.location.pathname); }
+    setSelTeam(null);
+    setSelMatch(null);
     setSelArticle(a);
   };
   const [selPlayer, setSelPlayer] = useState(null);
