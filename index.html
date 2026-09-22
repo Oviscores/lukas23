@@ -136,6 +136,8 @@ function getTeamLogo(abbr, lg, sz) {
   // Fix ESPN abbreviations
   var abbrMap = { AZ: 'ARI', WSH: 'WSH', SD: 'SD', KC: 'KC', SF: 'SF' };
   if (lg === 'MLB' && abbrMap[abbr]) abbr = abbrMap[abbr];
+  var nhlMap = { TBL: 'tb', NJD: 'nj', SJS: 'sj', LAK: 'lak', UTA: 'utah' };
+  if (lg === 'NHL' && nhlMap[abbr]) abbr = nhlMap[abbr];
   var src;
   if (lg==='NFL') src='https://a.espncdn.com/i/teamlogos/nfl/500/'+abbr.toLowerCase()+'.png';
   else if (lg==='NHL') src='https://a.espncdn.com/i/teamlogos/nhl/500/'+abbr.toLowerCase()+'.png';
