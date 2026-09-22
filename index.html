@@ -4398,7 +4398,7 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
 }, onMoreStats = () => {
 }, onNavigate: onNavigate2 }) {
   const lc = LG[lg].color;
-  void statsVersion;
+  var _statsV = statsVersion; // force re-render on stats update
   const [showAllNews, setShowAllNews] = useState(false);
   const [showAllPlayers, setShowAllPlayers] = useState(false);
   const [statExpanded, setStatExpanded] = useState({});
