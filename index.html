@@ -4391,14 +4391,14 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
   var allStatus = _liveInj.slice(0, 6);
   return /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(245,243,240,0.05)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg + " \xB7 " + team.name)), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "16px 20px 30px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(TeamHero, { team, lg, lc, dk, tc }),  /* @__PURE__ */ React.createElement(TeamRoster, { rosterData: liveRoster || rosterData, liveRoster, rosterLoading, lg, lc, tc, team }), /* @__PURE__ */ React.createElement(TeamMatchesStats, { upcomingMatches: (lg==='NFL'&&espnSched?espnSched.upcoming:lg==='MLB'&&mlbSched?mlbSched.upcoming:upcomingMatches), recentMatches: (lg==='NFL'&&espnSched?espnSched.recent:lg==='MLB'&&mlbSched?mlbSched.recent:recentMatches), teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamNews, { relatedArts, team, lg, lc, onArticleClick })));
 }
-function LeaguePage({ lg: lgRaw, articles, statsVersion, onBack, onArticleClick, onMatchClick, onTeamClick = () => {
+function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatchClick, onTeamClick = () => {
 }, onStandingsClick = () => {
 }, onMoreNews = () => {
 }, onMorePlayers = () => {
 }, onMoreStats = () => {
 }, onNavigate: onNavigate2 }) {
   const lc = LG[lg].color;
-  var lg = lgRaw ? lgRaw.toUpperCase() : lgRaw; var _sv = statsVersion; void _sv;
+  var _sv = statsVersion; void _sv;
   const [showAllNews, setShowAllNews] = useState(false);
   const [showAllPlayers, setShowAllPlayers] = useState(false);
   const [statExpanded, setStatExpanded] = useState({});
