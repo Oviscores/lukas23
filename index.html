@@ -4515,7 +4515,36 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
   } }))),
       lg === 'MLB' && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.2)" } },
         /* @__PURE__ */ React.createElement("img", { src: "https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-mlb2.jpg", alt: "Zone US Baseball", style: { width: "100%", display: "block", borderRadius: 8 } })
-      ))));
+      )), /* @__PURE__ */ React.createElement("aside", { style: { display: "flex", flexDirection: "column", gap: 8 } },
+    /* @__PURE__ */ React.createElement("div", { style: mc },
+      /* @__PURE__ */ React.createElement(Hd, { label: "STATUTS" }),
+      (showAllPlayers ? playerStatus : playerStatus.slice(0, 5)).map(function(p, i) {
+        return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 4, padding: "3px 7px", borderBottom: "1px solid rgba(0,0,0,0.04)" } },
+          getTeamLogo(p.team, lg, 20),
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, p.name),
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: p.color, background: p.color + "18", padding: "1px 4px", borderRadius: 2, flexShrink: 0 } }, p.status === "INCERTAIN" ? "INCERT." : p.status)
+        );
+      }),
+      /* @__PURE__ */ React.createElement(MoreBtn, { label: "+ d'infos", onClick: function() { onMorePlayers(); } })
+    ),
+    (statCols[lg] || []).map(function(sc, si) {
+      var players = (GSTATS[lg] && GSTATS[lg][sc.key] && GSTATS[lg][sc.key].players || []).slice(0, statExpanded[si] ? undefined : 5);
+      return /* @__PURE__ */ React.createElement("div", { key: si, style: mc },
+        /* @__PURE__ */ React.createElement(Hd, { label: sc.label }),
+        players.map(function(p, i) {
+          return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 4, padding: "3px 7px", borderBottom: "1px solid rgba(0,0,0,0.04)" } },
+            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: i === 0 ? lc : "#999", width: 10, textAlign: "center" } }, i + 1),
+            /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+              /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#111" } }, p.name),
+              /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#aaa" } }, p.team)
+            ),
+            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: i === 0 ? lc : "#333" } }, p.val)
+          );
+        }),
+        /* @__PURE__ */ React.createElement(MoreBtn, { label: "+ de stats", onClick: function() { onMoreStats(lg); } })
+      );
+    })
+  )));
 }
 function FantasyHome({ onNavigate: onNavigate2 }) {
   return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "20px 20px 60px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 23, fontWeight: 900, color: "#111", marginBottom: 8 } }, "\u26A1 ZONE US FANTASY"), /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#444", marginBottom: 28 } }, "Alignements du soir \xB7 Gardiens titulaires \xB7 Blessures \xB7 Conseils"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, maxWidth: 800, margin: "0 auto" } }, ["NHL", "NFL", "NBA", "MLB"].map(function(lg) {
