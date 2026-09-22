@@ -7660,6 +7660,21 @@ history.pushState = function() {
   updateCanonical();
 };
 setTimeout(function() { if (window.fetchLeagueStats) { if (window.__STATS_LOADED__) window.__STATS_LOADED__.NFL = false; window.fetchLeagueStats('NFL'); } }, 2000);
+
+// Refresh classements toutes les 60 secondes
+setInterval(function() {
+  if (window.fetchStandings) {
+    window.fetchStandings('NFL');
+    window.fetchStandings('MLB');
+  }
+}, 60000);
+// Premier fetch rapide
+setTimeout(function() {
+  if (window.fetchStandings) {
+    window.fetchStandings('NFL');
+    window.fetchStandings('MLB');
+  }
+}, 1500);
 </script>
 </body>
 </html>
