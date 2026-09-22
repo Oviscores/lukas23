@@ -4414,7 +4414,7 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
     window.__setStandings__ = function(l, data) { if (l === lg) setConfs(data); };
   }, [lg]);
   const confKeys = Object.keys(confs);
-  const playerStatus = PLAYER_STATUS[lg] || [];
+  const playerStatus = (window.__INJURIES__ && window.__INJURIES__[lg] && window.__INJURIES__[lg].length > 0) ? window.__INJURIES__[lg] : (PLAYER_STATUS[lg] || []);
   const news = LNEWS[lg] || [];
   const statCols = {
     NHL: [{ key: 3, label: "Points" }, { key: 0, label: "Buts" }, { key: 1, label: "Passes (A)" }, { key: 2, label: "Save %" }],
