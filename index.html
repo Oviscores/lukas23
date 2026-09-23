@@ -4554,8 +4554,8 @@ function ScoreCard({ g, lg, onMatchClick }) {
         display: "block",
         padding: lg === "NHL" ? "0px 12px" : "10px 12px",
         textDecoration: "none",
-        background: "rgba(200,200,200,0.18)",
-        border: "1px solid rgba(255,255,255,0.6)",
+        background: "#fff",
+        border: "none",
         borderRadius: 3,
         marginBottom: 3,
         cursor: "pointer",
@@ -6719,19 +6719,19 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
         )
       ),
       React.createElement("div", {
-        style: {borderTop:"3px solid rgba(0,0,0,0.15)",background:"rgba(10,10,20,0.99)",overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}
+        style: {borderTop:"1px solid #e5e7eb",background:"#fff",overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}
       },
         React.createElement("div", {
           style: {maxWidth:1260,margin:"0 auto",padding:"0 20px",display:"flex",alignItems:"stretch",height:60}
         },
           React.createElement("div", {
-            style:{display:"flex",alignItems:"center",gap:8,paddingRight:18,borderRight:"1px solid rgba(255,255,255,0.12)",flexShrink:0}
+            style:{display:"flex",alignItems:"center",gap:8,paddingRight:18,borderRight:"1px solid #e5e7eb",flexShrink:0}
           },
             React.createElement("span", {style:{width:6,height:6,borderRadius:"50%",background:"#e30613",flexShrink:0}}),
             React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:700,letterSpacing:"0.15em",color:"#e30613"}}, "LIVE")
           ),
           React.createElement("div", {
-            style:{display:"flex",gap:0,background:"transparent",overflowX:"auto",scrollbarWidth:"none",flex:1}
+            style:{display:"flex",gap:"1px",background:"#d1d5db",overflowX:"auto",scrollbarWidth:"none",flex:1}
           },
             window.LIVE_MATCHES.map(function(m,i) {
               var lc2 = window.LG[m.lg].color;
