@@ -4450,7 +4450,7 @@ function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatc
       // Fallback statique
       var fallback = lg === 'NBA' && window.__NBA_STATIC__ ? window.__NBA_STATIC__ : (SCORES[lg] || []);
       return fallback.map(function(m) { return normalize(m, m.dateLabel || ''); });
-    })().map((g, i) => /* @__PURE__ */ React.createElement("div", { style: { borderRight: "1px solid rgba(0,0,0,0.1)" } }, React.createElement(ScoreCard, { key: i, g, lg, onMatchClick }))), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
+    })().map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
     e.preventDefault();
     if (onStandingsClick) onStandingsClick(lg);
   }, style: { display: "block", textAlign: "right", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: lc, textDecoration: "none", marginTop: 2 } }, "TOUS \u2192")), confKeys.map((confName) => /* @__PURE__ */ React.createElement("div", { key: confName }, /* @__PURE__ */ React.createElement("div", { onClick: () => onStandingsClick && onStandingsClick(lg), style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, letterSpacing: "0.06em", color: "#fff", background: lc, padding: "2px 5px", borderRadius: 2, marginBottom: 3, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("span", null, confName), /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.7 } }, "\u2192")), confs[confName].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", padding: "2px 3px", marginBottom: 1, background: i === 0 ? "rgba(200,200,200,0.25)" : "rgba(200,200,200,0.1)", border: "1px solid rgba(255,255,255,0.5)", borderRadius: 2, gap: 2 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: i === 0 ? lc : "#bbb", width: 8, flexShrink: 0 } }, s.r), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#333", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, s.ab), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: i === 0 ? lc : "#555", flexShrink: 0 } }, lg === "NFL" ? s.w + "-" + s.l : lg === "NBA" ? s.pct : lg === "MLB" ? s.pct : s.pts)))))), /* @__PURE__ */ React.createElement("main", { style: { display: "flex", flexDirection: "column", gap: 8, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.72)", borderRadius: 4, padding: "16px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", backdropFilter: "blur(8px)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 2 } }, (ALL_TEAMS[lg] || []).map((tid) => {
@@ -4554,7 +4554,7 @@ function ScoreCard({ g, lg, onMatchClick }) {
         display: "block",
         padding: "8px 14px",
         textDecoration: "none",
-        background: "#fff",
+        background: "#fff", borderRight: "1px solid #e2e8f0",
         borderLeft: "3px solid " + (isLive ? "#e30613" : "#e5e7eb"),
         borderRight: "none",
         borderTop: "none",
