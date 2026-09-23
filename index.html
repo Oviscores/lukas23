@@ -4562,7 +4562,7 @@ function ScoreCard({ g, lg, onMatchClick }) {
         borderRadius: 0,
         cursor: "pointer",
         minWidth: 130,
-        boxShadow: "1px 0 0 #e5e7eb",
+        borderRight: "1px solid #e5e7eb",
         transition: "background 0.15s"
       },
       onMouseEnter: (e) => { e.currentTarget.style.background = "#f8f9fa"; },
@@ -6741,8 +6741,8 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
           React.createElement("div", {
             style:{display:"flex",alignItems:"center",gap:8,paddingRight:18,borderRight:"1px solid rgba(255,255,255,0.12)",flexShrink:0}
           },
-            React.createElement("span", {style:{width:9,height:9,borderRadius:"50%",background:"#ef4444",flexShrink:0,boxShadow:"0 0 8px #ef4444"}}),
-            React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:900,letterSpacing:"0.25em",color:"#ef4444"}}, "LIVE")
+            React.createElement("span", {style:{width:6,height:6,borderRadius:"50%",background:"#e30613",flexShrink:0}}),
+            React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:700,letterSpacing:"0.15em",color:"#e30613"}}, "LIVE")
           ),
           React.createElement("div", {
             style:{display:"flex",gap:0,overflowX:"auto",scrollbarWidth:"none",flex:1}
