@@ -4542,37 +4542,51 @@ function FantasyHome({ onNavigate: onNavigate2 }) {
 }
 function ScoreCard({ g, lg, onMatchClick }) {
   const hw = g.hs > g.as, lc = LG[lg].color;
+  const isFinal = g.st === 'FINAL';
+  const isLive = g.st === 'LIVE';
+  const isUpcoming = g.st === 'UPCOMING';
   return /* @__PURE__ */ React.createElement(
     "a",
     {
       href: "#",
-      onClick: (e) => {
-        e.preventDefault();
-        if (onMatchClick) onMatchClick(g, lg);
-      },
+      onClick: (e) => { e.preventDefault(); if (onMatchClick) onMatchClick(g, lg); },
       style: {
         display: "block",
-        padding: lg === "NHL" ? "0px 12px" : "10px 12px",
+        padding: "8px 14px",
         textDecoration: "none",
-        background: "rgba(200,200,200,0.18)",
-        border: "1px solid rgba(255,255,255,0.6)",
-        borderRadius: 3,
-        marginBottom: 3,
+        background: "#fff",
+        borderLeft: "3px solid " + (isLive ? "#e30613" : "#e5e7eb"),
+        borderRight: "none",
+        borderTop: "none",
+        borderBottom: "none",
+        borderRadius: 0,
         cursor: "pointer",
-        transition: "all 0.15s"
+        minWidth: 130,
+        boxShadow: "1px 0 0 #e5e7eb",
+        transition: "background 0.15s"
       },
-      onMouseEnter: (e) => {
-        e.currentTarget.style.background = "rgba(255,255,255,0.35)";
-        e.currentTarget.style.borderColor = lc;
-      },
-      onMouseLeave: (e) => {
-        e.currentTarget.style.background = "rgba(200,200,200,0.18)";
-        e.currentTarget.style.borderColor = "rgba(255,255,255,0.6)";
-      }
+      onMouseEnter: (e) => { e.currentTarget.style.background = "#f8f9fa"; },
+      onMouseLeave: (e) => { e.currentTarget.style.background = "#fff"; }
     },
-    [{ id: g.away, sc: g.as, win: !hw }, { id: g.home, sc: g.hs, win: hw }].map((t, ti) => /* @__PURE__ */ React.createElement("div", { key: ti, style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3 } }, /* @__PURE__ */ getTeamLogo(t.id, lg, 33), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: t.win ? 700 : 500, color: t.win ? "#111" : "#555" } }, t.id)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: t.win ? 800 : 600, color: t.win ? "#111" : "#666" } }, g.st === "UPCOMING" ? (ti === 0 ? (g.dateLabel || g.date || "") : (g.time || "")) : (t.sc !== null && t.sc !== undefined ? t.sc : "-"))))
+    [{ id: g.away, sc: g.as, win: !hw && isFinal }, { id: g.home, sc: g.hs, win: hw && isFinal }].map((t, ti) =>
+      /* @__PURE__ */ React.createElement("div", { key: ti, style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: ti === 0 ? 4 : 0 } },
+        /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
+          /* @__PURE__ */ getTeamLogo(t.id, lg, 20),
+          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: t.win ? 800 : 500, color: t.win ? "#111" : "#6b7280" } }, t.id)
+        ),
+        /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: t.win ? 800 : 500, color: t.win ? "#111" : "#6b7280", minWidth: 20, textAlign: "right" } },
+          isUpcoming ? (ti === 0 ? (g.dateLabel || g.date || "") : (g.time || "")) : (t.sc !== null && t.sc !== undefined ? t.sc : "-")
+        )
+      )
+    ),
+    /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 4 } },
+      /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: isLive ? "#e30613" : "#9ca3af", letterSpacing: "0.05em" } },
+        isLive ? (g.period || "LIVE") : isFinal ? "FINAL" : (LG[lg] ? LG[lg].label : lg)
+      )
+    )
   );
 }
+
 
 function RosterSection({ match, hc, ac }) {
   const lg = match.lg;
@@ -6719,7 +6733,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
         )
       ),
       React.createElement("div", {
-        style: {borderTop:"3px solid rgba(0,0,0,0.15)",background:"rgba(10,10,20,0.99)",overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}
+        style: {borderTop:"3px solid rgba(0,0,0,0.15)",background:"#f3f4f6",overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}
       },
         React.createElement("div", {
           style: {maxWidth:1260,margin:"0 auto",padding:"0 20px",display:"flex",alignItems:"stretch",height:60}
