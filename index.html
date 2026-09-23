@@ -4562,7 +4562,7 @@ function ScoreCard({ g, lg, onMatchClick }) {
         borderRadius: 0,
         cursor: "pointer",
         minWidth: 130,
-        borderRight: "1px solid #e5e7eb",
+        
         transition: "background 0.15s"
       },
       onMouseEnter: (e) => { e.currentTarget.style.background = "#f8f9fa"; },
@@ -5139,7 +5139,7 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
       });
       return scores;
     })()
-  ).filter(function(e){return e[1].length>0;}).map(([lg, games]) => /* @__PURE__ */ React.createElement("div", { key: lg }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#333" } }, lg)), games.map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
+  ).filter(function(e){return e[1].length>0;}).map(([lg, games]) => /* @__PURE__ */ React.createElement("div", { key: lg, style: { borderRight: "1px solid #e5e7eb", paddingRight: 12, marginRight: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#333" } }, lg)), games.map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
     e.preventDefault();
     if (onStandingsClick) onStandingsClick(lg);
   }, style: { display: "block", textAlign: "right", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, textDecoration: "none", marginBottom: 4 } }, "TOUS \u2192"))));
