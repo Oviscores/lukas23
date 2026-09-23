@@ -6,6 +6,12 @@
   <meta name="robots" content="index, follow"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<script>
+(function(){
+  var can = document.querySelector('link[rel="canonical"]');
+  if(can) can.setAttribute('href', 'https://zoneus.fr/' + window.location.search);
+})();
+</script>
 <link rel="canonical" href="https://zoneus.fr/">
   <meta property="og:image" content="https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp">
   <link rel="preconnect" href="https://a.espncdn.com"><link rel="preconnect" href="https://cdn.sanity.io">
