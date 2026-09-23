@@ -4540,48 +4540,6 @@ function FantasyHome({ onNavigate: onNavigate2 }) {
     );
   })));
 }
-function LiveBarCard({ g, lg, onMatchClick }) {
-  const hw = g.hs > g.as, lc = LG[lg].color;
-  const isFinal = g.st === 'FINAL';
-  const isLive = g.st === 'LIVE';
-  const isUpcoming = !isFinal && (g.hs === null || g.hs === undefined);
-  return /* @__PURE__ */ React.createElement(
-    "a",
-    {
-      href: "#",
-      onClick: (e) => { e.preventDefault(); if (onMatchClick) onMatchClick(g, lg); },
-      style: {
-        display: "block",
-        padding: lg === "NHL" ? "0px 10px" : "8px 10px",
-        textDecoration: "none",
-        background: "rgba(200,200,200,0.18)",
-        border: "1px solid rgba(255,255,255,0.6)",
-        cursor: "pointer",
-        minWidth: 110,
-        maxWidth: 130,
-        flexShrink: 0,
-      }
-    },
-    /* @__PURE__ */ React.createElement("div", { style: { height: 2, background: isLive ? "#ef4444" : isFinal ? lc : "transparent", marginBottom: 4 } }),
-    [{ id: g.away, sc: g.as, win: !hw && isFinal }, { id: g.home, sc: g.hs, win: hw && isFinal }].map((t, ti) =>
-      /* @__PURE__ */ React.createElement("div", { key: ti, style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 } },
-        /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 4 } },
-          /* @__PURE__ */ getTeamLogo(t.id, lg, 20),
-          /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: t.win ? 800 : 500, color: t.win ? "#111" : "#6b7280" } }, t.id)
-        ),
-        /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: t.win ? 800 : 500, color: t.win ? "#111" : "#9ca3af" } },
-          isUpcoming ? (ti === 0 ? "" : (g.time || "")) : (t.sc !== null && t.sc !== undefined ? t.sc : "-")
-        )
-      )
-    ),
-    /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 2 } },
-      /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: isLive ? "#ef4444" : "#9ca3af", letterSpacing: "0.08em" } },
-        isLive ? (g.period || "LIVE") : isFinal ? "FINAL" : (LG[lg] ? LG[lg].label : lg)
-      )
-    )
-  );
-}
-
 function ScoreCard({ g, lg, onMatchClick }) {
   const hw = g.hs > g.as, lc = LG[lg].color;
   return /* @__PURE__ */ React.createElement(
@@ -5167,7 +5125,7 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
       });
       return scores;
     })()
-  ).filter(function(e){return e[1].length>0;}).map(([lg, games]) => /* @__PURE__ */ React.createElement("div", { key: lg, style: { borderRight: "1px solid #e5e7eb", paddingRight: 12, marginRight: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#333" } }, lg)), games.map((g, i) => /* @__PURE__ */ React.createElement(LiveBarCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
+  ).filter(function(e){return e[1].length>0;}).map(([lg, games]) => /* @__PURE__ */ React.createElement("div", { key: lg, style: { borderRight: "1px solid #e5e7eb", paddingRight: 12, marginRight: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 13 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#333" } }, lg)), games.map((g, i) => /* @__PURE__ */ React.createElement(ScoreCard, { key: i, g, lg, onMatchClick })), /* @__PURE__ */ React.createElement("a", { href: "#", onClick: (e) => {
     e.preventDefault();
     if (onStandingsClick) onStandingsClick(lg);
   }, style: { display: "block", textAlign: "right", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: LG[lg].color, textDecoration: "none", marginBottom: 4 } }, "TOUS \u2192"))));
