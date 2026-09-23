@@ -6357,7 +6357,7 @@ function ZoneUS() {
   const [selArticle, setSelArticle] = useState(null);
   const slugify = function(str) { return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); };
   const goArticle = function(a) {
-    if (a) { var slug = slugify(a.title); history.pushState({}, '', '?article=' + slug); document.title = a.title + ' | Zone US'; }
+    if (a) { var slug = slugify(a.title); history.pushState({}, '', '?article=' + slug); document.title = (a.title.charAt(0).toUpperCase() + a.title.slice(1).toLowerCase()) + ' | Zone US'; }
     else { history.pushState({}, '', window.location.pathname); }
     setSelTeam(null);
     setSelMatch(null);
