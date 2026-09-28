@@ -2440,19 +2440,7 @@ Object.keys(TEAMS_EXTRA2).forEach((lg) => {
 });
 window.TEAMS_DB = TEAMS_DB;
 
-const LIVE_MATCHES = [
-  { id: "m1", lg: "NHL", status: "LIVE", period: "P3 14:22", homeTeam: "TOR", awayTeam: "BOS", homeScore: 2, awayScore: 3, time: "20h00", arena: "Scotiabank Arena", city: "Toronto" },
-  { id: "m2", lg: "NHL", status: "LIVE", period: "P2 08:44", homeTeam: "EDM", awayTeam: "VGK", homeScore: 1, awayScore: 1, time: "22h00", arena: "Rogers Place", city: "Edmonton" },
-  { id: "m3", lg: "NBA", status: "UPCOMING", period: null, homeTeam: "BOS", awayTeam: "NYK", homeScore: null, awayScore: null, time: "19h30", arena: "TD Garden", city: "Boston" },
-  { id: "m4", lg: "NBA", status: "UPCOMING", period: null, homeTeam: "OKC", awayTeam: "DEN", homeScore: null, awayScore: null, time: "21h00", arena: "Paycom Center", city: "Oklahoma City" },
-  { id: "m5", lg: "MLB", status: "LIVE", period: "7e manche", homeTeam: "NYY", awayTeam: "BOS", homeScore: 4, awayScore: 2, time: "19h05", arena: "Yankee Stadium", city: "New York" },
-  { id: "m6", lg: "MLB", status: "UPCOMING", period: null, homeTeam: "LAD", awayTeam: "ATL", homeScore: null, awayScore: null, time: "22h10", arena: "Dodger Stadium", city: "Los Angeles" },
-  { id: "m7", lg: "NFL", status: "UPCOMING", period: null, homeTeam: "KC", awayTeam: "BUF", homeScore: null, awayScore: null, time: "Dim 20h20", arena: "Arrowhead Stadium", city: "Kansas City" },
-  { id: "m8", lg: "NHL", status: "FINAL", period: "Final", homeTeam: "FLA", awayTeam: "TBL", homeScore: 5, awayScore: 3, time: "19h00", arena: "Amerant Bank Arena", city: "Sunrise" },
-  { id: "m9", lg: "NBA", status: "FINAL", period: "Final", homeTeam: "DEN", awayTeam: "LAL", homeScore: 112, awayScore: 104, time: "21h30", arena: "Ball Arena", city: "Denver" },
-  { id: "m10", lg: "MLB", status: "UPCOMING", period: null, homeTeam: "HOU", awayTeam: "SEA", homeScore: null, awayScore: null, time: "20h10", arena: "Minute Maid Park", city: "Houston" }
-]
-window.LIVE_MATCHES = LIVE_MATCHES;;
+window.LIVE_MATCHES = [];
 
 
 // ============================================================
@@ -2488,6 +2476,7 @@ async function fetchLiveScores() {
               homeScore: isLive || isFinal ? (ht.score || 0) : null,
               awayScore: isLive || isFinal ? (at.score || 0) : null,
               time: g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
+              startUTC: g.startTimeUTC ? new Date(g.startTimeUTC).getTime() : 0,
               homeLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (ht.abbrev||'NHL') + '_light.svg',
               awayLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (at.abbrev||'NHL') + '_light.svg'
             });
@@ -2528,6 +2517,7 @@ async function fetchLiveScores() {
           homeScore: isLive || isFinal ? (ht.score || 0) : null,
           awayScore: isLive || isFinal ? (at.score || 0) : null,
           time: g.gameDate ? new Date(g.gameDate).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
+          startUTC: g.gameDate ? new Date(g.gameDate).getTime() : 0,
           homeLogo: htId ? 'https://www.mlbstatic.com/team-logos/' + htId + '.svg' : '',
           awayLogo: atId ? 'https://www.mlbstatic.com/team-logos/' + atId + '.svg' : ''
         });
@@ -2569,7 +2559,7 @@ async function fetchLiveScores() {
     var oa = order[a.status] !== undefined ? order[a.status] : 1;
     var ob = order[b.status] !== undefined ? order[b.status] : 1;
     if (oa !== ob) return oa - ob;
-    return (a.time || '').localeCompare(b.time || '');
+    return (a.startUTC || 0) - (b.startUTC || 0);
   });
   try {
     const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard');
@@ -2583,7 +2573,7 @@ async function fetchLiveScores() {
       const isLive = status && (status.state === 'in');
       const isFinal = status && status.completed;
       if (isFinal) continue;
-      results.push({ id: 'nfl_' + g.id, eventId: g.id, lg: 'NFL', status: isLive ? 'LIVE' : 'UPCOMING', period: comp.status && comp.status.period ? 'Q' + comp.status.period : '', homeTeam: home.team ? home.team.abbreviation : '', awayTeam: away.team ? away.team.abbreviation : '', homeScore: isLive ? parseInt(home.score || 0) : null, awayScore: isLive ? parseInt(away.score || 0) : null, time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '', homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + home.team.abbreviation.toLowerCase() + '.png' : '', awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + away.team.abbreviation.toLowerCase() + '.png' : '' });
+      results.push({ id: 'nfl_' + g.id, eventId: g.id, lg: 'NFL', status: isLive ? 'LIVE' : 'UPCOMING', period: comp.status && comp.status.period ? 'Q' + comp.status.period : '', homeTeam: home.team ? home.team.abbreviation : '', awayTeam: away.team ? away.team.abbreviation : '', homeScore: isLive ? parseInt(home.score || 0) : null, awayScore: isLive ? parseInt(away.score || 0) : null, time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '', startUTC: g.date ? new Date(g.date).getTime() : 0, homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + home.team.abbreviation.toLowerCase() + '.png' : '', awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + away.team.abbreviation.toLowerCase() + '.png' : '' });
     }
   } catch(e) { console.log('NFL livebar error:', e.message); }
   return results;
