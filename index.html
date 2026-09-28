@@ -6761,7 +6761,10 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
                   isLive ? React.createElement("span", {style:{width:7,height:7,borderRadius:"50%",background:"#ef4444",boxShadow:"0 0 6px #ef4444"}}) : null,
                   getTeamLogo(m.homeTeam, m.lg, 32),
                   (isLive||isFinal) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:900,color:"#fff"}}, m.homeScore) : null,
-                  React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,color:"rgba(255,255,255,0.25)",margin:"0 2px"}}, "\u2013"),
+                  React.createElement("span", {style:{display:"flex",flexDirection:"column",alignItems:"center",margin:"0 2px"}},
+                    (!isLive && !isFinal && m.startUTC) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,fontWeight:700,color:"rgba(255,255,255,0.5)",letterSpacing:"0.05em",lineHeight:1}}, new Date(m.startUTC).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}).toUpperCase()) : null,
+                    React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,color:"rgba(255,255,255,0.25)"}}, "\u2013")
+                  ),
                   (isLive||isFinal) ? React.createElement("span", {style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:900,color:"#fff"}}, m.awayScore) : null,
                   getTeamLogo(m.awayTeam, m.lg, 32)
                 ),
