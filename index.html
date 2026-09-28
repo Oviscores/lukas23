@@ -2553,14 +2553,6 @@ async function fetchLiveScores() {
     }
   } catch(e) { console.log('NBA API error:', e.message); }
 
-  // Trier: LIVE en premier, puis UPCOMING par heure, puis FINAL
-  results.sort(function(a, b) {
-    var order = { 'LIVE': 0, 'UPCOMING': 1, 'FINAL': 2 };
-    var oa = order[a.status] !== undefined ? order[a.status] : 1;
-    var ob = order[b.status] !== undefined ? order[b.status] : 1;
-    if (oa !== ob) return oa - ob;
-    return (a.startUTC || 0) - (b.startUTC || 0);
-  });
   try {
     const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard');
     const d = await r.json();
@@ -2576,6 +2568,15 @@ async function fetchLiveScores() {
       results.push({ id: 'nfl_' + g.id, eventId: g.id, lg: 'NFL', status: isLive ? 'LIVE' : 'UPCOMING', period: comp.status && comp.status.period ? 'Q' + comp.status.period : '', homeTeam: home.team ? home.team.abbreviation : '', awayTeam: away.team ? away.team.abbreviation : '', homeScore: isLive ? parseInt(home.score || 0) : null, awayScore: isLive ? parseInt(away.score || 0) : null, time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '', startUTC: g.date ? new Date(g.date).getTime() : 0, homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + home.team.abbreviation.toLowerCase() + '.png' : '', awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + away.team.abbreviation.toLowerCase() + '.png' : '' });
     }
   } catch(e) { console.log('NFL livebar error:', e.message); }
+
+  // Trier: LIVE en premier, puis UPCOMING par heure UTC, puis FINAL
+  results.sort(function(a, b) {
+    var order = { 'LIVE': 0, 'UPCOMING': 1, 'FINAL': 2 };
+    var oa = order[a.status] !== undefined ? order[a.status] : 1;
+    var ob = order[b.status] !== undefined ? order[b.status] : 1;
+    if (oa !== ob) return oa - ob;
+    return (a.startUTC || 0) - (b.startUTC || 0);
+  });
   return results;
 }
 
