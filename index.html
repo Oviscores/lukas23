@@ -2469,10 +2469,8 @@ async function fetchLiveScores() {
     const r = await fetch(PROXY + '?league=nhl');
     const d = await r.json();
     if (d.gamesByDate) {
-      const today = new Date().toISOString().split('T')[0];
       for (const dateGroup of d.gamesByDate) {
-        if (dateGroup.date === today) {
-          for (const g of (dateGroup.games || [])) {
+        for (const g of (dateGroup.games || [])) {
             const ht = g.homeTeam || {};
             const at = g.awayTeam || {};
             const state = g.gameState || 'FUT';
@@ -2491,7 +2489,6 @@ async function fetchLiveScores() {
               homeLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (ht.abbrev||'NHL') + '_light.svg',
               awayLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (at.abbrev||'NHL') + '_light.svg'
             });
-          }
         }
       }
     }
@@ -2499,10 +2496,19 @@ async function fetchLiveScores() {
 
   // MLB
   try {
-    const r = await fetch(PROXY + '?league=mlb');
-    const d = await r.json();
-    if (d.dates && d.dates[0]) {
-      for (const g of (d.dates[0].games || [])) {
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    const [rToday, rTomorrow] = await Promise.all([
+      fetch(PROXY + '?league=mlb'),
+      fetch(PROXY + '?league=mlb&date=' + tomorrowStr)
+    ]);
+    const [dToday, dTomorrow] = await Promise.all([rToday.json(), rTomorrow.json()]);
+    const allDates = [...(dToday.dates || []), ...(dTomorrow.dates || [])];
+    const seenMlb = new Set();
+    for (const dateObj of allDates) {
+      for (const g of (dateObj.games || [])) {
+        if (seenMlb.has(g.gamePk)) continue;
+        seenMlb.add(g.gamePk);
         const ht = g.teams?.home || {};
         const at = g.teams?.away || {};
         const state = g.status?.abstractGameState || '';
