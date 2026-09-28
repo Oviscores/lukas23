@@ -2476,6 +2476,8 @@ async function fetchLiveScores() {
             const state = g.gameState || 'FUT';
             const isLive = state === 'LIVE' || state === 'CRIT';
             const isFinal = state === 'OFF' || state === 'FINAL';
+            // Ne pas afficher les matchs terminés (pré-saison passée)
+            if (isFinal) continue;
             results.push({
               id: 'nhl_' + g.id,
               lg: 'NHL',
