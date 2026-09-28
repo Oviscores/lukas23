@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zone US — Sport américain en français | NFL, NHL, NBA, MLB</title>
-  <meta name="description" content="Zone US, le média sportif francophone dédié au sport américain. Actualités, résultats en direct, analyses et statistiques NFL, NHL, NBA et MLB."/>
-  <link rel="canonical" href="https://zoneus.fr/"/>
+  <title>Zone US</title>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <style>
@@ -1604,8 +1602,10 @@ async function fetchLiveScores() {
     const r = await fetch(PROXY + '?league=nhl');
     const d = await r.json();
     if (d.gamesByDate) {
+      const today = new Date().toISOString().split('T')[0];
       for (const dateGroup of d.gamesByDate) {
-        for (const g of (dateGroup.games || [])) {
+        if (dateGroup.date === today) {
+          for (const g of (dateGroup.games || [])) {
             const ht = g.homeTeam || {};
             const at = g.awayTeam || {};
             const state = g.gameState || 'FUT';
@@ -1624,6 +1624,7 @@ async function fetchLiveScores() {
               homeLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (ht.abbrev||'NHL') + '_light.svg',
               awayLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (at.abbrev||'NHL') + '_light.svg'
             });
+          }
         }
       }
     }
