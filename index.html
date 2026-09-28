@@ -2601,7 +2601,8 @@ async function initLiveScores() {
   } catch(e) { console.log('initLiveScores error:', e); }
 }
 
-initLiveScores();
+// Attendre que React soit monté avant le premier appel
+setTimeout(initLiveScores, 1500);
 setInterval(initLiveScores, 30000);
 
 
