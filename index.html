@@ -1604,10 +1604,8 @@ async function fetchLiveScores() {
     const r = await fetch(PROXY + '?league=nhl');
     const d = await r.json();
     if (d.gamesByDate) {
-      const today = new Date().toISOString().split('T')[0];
       for (const dateGroup of d.gamesByDate) {
-        if (dateGroup.date === today) {
-          for (const g of (dateGroup.games || [])) {
+        for (const g of (dateGroup.games || [])) {
             const ht = g.homeTeam || {};
             const at = g.awayTeam || {};
             const state = g.gameState || 'FUT';
@@ -1626,7 +1624,6 @@ async function fetchLiveScores() {
               homeLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (ht.abbrev||'NHL') + '_light.svg',
               awayLogo: 'https://assets.nhle.com/logos/nhl/svg/' + (at.abbrev||'NHL') + '_light.svg'
             });
-          }
         }
       }
     }
