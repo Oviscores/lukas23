@@ -4665,7 +4665,7 @@ function MatchPage({ match, onBack }) {
           if (data && data.liveData) setBoxscore({ type: 'MLB', data: data.liveData });
         } else if (match.lg === 'NHL') {
           var nhlId = (match.id+'').replace('nhl_','');
-          if (nhlId) { var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId); data = await r3.json(); if (data && data.id) setBoxscore({ type: 'NHL', data: data }); }
+          if (nhlId) { var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId); data = await r3.json(); if (data && data.gameState) setBoxscore({ type: 'NHL', data: data }); }
         } else if (match.lg === 'NFL') {
           var _rawId = match.eventId || match.id || '';
           var _cleanId = (_rawId+'').replace('nfl_','');
@@ -4944,81 +4944,80 @@ function MatchPage({ match, onBack }) {
 
         /* NHL Boxscore */
         !bxLoading && boxscore && boxscore.type === 'NHL' && React.createElement("div", { style: { marginBottom: 14 } },
-          /* Tableau par période */
-          boxscore.data.periodDescriptor && React.createElement("div", { style: { overflowX: "auto", padding: "12px 16px 0" } },
-            React.createElement("table", { style: { width: "100%", borderCollapse: "collapse", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } },
+          /* Score + tirs */
+          React.createElement("div", { style: { overflowX: "auto", padding: "12px 16px 0" } },
+            React.createElement("table", { style: { width: "100%", borderCollapse: "collapse", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13 } },
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.06)" } },
-                  React.createElement("th", { style: { padding: "4px 8px", textAlign: "left", fontWeight: 800 } }, "ÉQUIPE"),
-                  (boxscore.data.linescore && boxscore.data.linescore.byPeriod || []).map(function(p, i) {
-                    return React.createElement("th", { key: i, style: { padding: "4px 6px", textAlign: "center", fontWeight: 700, color: "#555" } }, p.periodDescriptor && p.periodDescriptor.periodType === 'OT' ? 'OT' : 'P' + p.period);
-                  }),
-                  React.createElement("th", { style: { padding: "4px 8px", textAlign: "center", fontWeight: 800, color: lc } }, "B"),
-                  React.createElement("th", { style: { padding: "4px 8px", textAlign: "center", fontWeight: 800, color: "#555" } }, "T")
+                  React.createElement("th", { style: { padding: "6px 8px", textAlign: "left", fontWeight: 800 } }, "ÉQUIPE"),
+                  React.createElement("th", { style: { padding: "6px 8px", textAlign: "center", fontWeight: 800, color: lc } }, "B"),
+                  React.createElement("th", { style: { padding: "6px 8px", textAlign: "center", fontWeight: 700, color: "#555" } }, "TIRS"),
+                  (boxscore.data.gameOutcome && boxscore.data.gameOutcome.lastPeriodType === 'OT') && React.createElement("th", { style: { padding: "6px 8px", textAlign: "center", fontWeight: 700, color: "#e67e22" } }, "OT")
                 )
               ),
               React.createElement("tbody", null,
-                [['homeTeam', match.homeTeam], ['awayTeam', match.awayTeam]].map(function(info) {
-                  var side = info[0], teamAb = info[1];
-                  var periods = boxscore.data.linescore && boxscore.data.linescore.byPeriod || [];
-                  var teamData = boxscore.data[side] || {};
+                [['awayTeam', boxscore.data.awayTeam, ac.bg], ['homeTeam', boxscore.data.homeTeam, hc.bg]].map(function(info) {
+                  var side = info[0], td = info[1] || {}, col = info[2];
                   return React.createElement("tr", { key: side, style: { borderTop: "1px solid rgba(0,0,0,0.06)" } },
-                    React.createElement("td", { style: { padding: "4px 8px", fontWeight: 800 } }, teamAb),
-                    periods.map(function(p, i) {
-                      var goals = p[side] && p[side].goals !== undefined ? p[side].goals : '-';
-                      return React.createElement("td", { key: i, style: { padding: "4px 6px", textAlign: "center" } }, goals);
-                    }),
-                    React.createElement("td", { style: { padding: "4px 8px", textAlign: "center", fontWeight: 900, color: lc } }, teamData.score !== undefined ? teamData.score : '-'),
-                    React.createElement("td", { style: { padding: "4px 8px", textAlign: "center" } }, teamData.sog !== undefined ? teamData.sog : '-')
+                    React.createElement("td", { style: { padding: "6px 8px", fontWeight: 800, display: "flex", alignItems: "center", gap: 6 } },
+                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", background: col, borderRadius: 3, padding: "1px 5px" } }, td.abbrev || ''),
+                      React.createElement("span", null, (td.commonName && td.commonName.default) || td.abbrev || '')
+                    ),
+                    React.createElement("td", { style: { padding: "6px 8px", textAlign: "center", fontWeight: 900, fontSize: 16, color: lc } }, td.score !== undefined ? td.score : '-'),
+                    React.createElement("td", { style: { padding: "6px 8px", textAlign: "center" } }, td.sog !== undefined ? td.sog : '-'),
+                    (boxscore.data.gameOutcome && boxscore.data.gameOutcome.lastPeriodType === 'OT') && React.createElement("td", { style: { padding: "6px 8px", textAlign: "center", color: "#e67e22", fontWeight: 800 } }, side === 'awayTeam' && td.score > (boxscore.data.homeTeam||{}).score ? '✓' : side === 'homeTeam' && td.score > (boxscore.data.awayTeam||{}).score ? '✓' : '')
                   );
                 })
               )
             )
           ),
-          /* Liste des buts */
-          boxscore.data.goals && boxscore.data.goals.length > 0 && React.createElement("div", { style: { marginTop: 12 } },
-            React.createElement("div", { style: { background: "#111", padding: "8px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "BUTS"),
-            boxscore.data.goals.map(function(goal, i) {
-              var period = goal.periodDescriptor && goal.periodDescriptor.periodType === 'OT' ? 'OT' : goal.period ? 'P'+goal.period : '';
-              var time = goal.timeInPeriod || '';
-              var scorer = goal.name && (goal.name.default || goal.firstName && goal.firstName.default + ' ' + goal.lastName.default) || '';
-              var assists = (goal.assists || []).map(function(a) { return a.name && (a.name.default || '') || ''; }).filter(Boolean).join(', ');
-              var teamAb = goal.teamAbbrev && goal.teamAbbrev.default || goal.teamAbbrev || '';
-              var isHome = teamAb === match.homeTeam;
-              var col = isHome ? hc.bg : ac.bg;
-              var ppLabel = goal.strength === 'pp' ? ' (AN)' : goal.strength === 'sh' ? ' (DES)' : goal.strength === 'en' ? ' (CN)' : '';
-              return React.createElement("div", { key: i, style: { display: "flex", gap: 10, padding: "8px 12px", borderBottom: "1px solid rgba(0,0,0,0.05)", alignItems: "flex-start", background: i%2===0?"#fff":"#f8f8f8" } },
-                React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", minWidth: 40, gap: 2 } },
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: col, borderRadius: 3, padding: "2px 5px" } }, teamAb),
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa" } }, period + ' ' + time)
-                ),
-                React.createElement("div", { style: { flex: 1 } },
-                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111" } }, scorer + ppLabel),
-                  assists && React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#888" } }, 'Passes : ' + assists)
-                )
-              );
-            })
-          ),
-          /* Stats gardiens */
-          React.createElement("div", { style: { marginTop: 12 } },
-            React.createElement("div", { style: { background: "#111", padding: "8px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "GARDIENS"),
-            [['homeTeam', match.homeTeam, hc.bg], ['awayTeam', match.awayTeam, ac.bg]].map(function(info) {
-              var side = info[0], teamAb = info[1], col = info[2];
-              var goalies = boxscore.data[side] && boxscore.data[side].goalies || [];
-              return goalies.map(function(g, i) {
-                var name = g.name && (g.name.default || '') || '';
-                var sa = g.saveShotsAgainst || (g.saves !== undefined ? g.saves + '-' + ((g.saves||0)+(g.goalsAgainst||0)) : '');
-                var pct = g.savePctg !== undefined ? (g.savePctg*100).toFixed(1)+'%' : '';
-                return React.createElement("div", { key: side+i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 12px", background: i%2===0?"#fff":"#f5f5f5", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
-                  React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
-                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: col, borderRadius: 3, padding: "1px 5px" } }, teamAb),
-                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111" } }, name)
+          /* Stats skateurs par équipe */
+          [['awayTeam', ac.bg], ['homeTeam', hc.bg]].map(function(info) {
+            var side = info[0], col = info[1];
+            var teamStats = boxscore.data.playerByGameStats && boxscore.data.playerByGameStats[side];
+            if (!teamStats) return null;
+            var td = boxscore.data[side] || {};
+            var abbrev = td.abbrev || side;
+            var allSkaters = (teamStats.forwards || []).concat(teamStats.defense || []);
+            var scorers = allSkaters.filter(function(p) { return p.points > 0; }).sort(function(a,b) { return b.points - a.points; });
+            var goalies = teamStats.goalies || [];
+            return React.createElement("div", { key: side, style: { marginTop: 10 } },
+              React.createElement("div", { style: { background: col, padding: "8px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "0.08em", display: "flex", justifyContent: "space-between" } },
+                React.createElement("span", null, abbrev + " — POINTEURS"),
+                React.createElement("span", { style: { opacity: 0.7, fontWeight: 700, fontSize: 11 } }, "B  A  PTS  +/-  TIR  TPS")
+              ),
+              scorers.length === 0
+                ? React.createElement("div", { style: { padding: "8px 12px", fontFamily: "'Barlow',sans-serif", fontSize: 12, color: "#aaa" } }, "Aucun point")
+                : scorers.map(function(p, i) {
+                  return React.createElement("div", { key: p.playerId, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 12px", background: i%2===0?"#fff":"#f8f8f8", borderBottom: "1px solid rgba(0,0,0,0.04)" } },
+                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
+                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#aaa", width: 22 } }, "#" + p.sweaterNumber),
+                      React.createElement("div", null,
+                        React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111" } }, p.name && p.name.default || ''),
+                        React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#aaa" } }, p.position)
+                      )
+                    ),
+                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, color: "#444", background: "#f0f0f0", borderRadius: 3, padding: "2px 8px", letterSpacing: "0.05em" } },
+                      p.goals + "  " + p.assists + "  " + p.points + "  " + (p.plusMinus >= 0 ? '+' : '') + p.plusMinus + "  " + p.sog + "  " + (p.toi || '')
+                    )
+                  );
+                }),
+              /* Gardiens */
+              goalies.filter(function(g) { return g.toi && g.toi !== '00:00'; }).map(function(g, i) {
+                var name = g.name && g.name.default || '';
+                var sa = g.saveShotsAgainst || '';
+                var pct = g.savePctg !== undefined ? (g.savePctg * 100).toFixed(1) + '%' : '';
+                var dec = g.decision === 'W' ? ' ✓' : g.decision === 'L' ? ' ✗' : g.decision === 'O' ? ' OT' : '';
+                return React.createElement("div", { key: g.playerId, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 12px", background: "#f0f4ff", borderTop: "1px solid rgba(0,0,0,0.06)" } },
+                  React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
+                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, background: col, color: "#fff", borderRadius: 3, padding: "1px 4px" } }, "G"),
+                    React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111" } }, name + dec)
                   ),
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, color: "#444", fontWeight: 700, background: "#f0f0f0", borderRadius: 3, padding: "1px 8px" } }, sa + (pct?' · '+pct:''))
+                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, color: "#444", background: "#e8edf8", borderRadius: 3, padding: "2px 8px" } }, sa + (pct ? ' · ' + pct : '') + ' · ' + (g.toi || ''))
                 );
-              });
-            })
-          )
+              })
+            );
+          })
         ),
 
         /* NFL Stats joueurs */
