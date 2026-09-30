@@ -4653,7 +4653,7 @@ function MatchPage({ match, onBack }) {
   React.useEffect(function() {
     setBoxscore(null);
     console.log('boxscore fetch:', match.lg, match.status, match.id);
-    if (match.status !== 'FINAL' && match.status !== 'LIVE') return;
+    if (match.status === 'UPCOMING') return;
     setBxLoading(true);
     (async function() {
       try {
