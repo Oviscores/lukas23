@@ -4673,7 +4673,37 @@ function MatchPage({ match, onBack }) {
               if (!matchData.homeTeam && data.homeTeam && data.homeTeam.abbrev) {
                 setMatchData(function(prev) { return Object.assign({}, prev, { homeTeam: data.homeTeam.abbrev, awayTeam: data.awayTeam.abbrev, homeScore: data.homeTeam.score, awayScore: data.awayTeam.score, status: data.gameState === 'OFF' ? 'FINAL' : data.gameState === 'LIVE' ? 'LIVE' : 'UPCOMING' }); });
               }
-              setBoxscore({ type: 'NHL', data: data });
+              /* Fetch play-by-play pour les buts */
+              var goals = [];
+              var rosterMap = {};
+              try {
+                var pbpResp = await fetch('https://api-web.nhle.com/v1/gamecenter/' + nhlId + '/play-by-play');
+                var pbpData = await pbpResp.json();
+                /* Construire map playerId -> nom */
+                (pbpData.rosterSpots || []).forEach(function(rs) {
+                  rosterMap[rs.playerId] = (rs.firstName && rs.firstName.default ? rs.firstName.default.charAt(0) + '. ' : '') + (rs.lastName && rs.lastName.default ? rs.lastName.default : '');
+                });
+                /* Extraire les buts */
+                goals = (pbpData.plays || []).filter(function(p) { return p.typeDescKey === 'goal'; }).map(function(p) {
+                  var d = p.details || {};
+                  var periodLabel = p.periodDescriptor && p.periodDescriptor.number <= 3 ? 'P' + p.periodDescriptor.number : p.periodDescriptor && p.periodDescriptor.periodType === 'OT' ? 'PR' : p.periodDescriptor && p.periodDescriptor.periodType === 'SO' ? 'TB' : 'P' + (p.periodDescriptor && p.periodDescriptor.number);
+                  return {
+                    time: p.timeInPeriod || '',
+                    period: periodLabel,
+                    scorer: rosterMap[d.scoringPlayerId] || '',
+                    assist1: rosterMap[d.assist1PlayerId] || '',
+                    assist2: rosterMap[d.assist2PlayerId] || '',
+                    teamId: d.eventOwnerTeamId,
+                    homeTeamId: data.homeTeam && data.homeTeam.id,
+                    awayTeamId: data.awayTeam && data.awayTeam.id,
+                    goalType: d.shotType || '',
+                    strength: d.strength || '',
+                    homeScore: d.homeScore,
+                    awayScore: d.awayScore,
+                  };
+                });
+              } catch(pbpErr) { console.log('pbp error', pbpErr); }
+              setBoxscore({ type: 'NHL', data: data, goals: goals });
             }
           }
         } else if (matchData.lg === 'NFL') {
@@ -4684,7 +4714,7 @@ function MatchPage({ match, onBack }) {
       } catch(e) { console.log('boxscore error:', e); }
       setBxLoading(false);
     })();
-  }, [matchData.id, matchData.eventId, matchData.status]);
+  }, [matchData.id, matchData.eventId]);
   const lc = LG[matchData.lg].color;
   const dk = LG[matchData.lg].dark;
   const hk = matchData.homeTeam + "_" + matchData.lg;
@@ -4980,6 +5010,51 @@ function MatchPage({ match, onBack }) {
                 })
               )
             )
+          ),
+          /* Timeline des buts */
+          boxscore.goals && boxscore.goals.length > 0 && React.createElement("div", { style: { margin: "14px 16px 0" } },
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, letterSpacing: "0.12em", color: "#888", marginBottom: 10, textTransform: "uppercase" } }, "⚡ Buts du match"),
+            /* Grouper par période */
+            (function() {
+              var periods = {};
+              boxscore.goals.forEach(function(g) { if (!periods[g.period]) periods[g.period] = []; periods[g.period].push(g); });
+              var periodOrder = ['P1','P2','P3','PR','TB'];
+              var periodLabel = { 'P1': '1re Période', 'P2': '2e Période', 'P3': '3e Période', 'PR': 'Prolongation', 'TB': 'Tirs de barrage' };
+              return periodOrder.filter(function(p) { return periods[p]; }).map(function(p) {
+                return React.createElement("div", { key: p, style: { marginBottom: 14 } },
+                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#aaa", letterSpacing: "0.1em", borderBottom: "2px solid #f0f0f0", paddingBottom: 4, marginBottom: 8 } }, periodLabel[p] || p),
+                  periods[p].map(function(g, i) {
+                    var isHome = g.teamId === g.homeTeamId;
+                    var teamAb = isHome ? (boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) : (boxscore.data.awayTeam && boxscore.data.awayTeam.abbrev);
+                    var col = isHome ? hc.bg : ac.bg;
+                    var assists = [g.assist1, g.assist2].filter(Boolean).join(', ');
+                    var strength = g.strength === 'pp' ? ' 🔺 AN' : g.strength === 'sh' ? ' 🔻 INF' : g.strength === 'en' ? ' ⬛ FD' : '';
+                    return React.createElement("div", { key: i, style: { display: "flex", alignItems: "flex-start", gap: 10, padding: "8px 0", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
+                      /* Temps + période */
+                      React.createElement("div", { style: { minWidth: 38, textAlign: "center", flexShrink: 0 } },
+                        React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: col } }, g.time),
+                      ),
+                      /* Icône de rondelle */
+                      React.createElement("div", { style: { width: 28, height: 28, borderRadius: "50%", background: col, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 } },
+                        React.createElement("span", { style: { fontSize: 14 } }, "🏒")
+                      ),
+                      /* Détails */
+                      React.createElement("div", { style: { flex: 1 } },
+                        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" } },
+                          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 900, color: "#111" } }, g.scorer),
+                          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: col, borderRadius: 3, padding: "1px 5px" } }, teamAb),
+                          strength && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#888" } }, strength)
+                        ),
+                        assists && React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#888", marginTop: 2 } }, "Passes : " + assists),
+                        React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#ccc", marginTop: 2 } },
+                          g.awayScore !== undefined ? (boxscore.data.awayTeam&&boxscore.data.awayTeam.abbrev||'VIS') + " " + g.awayScore + " – " + g.homeScore + " " + (boxscore.data.homeTeam&&boxscore.data.homeTeam.abbrev||'DOM') : ""
+                        )
+                      )
+                    );
+                  })
+                );
+              });
+            })()
           ),
           /* Stats skateurs par équipe */
           [['awayTeam', ac.bg], ['homeTeam', hc.bg]].map(function(info) {
