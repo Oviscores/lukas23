@@ -6692,15 +6692,13 @@ function AllArticlesPage({ arts, onArticleClick, onBack }) {
 
 function ZoneUS() {
     const [menuOpen, setMenuOpen] = React.useState(false);
-  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
-  React.useEffect(function() { 
-    window.__zoneus_refresh__ = forceUpdate; 
+  React.useEffect(function() {
     function onHashChange() {
       var h = window.location.hash.slice(1);
       _setPage(h && h !== 'home' ? h : 'home');
     }
     window.addEventListener('hashchange', onHashChange);
-    return function() { delete window.__zoneus_refresh__; window.removeEventListener('hashchange', onHashChange); }; 
+    return function() { window.removeEventListener('hashchange', onHashChange); };
   }, []);
   const [arts, setArts] = useState(ARTICLES);
   var _saa = React.useState(false); var showAllArts = _saa[0], setShowAllArts = _saa[1];
