@@ -4993,28 +4993,28 @@ function MatchPage({ match, onBack }) {
           var isOT = boxscore.data.gameOutcome && boxscore.data.gameOutcome.lastPeriodType === 'OT';
           var isSO = boxscore.data.gameOutcome && boxscore.data.gameOutcome.lastPeriodType === 'SO';
           return React.createElement("div", { style: { marginBottom: 14 } },
-            /* Score résumé : VIS X – Y DOM (Tirs) */
+            /* Score résumé : DOM X – Y VIS (Tirs) */
             React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: "1px solid #f0f0f0" } },
-              /* Visiteur */
+              /* Domicile */
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, flex: 1 } },
-                getTeamLogo(at.abbrev, matchData.lg, 32),
+                getTeamLogo(ht.abbrev, matchData.lg, 32),
                 React.createElement("div", null,
-                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#111" } }, at.abbrev || ''),
-                  React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#aaa" } }, at.sog + " tirs")
+                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#111" } }, ht.abbrev || ''),
+                  React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#aaa" } }, ht.sog + " tirs")
                 )
               ),
               /* Score central */
               React.createElement("div", { style: { textAlign: "center", padding: "0 16px" } },
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 32, fontWeight: 900, color: "#111", letterSpacing: 4, lineHeight: 1 } }, at.score + " – " + ht.score),
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 32, fontWeight: 900, color: "#111", letterSpacing: 4, lineHeight: 1 } }, ht.score + " – " + at.score),
                 (isOT || isSO) && React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#e67e22", marginTop: 2 } }, isSO ? "TIRS DE BARRAGE" : "PROLONGATION")
               ),
-              /* Domicile */
+              /* Visiteur */
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, flex: 1, justifyContent: "flex-end" } },
                 React.createElement("div", { style: { textAlign: "right" } },
-                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#111" } }, ht.abbrev || ''),
-                  React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#aaa" } }, ht.sog + " tirs")
+                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#111" } }, at.abbrev || ''),
+                  React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#aaa" } }, at.sog + " tirs")
                 ),
-                getTeamLogo(ht.abbrev, matchData.lg, 32)
+                getTeamLogo(at.abbrev, matchData.lg, 32)
               )
             ),
             /* Buts — une ligne par but (AVANT les stats) */
