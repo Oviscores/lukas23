@@ -4717,12 +4717,16 @@ function MatchPage({ match, onBack }) {
   }, [matchData.id, matchData.eventId]);
   const lc = LG[matchData.lg].color;
   const dk = LG[matchData.lg].dark;
-  const hk = matchData.homeTeam + "_" + matchData.lg;
-  const ak = matchData.awayTeam + "_" + matchData.lg;
+  const _bsHome = boxscore && boxscore.data && boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev;
+  const _bsAway = boxscore && boxscore.data && boxscore.data.awayTeam && boxscore.data.awayTeam.abbrev;
+  const _homeAb = matchData.homeTeam || _bsHome || '';
+  const _awayAb = matchData.awayTeam || _bsAway || '';
+  const hk = _homeAb + "_" + matchData.lg;
+  const ak = _awayAb + "_" + matchData.lg;
   const hc = TC[hk] || { bg: lc, fg: "#fff" };
   const ac = TC[ak] || { bg: "#333", fg: "#fff" };
-  const hName = TEAM_NAMES[hk] || matchData.homeTeam;
-  const aName = TEAM_NAMES[ak] || matchData.awayTeam;
+  const hName = TEAM_NAMES[hk] || _homeAb;
+  const aName = TEAM_NAMES[ak] || _awayAb;
   const h2hKey = matchData.awayTeam + "-" + matchData.homeTeam;
   const h2hKeyAlt = matchData.homeTeam + "-" + matchData.awayTeam;
   const h2h = H2H[h2hKey] || H2H[h2hKeyAlt] || { wins: [0, 0], last5: [], avgGoals: 0 };
@@ -5013,6 +5017,43 @@ function MatchPage({ match, onBack }) {
                 getTeamLogo(ht.abbrev, matchData.lg, 32)
               )
             ),
+            /* Buts — une ligne par but (AVANT les stats) */
+            boxscore.goals && boxscore.goals.length > 0 && React.createElement("div", { style: { padding: "12px 16px 14px", borderBottom: "1px solid #f0f0f0" } },
+              React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.12em", color: "#bbb", marginBottom: 10 } }, "BUTS DU MATCH"),
+              (function() {
+                var periodOrder = ['P1','P2','P3','PR','TB'];
+                var periodLabel = { 'P1': '1re période', 'P2': '2e période', 'P3': '3e période', 'PR': 'Prolongation', 'TB': 'Tirs de barrage' };
+                var periods = {};
+                boxscore.goals.forEach(function(g) { if (!periods[g.period]) periods[g.period] = []; periods[g.period].push(g); });
+                return periodOrder.filter(function(p) { return periods[p]; }).map(function(p) {
+                  return React.createElement("div", { key: p, style: { marginBottom: 14 } },
+                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
+                      React.createElement("div", { style: { flex: 1, height: 1, background: "#f0f0f0" } }),
+                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#ccc", letterSpacing: "0.1em" } }, (periodLabel[p] || p).toUpperCase()),
+                      React.createElement("div", { style: { flex: 1, height: 1, background: "#f0f0f0" } })
+                    ),
+                    periods[p].map(function(g, i) {
+                      var isHome = g.teamId === g.homeTeamId;
+                      var col = isHome ? hc.bg : ac.bg;
+                      var teamAb = isHome ? (boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) : (boxscore.data.awayTeam && boxscore.data.awayTeam.abbrev);
+                      var assists = [g.assist1, g.assist2].filter(Boolean).join(', ');
+                      var tag = g.strength === 'pp' ? 'AN' : g.strength === 'sh' ? 'INF' : g.strength === 'en' ? 'FD' : '';
+                      return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "8px 4px", borderBottom: i < periods[p].length-1 ? "1px solid #f5f5f5" : "none" } },
+                        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#aaa", minWidth: 34, flexShrink: 0 } }, g.time),
+                        getTeamLogo(teamAb, matchData.lg, 22),
+                        tag && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: col, background: col + "18", borderRadius: 2, padding: "1px 4px", flexShrink: 0 } }, tag),
+                        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: "#111", flex: 1 } },
+                          g.scorer,
+                          assists ? React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 400, color: "#888" } }, "  (" + assists + ")") : null
+                        ),
+                        g.awayScore !== undefined && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#ddd", flexShrink: 0 } }, g.awayScore + "–" + g.homeScore)
+                      );
+                    })
+                  );
+                });
+              })()
+            ),
+
             /* Stats joueurs NHL */
             boxscore.data.playerByGameStats && (function() {
               var sides = [
@@ -5110,48 +5151,6 @@ function MatchPage({ match, onBack }) {
               );
             })(),
 
-            /* Buts — une ligne par but */
-            boxscore.goals && boxscore.goals.length > 0 && React.createElement("div", { style: { padding: "12px 16px 14px" } },
-              React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.12em", color: "#bbb", marginBottom: 10 } }, "BUTS DU MATCH"),
-              (function() {
-                var periodOrder = ['P1','P2','P3','PR','TB'];
-                var periodLabel = { 'P1': '1re période', 'P2': '2e période', 'P3': '3e période', 'PR': 'Prolongation', 'TB': 'Tirs de barrage' };
-                var periods = {};
-                boxscore.goals.forEach(function(g) { if (!periods[g.period]) periods[g.period] = []; periods[g.period].push(g); });
-                return periodOrder.filter(function(p) { return periods[p]; }).map(function(p) {
-                  return React.createElement("div", { key: p, style: { marginBottom: 14 } },
-                    /* Séparateur période */
-                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
-                      React.createElement("div", { style: { flex: 1, height: 1, background: "#f0f0f0" } }),
-                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#ccc", letterSpacing: "0.1em" } }, (periodLabel[p] || p).toUpperCase()),
-                      React.createElement("div", { style: { flex: 1, height: 1, background: "#f0f0f0" } })
-                    ),
-                    periods[p].map(function(g, i) {
-                      var isHome = g.teamId === g.homeTeamId;
-                      var col = isHome ? hc.bg : ac.bg;
-                      var teamAb = isHome ? ht.abbrev : at.abbrev;
-                      var assists = [g.assist1, g.assist2].filter(Boolean).join(', ');
-                      var tag = g.strength === 'pp' ? 'AN' : g.strength === 'sh' ? 'INF' : g.strength === 'en' ? 'FD' : '';
-                      return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "8px 4px", borderBottom: i < periods[p].length-1 ? "1px solid #f5f5f5" : "none" } },
-                        /* Temps */
-                        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#aaa", minWidth: 34, flexShrink: 0 } }, g.time),
-                        /* Logo équipe */
-                        getTeamLogo(teamAb, matchData.lg, 22),
-                        /* Tag force */
-                        tag && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: col, background: col + "18", borderRadius: 2, padding: "1px 4px", flexShrink: 0 } }, tag),
-                        /* Buteur (passeurs) */
-                        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: "#111", flex: 1 } },
-                          g.scorer,
-                          assists ? React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 400, color: "#888" } }, "  (" + assists + ")") : null
-                        ),
-                        /* Score progressif */
-                        g.awayScore !== undefined && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#ddd", flexShrink: 0 } }, g.awayScore + "–" + g.homeScore)
-                      );
-                    })
-                  );
-                });
-              })()
-            )
           );
         })(),
 
