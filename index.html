@@ -3599,9 +3599,14 @@ function MatchScoreInArticle({ matchId, matchLg }) {
         });
         setBx(boxData); setGoals(goalsList); setLoading(false);
       }).catch(function(){setLoading(false);});
+    } else if (matchLg === 'MLB') {
+      var mlbId = (matchId+'').replace('mlb_','');
+      fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_boxscore&gamePk=' + mlbId)
+        .then(function(r){return r.json();})
+        .then(function(d){setBx(d.liveData||d);setLoading(false);})
+        .catch(function(){setLoading(false);});
     } else {
-      var url = matchLg === 'NFL' ? 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + matchId
-        : 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/summary?event=' + matchId;
+      var url = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + matchId;
       fetch(url).then(function(r){return r.json();}).then(function(d){setBx(d);setLoading(false);}).catch(function(){setLoading(false);});
     }
   }, [matchId]);
@@ -3663,6 +3668,85 @@ function MatchScoreInArticle({ matchId, matchLg }) {
                 g.awayScore !== undefined && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#ccc", flexShrink: 0 } }, g.homeScore+"–"+g.awayScore)
               );
             })
+          );
+        })
+      )
+    );
+  }
+
+  /* ── Rendu MLB ── */
+  if (matchLg === 'MLB' && bx.linescore) {
+    var ls = bx.linescore;
+    var mlbHome = bx.boxscore && bx.boxscore.teams && bx.boxscore.teams.home;
+    var mlbAway = bx.boxscore && bx.boxscore.teams && bx.boxscore.teams.away;
+    var mlbHomeAb = mlbHome && mlbHome.team && mlbHome.team.abbreviation || '';
+    var mlbAwayAb = mlbAway && mlbAway.team && mlbAway.team.abbreviation || '';
+    var hkM = mlbHomeAb+'_MLB'; var akM = mlbAwayAb+'_MLB';
+    var hColM = TC[hkM]||{bg:'#333',fg:'#fff'}; var aColM = TC[akM]||{bg:'#555',fg:'#fff'};
+    var innings = ls.innings || [];
+    var scoring = (bx.plays && bx.plays.allPlays || []).filter(function(p){ return p.result && p.result.type === 'atBat' && p.about && p.about.isScoringPlay; });
+    return React.createElement("div", { style: { background: "rgba(255,255,255,0.9)", borderRadius: 8, overflow: "hidden", marginTop: 24 } },
+      React.createElement("div", { style: { background: lc, padding: "10px 14px" } },
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff" } }, "RÉSULTAT")
+      ),
+      /* Score + logos */
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-around", alignItems: "center", padding: "16px 24px", background: "#111" } },
+        React.createElement("div", { style: { textAlign: "center" } },
+          getTeamLogo(mlbHomeAb, 'MLB', 52),
+          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 36, marginTop: 4 } }, ls.home&&ls.home.runs||'0')
+        ),
+        React.createElement("div", { style: { textAlign: "center" } },
+          React.createElement("div", { style: { color: "rgba(255,255,255,0.4)", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 700 } }, "FINAL"),
+          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 42, letterSpacing: 6, lineHeight: 1 } }, (ls.home&&ls.home.runs||'0') + ' – ' + (ls.away&&ls.away.runs||'0'))
+        ),
+        React.createElement("div", { style: { textAlign: "center" } },
+          getTeamLogo(mlbAwayAb, 'MLB', 52),
+          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 36, marginTop: 4 } }, ls.away&&ls.away.runs||'0')
+        )
+      ),
+      /* Tableau des manches */
+      innings.length > 0 && React.createElement("div", { style: { overflowX: "auto", background: "#fff", padding: "10px 12px" } },
+        React.createElement("table", { style: { width: "100%", borderCollapse: "collapse", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } },
+          React.createElement("thead", null,
+            React.createElement("tr", { style: { background: "#f5f5f5" } },
+              React.createElement("th", { style: { padding: "4px 8px", textAlign: "left", fontWeight: 800, color: "#555" } }, ""),
+              innings.map(function(inn,i){ return React.createElement("th", { key: i, style: { padding: "4px 6px", textAlign: "center", fontWeight: 700, color: "#888", minWidth: 24 } }, inn.num); }),
+              React.createElement("th", { style: { padding: "4px 8px", textAlign: "center", fontWeight: 900, color: lc } }, "R"),
+              React.createElement("th", { style: { padding: "4px 8px", textAlign: "center", fontWeight: 800, color: "#555" } }, "H"),
+              React.createElement("th", { style: { padding: "4px 8px", textAlign: "center", fontWeight: 800, color: "#555" } }, "E")
+            )
+          ),
+          React.createElement("tbody", null,
+            [['home', mlbHomeAb, hColM], ['away', mlbAwayAb, aColM]].map(function(row) {
+              var side = row[0], ab = row[1], col = row[2];
+              return React.createElement("tr", { key: side, style: { borderTop: "1px solid #f0f0f0" } },
+                React.createElement("td", { style: { padding: "5px 8px", fontWeight: 900, color: col.bg, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12 } }, ab),
+                innings.map(function(inn,i){
+                  var runs = inn[side]&&inn[side].runs!==undefined ? inn[side].runs : '–';
+                  return React.createElement("td", { key: i, style: { padding: "5px 6px", textAlign: "center", color: runs>0?"#111":"#aaa" } }, runs);
+                }),
+                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontWeight: 900, color: lc } }, ls[side]&&ls[side].runs),
+                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, ls[side]&&ls[side].hits),
+                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, ls[side]&&ls[side].errors)
+              );
+            })
+          )
+        )
+      ),
+      /* Plays marquants */
+      scoring.length > 0 && React.createElement("div", { style: { background: "#fff", borderTop: "1px solid #f0f0f0" } },
+        React.createElement("div", { style: { background: "#111", padding: "6px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "ACTIONS MARQUANTES"),
+        scoring.map(function(play, i) {
+          var ab = play.result && play.result.awayScore !== undefined;
+          return React.createElement("div", { key: i, style: { display: "flex", gap: 8, padding: "7px 12px", borderBottom: "1px solid #f5f5f5", alignItems: "flex-start", background: i%2===0?"#fff":"#fafafa" } },
+            React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", minWidth: 28, gap: 1 } },
+              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: "#fff", background: lc, borderRadius: 3, padding: "1px 4px" } }, "M"+( play.about&&play.about.inning||'')),
+              React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "#aaa" } }, play.about&&play.about.halfInning==='top'?'▲':'▼')
+            ),
+            React.createElement("div", { style: { flex: 1 } },
+              React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 12, color: "#111", lineHeight: 1.4 } }, play.result&&play.result.description||''),
+              ab && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#555", background: "#f0f0f0", borderRadius: 2, padding: "1px 5px", marginTop: 2, display: "inline-block" } }, (play.result.awayScore||0)+" – "+(play.result.homeScore||0))
+            )
           );
         })
       )
