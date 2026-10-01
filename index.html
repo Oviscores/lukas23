@@ -5013,6 +5013,103 @@ function MatchPage({ match, onBack }) {
                 getTeamLogo(ht.abbrev, matchData.lg, 32)
               )
             ),
+            /* Stats joueurs NHL */
+            boxscore.data.playerByGameStats && (function() {
+              var sides = [
+                { key: 'awayTeam', team: at, col: ac },
+                { key: 'homeTeam', team: ht, col: hc }
+              ];
+              var thStyle = { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#bbb", padding: "6px 8px", textAlign: "center", letterSpacing: "0.05em", borderBottom: "2px solid #f0f0f0", whiteSpace: "nowrap" };
+              var thLStyle = Object.assign({}, thStyle, { textAlign: "left" });
+              var tdStyle = { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#333", padding: "6px 8px", textAlign: "center", borderBottom: "1px solid #f5f5f5" };
+              var tdLStyle = Object.assign({}, tdStyle, { textAlign: "left", fontWeight: 800, color: "#111" });
+              function fmtTOI(t) { if (!t) return '—'; var parts = t.split(':'); if (parts.length === 3) return parts[0]+':'+parts[1]; return t; }
+              return React.createElement("div", { style: { borderTop: "1px solid #f0f0f0" } },
+                sides.map(function(side) {
+                  var ps = boxscore.data.playerByGameStats[side.key];
+                  if (!ps) return null;
+                  var forwards = (ps.forwards || []);
+                  var defense = (ps.defense || []);
+                  var skaters = forwards.concat(defense);
+                  var goalies = ps.goalies || [];
+                  return React.createElement("div", { key: side.key },
+                    /* Header équipe */
+                    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, padding: "10px 16px 8px", background: side.col.bg + "10", borderTop: "2px solid " + side.col.bg } },
+                      getTeamLogo(side.team.abbrev, matchData.lg, 22),
+                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: side.col.bg, letterSpacing: "0.08em" } }, side.team.abbrev || '')
+                    ),
+                    /* Tableau patineurs */
+                    skaters.length > 0 && React.createElement("div", { style: { overflowX: "auto" } },
+                      React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
+                        React.createElement("thead", null,
+                          React.createElement("tr", null,
+                            React.createElement("th", { style: Object.assign({}, thLStyle, { paddingLeft: 16, minWidth: 120 }) }, "PATINEUR"),
+                            React.createElement("th", { style: thStyle }, "G"),
+                            React.createElement("th", { style: thStyle }, "A"),
+                            React.createElement("th", { style: Object.assign({}, thStyle, { color: side.col.bg }) }, "PTS"),
+                            React.createElement("th", { style: thStyle }, "+/-"),
+                            React.createElement("th", { style: thStyle }, "TIR"),
+                            React.createElement("th", { style: thStyle }, "BL"),
+                            React.createElement("th", { style: thStyle }, "TPS")
+                          )
+                        ),
+                        React.createElement("tbody", null,
+                          skaters.map(function(p, i) {
+                            var s = p;
+                            var pm = (s.plusMinus || 0) > 0 ? '+' + s.plusMinus : (s.plusMinus || 0);
+                            var pts = (s.goals || 0) + (s.assists || 0);
+                            return React.createElement("tr", { key: i, style: { background: i % 2 === 0 ? "#fff" : "#fafafa" } },
+                              React.createElement("td", { style: Object.assign({}, tdLStyle, { paddingLeft: 16 }) },
+                                (s.name && s.name.default) || s.lastName || '—'
+                              ),
+                              React.createElement("td", { style: tdStyle }, s.goals || 0),
+                              React.createElement("td", { style: tdStyle }, s.assists || 0),
+                              React.createElement("td", { style: Object.assign({}, tdStyle, { fontWeight: 900, color: pts > 0 ? side.col.bg : "#333" }) }, pts || 0),
+                              React.createElement("td", { style: Object.assign({}, tdStyle, { color: (s.plusMinus || 0) > 0 ? "#16a34a" : (s.plusMinus || 0) < 0 ? "#dc2626" : "#aaa" }) }, pm),
+                              React.createElement("td", { style: tdStyle }, s.shots || 0),
+                              React.createElement("td", { style: tdStyle }, s.blockedShots || 0),
+                              React.createElement("td", { style: tdStyle }, fmtTOI(s.toi))
+                            );
+                          })
+                        )
+                      )
+                    ),
+                    /* Tableau gardiens */
+                    goalies.length > 0 && React.createElement("div", { style: { overflowX: "auto", borderTop: "1px solid #f0f0f0" } },
+                      React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
+                        React.createElement("thead", null,
+                          React.createElement("tr", null,
+                            React.createElement("th", { style: Object.assign({}, thLStyle, { paddingLeft: 16 }) }, "GARDIEN"),
+                            React.createElement("th", { style: thStyle }, "TIR"),
+                            React.createElement("th", { style: thStyle }, "BA"),
+                            React.createElement("th", { style: Object.assign({}, thStyle, { color: side.col.bg }) }, "%ARR"),
+                            React.createElement("th", { style: thStyle }, "TPS")
+                          )
+                        ),
+                        React.createElement("tbody", null,
+                          goalies.map(function(g, i) {
+                            var sa = g.shotsAgainst || 0;
+                            var ga = g.goalsAgainst || 0;
+                            var sv = sa - ga;
+                            var pct = sa > 0 ? (sv / sa).toFixed(3).replace('0.', '.') : '—';
+                            return React.createElement("tr", { key: i, style: { background: "#fff" } },
+                              React.createElement("td", { style: Object.assign({}, tdLStyle, { paddingLeft: 16 }) },
+                                (g.name && g.name.default) || g.lastName || '—'
+                              ),
+                              React.createElement("td", { style: tdStyle }, sa),
+                              React.createElement("td", { style: tdStyle }, ga),
+                              React.createElement("td", { style: Object.assign({}, tdStyle, { fontWeight: 900, color: side.col.bg }) }, pct),
+                              React.createElement("td", { style: tdStyle }, fmtTOI(g.toi))
+                            );
+                          })
+                        )
+                      )
+                    )
+                  );
+                })
+              );
+            })(),
+
             /* Buts — une ligne par but */
             boxscore.goals && boxscore.goals.length > 0 && React.createElement("div", { style: { padding: "12px 16px 14px" } },
               React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.12em", color: "#bbb", marginBottom: 10 } }, "BUTS DU MATCH"),
