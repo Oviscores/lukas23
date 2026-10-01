@@ -3675,23 +3675,24 @@ function MatchScoreInArticle({ matchId, matchLg }) {
   }
 
   /* ── Rendu MLB ── */
-  if (matchLg === 'MLB' && bx.linescore) {
-    var ls = bx.linescore;
-    var mlbHome = bx.boxscore && bx.boxscore.teams && bx.boxscore.teams.home;
-    var mlbAway = bx.boxscore && bx.boxscore.teams && bx.boxscore.teams.away;
-    var mlbHomeAb = mlbHome && mlbHome.team && mlbHome.team.abbreviation || '';
-    var mlbAwayAb = mlbAway && mlbAway.team && mlbAway.team.abbreviation || '';
+  if (matchLg === 'MLB') {
+    /* Le proxy peut retourner la réponse complète {liveData,gameData} ou directement liveData */
+    var mlbFull = bx.liveData ? bx : null;
+    var mlbLive = bx.liveData || bx;
+    var ls = mlbLive.linescore || null;
+    if (!ls) return null;
+    var mlbHomeAb = (mlbFull && mlbFull.gameData && mlbFull.gameData.teams && mlbFull.gameData.teams.home && mlbFull.gameData.teams.home.abbreviation) || (bx.teams && bx.teams.home && bx.teams.home.team && bx.teams.home.team.abbreviation) || '';
+    var mlbAwayAb = (mlbFull && mlbFull.gameData && mlbFull.gameData.teams && mlbFull.gameData.teams.away && mlbFull.gameData.teams.away.abbreviation) || (bx.teams && bx.teams.away && bx.teams.away.team && bx.teams.away.team.abbreviation) || '';
     var hkM = mlbHomeAb+'_MLB'; var akM = mlbAwayAb+'_MLB';
     var hColM = TC[hkM]||{bg:'#333',fg:'#fff'}; var aColM = TC[akM]||{bg:'#555',fg:'#fff'};
     var innings = ls.innings || [];
-    /* runs: API MLB retourne soit ls.teams.home.runs soit ls.home.runs selon l'endpoint */
-    var homeRuns = (ls.teams&&ls.teams.home&&ls.teams.home.runs!==undefined) ? ls.teams.home.runs : (ls.home&&ls.home.runs!==undefined ? ls.home.runs : null);
-    var awayRuns = (ls.teams&&ls.teams.away&&ls.teams.away.runs!==undefined) ? ls.teams.away.runs : (ls.away&&ls.away.runs!==undefined ? ls.away.runs : null);
-    var homeHits = (ls.teams&&ls.teams.home&&ls.teams.home.hits!==undefined) ? ls.teams.home.hits : (ls.home&&ls.home.hits!==undefined ? ls.home.hits : null);
-    var awayHits = (ls.teams&&ls.teams.away&&ls.teams.away.hits!==undefined) ? ls.teams.away.hits : (ls.away&&ls.away.hits!==undefined ? ls.away.hits : null);
-    var homeErrors = (ls.teams&&ls.teams.home&&ls.teams.home.errors!==undefined) ? ls.teams.home.errors : (ls.home&&ls.home.errors!==undefined ? ls.home.errors : null);
-    var awayErrors = (ls.teams&&ls.teams.away&&ls.teams.away.errors!==undefined) ? ls.teams.away.errors : (ls.away&&ls.away.errors!==undefined ? ls.away.errors : null);
-    var scoring = (bx.plays && bx.plays.allPlays || []).filter(function(p){ return p.result && p.result.type === 'atBat' && p.about && p.about.isScoringPlay; });
+    var homeRuns = (ls.teams&&ls.teams.home&&ls.teams.home.runs!==undefined) ? ls.teams.home.runs : null;
+    var awayRuns = (ls.teams&&ls.teams.away&&ls.teams.away.runs!==undefined) ? ls.teams.away.runs : null;
+    var homeHits = (ls.teams&&ls.teams.home&&ls.teams.home.hits!==undefined) ? ls.teams.home.hits : null;
+    var awayHits = (ls.teams&&ls.teams.away&&ls.teams.away.hits!==undefined) ? ls.teams.away.hits : null;
+    var homeErrors = (ls.teams&&ls.teams.home&&ls.teams.home.errors!==undefined) ? ls.teams.home.errors : null;
+    var awayErrors = (ls.teams&&ls.teams.away&&ls.teams.away.errors!==undefined) ? ls.teams.away.errors : null;
+    var scoring = (mlbLive.plays && mlbLive.plays.allPlays || []).filter(function(p){ return p.result && p.result.type === 'atBat' && p.about && p.about.isScoringPlay; });
     return React.createElement("div", { style: { background: "rgba(255,255,255,0.9)", borderRadius: 8, overflow: "hidden", marginTop: 24 } },
       React.createElement("div", { style: { background: lc, padding: "10px 14px" } },
         React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff" } }, "RÉSULTAT")
