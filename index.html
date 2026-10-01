@@ -4670,7 +4670,7 @@ function MatchPage({ match, onBack }) {
             data = await r3.json();
             if (data && data.gameState) {
               /* Enrichit match avec homeTeam/awayTeam depuis l'API si absents */
-              if (!matchData.homeTeam && data.homeTeam && data.homeTeam.abbrev) {
+              if (data.homeTeam && data.homeTeam.abbrev) {
                 setMatchData(function(prev) { return Object.assign({}, prev, { homeTeam: data.homeTeam.abbrev, awayTeam: data.awayTeam.abbrev, homeScore: data.homeTeam.score, awayScore: data.awayTeam.score, status: data.gameState === 'OFF' ? 'FINAL' : data.gameState === 'LIVE' ? 'LIVE' : 'UPCOMING' }); });
               }
               /* Fetch play-by-play pour les buts */
