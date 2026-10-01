@@ -6732,10 +6732,15 @@ function ZoneUS() {
     return function() { window.removeEventListener('popstate', onPop); };
   }, []);
   /* Résolution de l'article depuis le slug — seulement quand arts se charge */
+  var _artResolved = React.useRef(false);
   React.useEffect(function() {
     var params = new URLSearchParams(window.location.search);
     var artSlug = params.get('article');
-    if (artSlug && arts.length > 1) { var found = arts.find(function(a) { var s = a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); return s === artSlug; }); if (found) setSelArticle(found); }
+    if (artSlug && arts.length > 1 && !_artResolved.current) {
+      var found = arts.find(function(a) { var s = a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); return s === artSlug; });
+      if (found) { _artResolved.current = true; setSelArticle(found); }
+    }
+    if (!params.get('article')) { _artResolved.current = false; }
   }, [arts]);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
