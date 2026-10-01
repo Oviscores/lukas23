@@ -4825,26 +4825,30 @@ function MatchPage({ match, onBack }) {
   var _bx = React.useState(null); var boxscore = _bx[0], setBoxscore = _bx[1];
   var _bl = React.useState(false); var bxLoading = _bl[0], setBxLoading = _bl[1];
   var _matchData = React.useState(match); var matchData = _matchData[0], setMatchData = _matchData[1];
-  React.useEffect(function() { setMatchData(match); }, [match.id]);
+  var _enriched = React.useRef(false);
   React.useEffect(function() {
+    _enriched.current = false;
+    setMatchData(match);
     setBoxscore(null);
     setBxLoading(true);
+    var matchId = match.id; var matchLg = match.lg; var matchEventId = match.eventId;
     (async function() {
       try {
         var data = null;
-        if (matchData.lg === 'MLB' && matchData.id) {
-          var gamePk = matchData.id.replace('mlb_', '');
+        if (matchLg === 'MLB' && matchId) {
+          var gamePk = (matchId+'').replace('mlb_', '');
           var r = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_boxscore&gamePk=' + gamePk);
           data = await r.json();
           if (data && data.liveData) setBoxscore({ type: 'MLB', data: data.liveData });
-        } else if (matchData.lg === 'NHL') {
-          var nhlId = (matchData.id+'').replace('nhl_','');
+        } else if (matchLg === 'NHL') {
+          var nhlId = (matchId+'').replace('nhl_','');
           if (nhlId) {
             var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId);
             data = await r3.json();
             if (data && data.gameState) {
               /* Enrichit match avec homeTeam/awayTeam depuis l'API si absents */
-              if (data.homeTeam && data.homeTeam.abbrev) {
+              if (data.homeTeam && data.homeTeam.abbrev && !_enriched.current) {
+                _enriched.current = true;
                 setMatchData(function(prev) { return Object.assign({}, prev, { homeTeam: data.homeTeam.abbrev, awayTeam: data.awayTeam.abbrev, homeScore: data.homeTeam.score, awayScore: data.awayTeam.score, status: data.gameState === 'OFF' ? 'FINAL' : data.gameState === 'LIVE' ? 'LIVE' : 'UPCOMING' }); });
               }
               /* Fetch play-by-play pour les buts */
@@ -4853,42 +4857,27 @@ function MatchPage({ match, onBack }) {
               try {
                 var pbpResp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_pbp&gameId=' + nhlId);
                 var pbpData = await pbpResp.json();
-                /* Construire map playerId -> nom */
                 (pbpData.rosterSpots || []).forEach(function(rs) {
                   rosterMap[rs.playerId] = (rs.firstName && rs.firstName.default ? rs.firstName.default.charAt(0) + '. ' : '') + (rs.lastName && rs.lastName.default ? rs.lastName.default : '');
                 });
-                /* Extraire les buts */
                 goals = (pbpData.plays || []).filter(function(p) { return p.typeDescKey === 'goal'; }).map(function(p) {
                   var d = p.details || {};
                   var periodLabel = p.periodDescriptor && p.periodDescriptor.number <= 3 ? 'P' + p.periodDescriptor.number : p.periodDescriptor && p.periodDescriptor.periodType === 'OT' ? 'PR' : p.periodDescriptor && p.periodDescriptor.periodType === 'SO' ? 'TB' : 'P' + (p.periodDescriptor && p.periodDescriptor.number);
-                  return {
-                    time: p.timeInPeriod || '',
-                    period: periodLabel,
-                    scorer: rosterMap[d.scoringPlayerId] || '',
-                    assist1: rosterMap[d.assist1PlayerId] || '',
-                    assist2: rosterMap[d.assist2PlayerId] || '',
-                    teamId: d.eventOwnerTeamId,
-                    homeTeamId: data.homeTeam && data.homeTeam.id,
-                    awayTeamId: data.awayTeam && data.awayTeam.id,
-                    goalType: d.shotType || '',
-                    strength: d.strength || '',
-                    homeScore: d.homeScore,
-                    awayScore: d.awayScore,
-                  };
+                  return { time: p.timeInPeriod || '', period: periodLabel, scorer: rosterMap[d.scoringPlayerId] || '', assist1: rosterMap[d.assist1PlayerId] || '', assist2: rosterMap[d.assist2PlayerId] || '', teamId: d.eventOwnerTeamId, homeTeamId: data.homeTeam && data.homeTeam.id, awayTeamId: data.awayTeam && data.awayTeam.id, goalType: d.shotType || '', strength: d.strength || '', homeScore: d.homeScore, awayScore: d.awayScore };
                 });
               } catch(pbpErr) { console.log('pbp error', pbpErr); }
               setBoxscore({ type: 'NHL', data: data, goals: goals });
             }
           }
-        } else if (matchData.lg === 'NFL') {
-          var _rawId = matchData.eventId || matchData.id || '';
+        } else if (matchLg === 'NFL') {
+          var _rawId = matchEventId || matchId || '';
           var _cleanId = (_rawId+'').replace('nfl_','');
           if (_cleanId) { var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId); data = await r2.json(); if (data && data.boxscore) setBoxscore({ type: 'NFL', data: data }); }
         }
       } catch(e) { console.log('boxscore error:', e); }
       setBxLoading(false);
     })();
-  }, [match.id, match.eventId]);
+  }, [match.id]);
   const lc = LG[matchData.lg].color;
   const dk = LG[matchData.lg].dark;
   const _bsHome = (boxscore && boxscore.data && boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) || '';
