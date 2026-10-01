@@ -5127,6 +5127,36 @@ function MatchPage({ match, onBack }) {
             })
           )
         ),
+        /* MLB Scoring Plays */
+        !bxLoading && boxscore && boxscore.type === 'MLB' && (function() {
+          var allPlays = boxscore.data.plays && boxscore.data.plays.allPlays || [];
+          var scoring = allPlays.filter(function(p){ return p.result && p.result.type === 'atBat' && p.about && p.about.isScoringPlay; });
+          if (!scoring.length) return null;
+          var mlbHome = boxscore.data.boxscore && boxscore.data.boxscore.teams && boxscore.data.boxscore.teams.home;
+          var mlbAway = boxscore.data.boxscore && boxscore.data.boxscore.teams && boxscore.data.boxscore.teams.away;
+          var mlbHomeAb = mlbHome && mlbHome.team && mlbHome.team.abbreviation || matchData.homeTeam || '';
+          var mlbAwayAb = mlbAway && mlbAway.team && mlbAway.team.abbreviation || matchData.awayTeam || '';
+          var mlbHomeId = mlbHome && mlbHome.team && mlbHome.team.id;
+          return React.createElement("div", { style: { marginBottom: 14, background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)" } },
+            React.createElement("div", { style: { background: "#111", padding: "8px 16px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "ACTIONS MARQUANTES"),
+            scoring.map(function(play, i) {
+              var playTeamId = play.team && play.team.id;
+              var isScoringHome = playTeamId && mlbHomeId ? String(playTeamId) === String(mlbHomeId) : play.about && play.about.halfInning === 'bottom';
+              var scoringAb = isScoringHome ? mlbHomeAb : mlbAwayAb;
+              return React.createElement("div", { key: i, style: { display: "flex", gap: 10, padding: "8px 14px", borderBottom: "1px solid rgba(0,0,0,0.05)", alignItems: "flex-start", background: i%2===0 ? "#fff" : "#fafafa" } },
+                React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", minWidth: 32, gap: 2, flexShrink: 0 } },
+                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: lc, borderRadius: 3, padding: "2px 5px" } }, "M"+(play.about&&play.about.inning||'')),
+                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa" } }, play.about&&play.about.halfInning==='top'?'▲':'▼')
+                ),
+                scoringAb ? getTeamLogo(scoringAb, 'MLB', 22) : null,
+                React.createElement("div", { style: { flex: 1 } },
+                  React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 12, color: "#111", lineHeight: 1.5 } }, play.result&&play.result.description||''),
+                  play.result && play.result.awayScore !== undefined && React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#555", background: "#f0f0f0", borderRadius: 2, padding: "1px 5px", marginTop: 2, display: "inline-block" } }, (play.result.awayScore||0)+" – "+(play.result.homeScore||0))
+                )
+              );
+            })
+          );
+        })(),
         /* NFL Scoring Plays */
         !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data.scoringPlays && boxscore.data.scoringPlays.length > 0 && React.createElement("div", { style: { marginBottom: 14, background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden" } },
           React.createElement("div", { style: { background: "#111", padding: "8px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "ACTIONS MARQUANTES"),
