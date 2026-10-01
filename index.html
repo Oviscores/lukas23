@@ -4719,8 +4719,8 @@ function MatchPage({ match, onBack }) {
   const dk = LG[matchData.lg].dark;
   const _bsHome = (boxscore && boxscore.data && boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) || '';
   const _bsAway = (boxscore && boxscore.data && boxscore.data.awayTeam && boxscore.data.awayTeam.abbrev) || '';
-  const _homeAb = matchData.homeTeam || _bsHome;
-  const _awayAb = matchData.awayTeam || _bsAway;
+  const _homeAb = _bsHome || matchData.homeTeam || matchData.home || '';
+  const _awayAb = _bsAway || matchData.awayTeam || matchData.away || '';
   const hk = _homeAb + "_" + matchData.lg;
   const ak = _awayAb + "_" + matchData.lg;
   const hc = TC[hk] || { bg: lc, fg: "#fff" };
@@ -4730,10 +4730,10 @@ function MatchPage({ match, onBack }) {
   const h2hKey = matchData.awayTeam + "-" + matchData.homeTeam;
   const h2hKeyAlt = matchData.homeTeam + "-" + matchData.awayTeam;
   const h2h = H2H[h2hKey] || H2H[h2hKeyAlt] || { wins: [0, 0], last5: [], avgGoals: 0 };
-  const hStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === matchData.homeTeam);
-  const aStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === matchData.awayTeam);
-  const hPlayers = (PLAYERS_DB[matchData.lg] || []).filter((p) => p.team === matchData.homeTeam);
-  const aPlayers = (PLAYERS_DB[matchData.lg] || []).filter((p) => p.team === matchData.awayTeam);
+  const hStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === _homeAb);
+  const aStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === _awayAb);
+  const hPlayers = (PLAYERS_DB[matchData.lg] || []).filter((p) => p.team === _homeAb);
+  const aPlayers = (PLAYERS_DB[matchData.lg] || []).filter((p) => p.team === _awayAb);
   const isLive = matchData.status === "LIVE";
   const isFinal = matchData.status === "FINAL";
   const StatBar = ({ label, home, away, unit = "" }) => {
