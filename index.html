@@ -3603,7 +3603,7 @@ function MatchScoreInArticle({ matchId, matchLg }) {
       var mlbId = (matchId+'').replace('mlb_','');
       fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_boxscore&gamePk=' + mlbId)
         .then(function(r){return r.json();})
-        .then(function(d){setBx(d.liveData||d);setLoading(false);})
+        .then(function(d){setBx(d);setLoading(false);})
         .catch(function(){setLoading(false);});
     } else {
       var url = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + matchId;
