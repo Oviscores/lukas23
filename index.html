@@ -4677,7 +4677,7 @@ function MatchPage({ match, onBack }) {
               var goals = [];
               var rosterMap = {};
               try {
-                var pbpResp = await fetch('https://api-web.nhle.com/v1/gamecenter/' + nhlId + '/play-by-play');
+                var pbpResp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_pbp&gameId=' + nhlId);
                 var pbpData = await pbpResp.json();
                 /* Construire map playerId -> nom */
                 (pbpData.rosterSpots || []).forEach(function(rs) {
