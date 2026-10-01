@@ -3753,7 +3753,7 @@ function MatchScoreInArticle({ matchId, matchLg }) {
         scoring.map(function(play, i) {
           var ab = play.result && play.result.awayScore !== undefined;
           var playTeamId = play.team && play.team.id;
-          var mlbHomeTeamId = mlbHome && mlbHome.team && mlbHome.team.id;
+          var mlbHomeTeamId = (mlbFull && mlbFull.gameData && mlbFull.gameData.teams && mlbFull.gameData.teams.home && mlbFull.gameData.teams.home.id) || null;
           var isScoringHome = playTeamId && mlbHomeTeamId ? String(playTeamId) === String(mlbHomeTeamId) : play.about && play.about.halfInning === 'bottom';
           var scoringAb = isScoringHome ? mlbHomeAb : mlbAwayAb;
           return React.createElement("div", { key: i, style: { display: "flex", gap: 8, padding: "7px 12px", borderBottom: "1px solid #f5f5f5", alignItems: "flex-start", background: i%2===0?"#fff":"#fafafa" } },
