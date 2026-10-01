@@ -7439,7 +7439,7 @@ async function fetchNHLStats() {
   if (window.__NHL_STATS_LOADED__) return;
   window.__NHL_STATS_LOADED__ = true;
   const P = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-  const S = '20252026';
+  const S = '20262027';
   function pp(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(p){var n=(p.firstName&&p.firstName.default||'')+' '+(p.lastName&&p.lastName.default||'');var ab=(p.teamAbbrevs&&p.teamAbbrevs.default)||p.teamAbbrev||'';return{name:n.trim(),ab:ab,val:p.value!==undefined?p.value:0};});}
   function pg(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(g){var n=(g.firstName&&g.firstName.default||'')+' '+(g.lastName&&g.lastName.default||'');var ab=(g.teamAbbrevs&&g.teamAbbrevs.default)||(g.teamAbbrev&&g.teamAbbrev.default)||g.teamAbbrev||'';var v=g.value!==undefined?g.value:0;if(c==='savePctg')v=typeof v==='number'?v.toFixed(3):v;return{name:n.trim(),ab:ab,val:v};});}
   function pt(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(t){return{ab:(t.teamAbbrevs&&t.teamAbbrevs.default)||t.teamAbbrev||'',val:t.value!==undefined?t.value:0};});}
@@ -7605,7 +7605,7 @@ async function fetchNHLStats() {
   if (window.__NHL_STATS_LOADED__) return;
   window.__NHL_STATS_LOADED__ = true;
   const P = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-  const S = '20252026';
+  const S = '20262027';
   function pp(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(p){var n=(p.firstName&&p.firstName.default||'')+' '+(p.lastName&&p.lastName.default||'');var ab=(p.teamAbbrevs&&p.teamAbbrevs.default)||p.teamAbbrev||'';return{name:n.trim(),ab:ab,val:p.value!==undefined?p.value:0};});}
   function pg(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(g){var n=(g.firstName&&g.firstName.default||'')+' '+(g.lastName&&g.lastName.default||'');var ab=(g.teamAbbrevs&&g.teamAbbrevs.default)||(g.teamAbbrev&&g.teamAbbrev.default)||g.teamAbbrev||'';var v=g.value!==undefined?g.value:0;if(c==='savePctg')v=typeof v==='number'?v.toFixed(3):v;return{name:n.trim(),ab:ab,val:v};});}
   function pt(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(t){return{ab:(t.teamAbbrevs&&t.teamAbbrevs.default)||t.teamAbbrev||'',val:t.value!==undefined?t.value:0};});}
