@@ -3684,6 +3684,13 @@ function MatchScoreInArticle({ matchId, matchLg }) {
     var hkM = mlbHomeAb+'_MLB'; var akM = mlbAwayAb+'_MLB';
     var hColM = TC[hkM]||{bg:'#333',fg:'#fff'}; var aColM = TC[akM]||{bg:'#555',fg:'#fff'};
     var innings = ls.innings || [];
+    /* runs: API MLB retourne soit ls.teams.home.runs soit ls.home.runs selon l'endpoint */
+    var homeRuns = (ls.teams&&ls.teams.home&&ls.teams.home.runs!==undefined) ? ls.teams.home.runs : (ls.home&&ls.home.runs!==undefined ? ls.home.runs : null);
+    var awayRuns = (ls.teams&&ls.teams.away&&ls.teams.away.runs!==undefined) ? ls.teams.away.runs : (ls.away&&ls.away.runs!==undefined ? ls.away.runs : null);
+    var homeHits = (ls.teams&&ls.teams.home&&ls.teams.home.hits!==undefined) ? ls.teams.home.hits : (ls.home&&ls.home.hits!==undefined ? ls.home.hits : null);
+    var awayHits = (ls.teams&&ls.teams.away&&ls.teams.away.hits!==undefined) ? ls.teams.away.hits : (ls.away&&ls.away.hits!==undefined ? ls.away.hits : null);
+    var homeErrors = (ls.teams&&ls.teams.home&&ls.teams.home.errors!==undefined) ? ls.teams.home.errors : (ls.home&&ls.home.errors!==undefined ? ls.home.errors : null);
+    var awayErrors = (ls.teams&&ls.teams.away&&ls.teams.away.errors!==undefined) ? ls.teams.away.errors : (ls.away&&ls.away.errors!==undefined ? ls.away.errors : null);
     var scoring = (bx.plays && bx.plays.allPlays || []).filter(function(p){ return p.result && p.result.type === 'atBat' && p.about && p.about.isScoringPlay; });
     return React.createElement("div", { style: { background: "rgba(255,255,255,0.9)", borderRadius: 8, overflow: "hidden", marginTop: 24 } },
       React.createElement("div", { style: { background: lc, padding: "10px 14px" } },
@@ -3693,15 +3700,15 @@ function MatchScoreInArticle({ matchId, matchLg }) {
       React.createElement("div", { style: { display: "flex", justifyContent: "space-around", alignItems: "center", padding: "16px 24px", background: "#111" } },
         React.createElement("div", { style: { textAlign: "center" } },
           getTeamLogo(mlbHomeAb, 'MLB', 52),
-          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 36, marginTop: 4 } }, ls.home&&ls.home.runs||'0')
+          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 36, marginTop: 4 } }, homeRuns !== null ? homeRuns : '0')
         ),
         React.createElement("div", { style: { textAlign: "center" } },
           React.createElement("div", { style: { color: "rgba(255,255,255,0.4)", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 700 } }, "FINAL"),
-          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 42, letterSpacing: 6, lineHeight: 1 } }, (ls.home&&ls.home.runs||'0') + ' – ' + (ls.away&&ls.away.runs||'0'))
+          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 42, letterSpacing: 6, lineHeight: 1 } }, (homeRuns !== null ? homeRuns : '0') + ' – ' + (awayRuns !== null ? awayRuns : '0'))
         ),
         React.createElement("div", { style: { textAlign: "center" } },
           getTeamLogo(mlbAwayAb, 'MLB', 52),
-          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 36, marginTop: 4 } }, ls.away&&ls.away.runs||'0')
+          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 36, marginTop: 4 } }, awayRuns !== null ? awayRuns : '0')
         )
       ),
       /* Tableau des manches */
@@ -3725,9 +3732,9 @@ function MatchScoreInArticle({ matchId, matchLg }) {
                   var runs = inn[side]&&inn[side].runs!==undefined ? inn[side].runs : '–';
                   return React.createElement("td", { key: i, style: { padding: "5px 6px", textAlign: "center", color: runs>0?"#111":"#aaa" } }, runs);
                 }),
-                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontWeight: 900, color: lc } }, ls[side]&&ls[side].runs),
-                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, ls[side]&&ls[side].hits),
-                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, ls[side]&&ls[side].errors)
+                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontWeight: 900, color: lc } }, side==='home' ? homeRuns : awayRuns),
+                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, side==='home' ? homeHits : awayHits),
+                React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, side==='home' ? homeErrors : awayErrors)
               );
             })
           )
