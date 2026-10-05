@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zone US</title><meta name="description" content="Zone US, le media sportif francophone.">
-  <meta name="robots" content="index, follow"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <meta name="robots" content="index, follow">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
 <link rel="canonical" href="https://zoneus.fr/">
@@ -6795,8 +6797,23 @@ function ZoneUS() {
   });
   const slugify = function(str) { return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); };
   const goArticle = function(a) {
-    if (a) { var slug = slugify(a.title); history.pushState({}, '', '?article=' + slug); document.title = (a.title.charAt(0).toUpperCase() + a.title.slice(1).toLowerCase()) + ' | Zone US'; }
-    else { history.pushState({}, '', window.location.pathname); }
+    if (a) {
+      var slug = slugify(a.title);
+      history.pushState({}, '', '?article=' + slug);
+      var titleStr = (a.title.charAt(0).toUpperCase() + a.title.slice(1).toLowerCase()) + ' | Zone US';
+      document.title = titleStr;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', a.chapo || a.content && a.content.substring(0,160) || titleStr);
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      if (!ogTitle) { ogTitle = document.createElement('meta'); ogTitle.setAttribute('property','og:title'); document.head.appendChild(ogTitle); }
+      ogTitle.setAttribute('content', titleStr);
+      var ogDesc = document.querySelector('meta[property="og:description"]');
+      if (!ogDesc) { ogDesc = document.createElement('meta'); ogDesc.setAttribute('property','og:description'); document.head.appendChild(ogDesc); }
+      ogDesc.setAttribute('content', a.chapo || a.content && a.content.substring(0,160) || titleStr);
+      var ldJson = document.getElementById('ld-article');
+      if (!ldJson) { ldJson = document.createElement('script'); ldJson.type = 'application/ld+json'; ldJson.id = 'ld-article'; document.head.appendChild(ldJson); }
+      ldJson.textContent = JSON.stringify({ "@context":"https://schema.org", "@type":"NewsArticle", "headline": a.title, "description": a.chapo || '', "datePublished": a.date || '', "publisher": { "@type":"Organization", "name":"Zone US", "url":"https://zoneus.fr" }, "url": "https://zoneus.fr/?article=" + slug });
+    } else { history.pushState({}, '', window.location.pathname); }
     setSelTeam(null);
     setSelMatch(null);
     setSelArticle(a);
