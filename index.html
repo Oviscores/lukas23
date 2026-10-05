@@ -7407,22 +7407,20 @@ async function fetchStandings(lg) {
   window.__STANDINGS_LOADED__[lg] = true;
   try {
     if (lg === 'NHL') {
-      var r = await fetch('https://site.api.espn.com/apis/v2/sports/hockey/nhl/standings?season=2026');
+      var r = await fetch('https://api-web.nhle.com/v1/standings/now');
       var d = await r.json();
-      if (!d || !d.children) return;
-      var confs = {};
-      d.children.forEach(function(conf) {
-        var rows = [];
-        (conf.standings && conf.standings.entries || []).forEach(function(e, i) {
-          var stats = {}; (e.stats || []).forEach(function(s){stats[s.name]=s.value;});
-          var rawAb = e.team && e.team.abbreviation || '';
-          var nhlAbMap = {TB:'TBL',NJ:'NJD',LA:'LAK',SJ:'SJS',UTAH:'UTA',ARI:'UTA',PHX:'ARI'};
-          var ab = nhlAbMap[rawAb] || rawAb;
-          rows.push({ r: i+1, ab: ab, w: stats.wins || 0, l: stats.losses || 0, pts: stats.points || 0 });
-        });
-        confs[conf.name || 'Conference'] = rows;
+      if (!d || !d.standings) return;
+      var confEst = [], confOuest = [];
+      d.standings.forEach(function(t) {
+        var ab = t.teamAbbrev && t.teamAbbrev.default || '';
+        var row = { ab: ab, w: t.wins || 0, l: t.losses || 0, pts: t.points || 0 };
+        if (t.conferenceAbbrev === 'E') confEst.push(row);
+        else confOuest.push(row);
       });
-      if (Object.keys(confs).length > 0) { CONF_STANDINGS.NHL = confs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
+      confEst.sort(function(a,b){return b.pts-a.pts;}); confEst.forEach(function(r,i){r.r=i+1;});
+      confOuest.sort(function(a,b){return b.pts-a.pts;}); confOuest.forEach(function(r,i){r.r=i+1;});
+      var confs = { 'Conf. Est': confEst, 'Conf. Ouest': confOuest };
+      if (confEst.length > 0) { CONF_STANDINGS.NHL = confs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
     }
     if (lg === 'MLB') {
       var r = await fetch('https://site.api.espn.com/apis/v2/sports/baseball/mlb/standings?season=2025');
