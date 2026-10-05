@@ -518,28 +518,7 @@ const TEAM_NAMES = {
   WSH_MLB: "Washington Nationals"
 };
 const CONF_STANDINGS = {
-  NHL: {
-    "Conf. Ouest": [
-      { r: 1, ab: "EDM", w: 38, l: 24, pts: 82 },
-      { r: 2, ab: "COL", w: 37, l: 25, pts: 80 },
-      { r: 3, ab: "VGK", w: 35, l: 26, pts: 77 },
-      { r: 4, ab: "DAL", w: 34, l: 27, pts: 75 },
-      { r: 5, ab: "WPG", w: 33, l: 28, pts: 73 },
-      { r: 6, ab: "VAN", w: 32, l: 29, pts: 71 },
-      { r: 7, ab: "MIN", w: 30, l: 30, pts: 68 },
-      { r: 8, ab: "CGY", w: 28, l: 32, pts: 64 }
-    ],
-    "Conf. Est": [
-      { r: 1, ab: "BOS", w: 44, l: 18, pts: 94 },
-      { r: 2, ab: "FLA", w: 42, l: 20, pts: 90 },
-      { r: 3, ab: "TOR", w: 40, l: 22, pts: 86 },
-      { r: 4, ab: "TBL", w: 38, l: 24, pts: 82 },
-      { r: 5, ab: "NYR", w: 36, l: 24, pts: 80 },
-      { r: 6, ab: "OTT", w: 34, l: 26, pts: 76 },
-      { r: 7, ab: "CAR", w: 32, l: 28, pts: 72 },
-      { r: 8, ab: "DET", w: 30, l: 30, pts: 68 }
-    ]
-  },
+  NHL: {},
   NFL: {
     "AFC Nord": [{ r: 1, ab: "BAL", w: 13, l: 4 }, { r: 2, ab: "PIT", w: 10, l: 7 }, { r: 3, ab: "CLE", w: 9, l: 8 }, { r: 4, ab: "CIN", w: 7, l: 10 }],
     "AFC Est": [{ r: 1, ab: "BUF", w: 13, l: 4 }, { r: 2, ab: "MIA", w: 10, l: 7 }, { r: 3, ab: "NE", w: 4, l: 13 }, { r: 4, ab: "NYJ", w: 3, l: 14 }],
@@ -4849,6 +4828,7 @@ function MatchPage({ match, onBack }) {
     setBoxscore(null);
     setBxLoading(true);
     if (window.fetchStandings) {
+      window.__STANDINGS_LOADED__[match.lg] = false;
       var prevRefresh = window.__zoneus_refresh__;
       window.__zoneus_refresh__ = function() { setStTick(function(n){return n+1;}); if (prevRefresh) prevRefresh(); };
       window.fetchStandings(match.lg).then(function() {
@@ -7406,6 +7386,8 @@ async function fetchStandings(lg) {
   if (window.__STANDINGS_LOADED__[lg]) return;
   window.__STANDINGS_LOADED__[lg] = true;
   try {
+    /* petit délai pour ne pas bloquer le rendu initial */
+    await new Promise(function(res){setTimeout(res,0);});
     if (lg === 'NHL') {
       var r = await fetch('https://api-web.nhle.com/v1/standings/now');
       var d = await r.json();
