@@ -4893,6 +4893,55 @@ function MatchPage({ match, onBack }) {
       setBxLoading(false);
     })();
   }, [match.id]);
+  /* Retry si boxscore null après 2s (cold start worker) */
+  React.useEffect(function() {
+    if (!bxLoading && !boxscore && match.id) {
+      var _retryTimer = setTimeout(function() {
+        setBxLoading(true);
+        var matchId = match.id; var matchLg = match.lg; var matchEventId = match.eventId;
+        (async function() {
+          try {
+            var data = null;
+            if (matchLg === 'MLB' && matchId) {
+              var gamePk = (matchId+'').replace('mlb_', '');
+              var r = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_boxscore&gamePk=' + gamePk);
+              data = await r.json();
+              if (data && data.liveData) setBoxscore({ type: 'MLB', data: data.liveData });
+            } else if (matchLg === 'NHL') {
+              var nhlId = (matchId+'').replace('nhl_','');
+              if (nhlId) {
+                var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId);
+                data = await r3.json();
+                if (data && data.gameState) {
+                  var goals2 = [];
+                  var rosterMap2 = {};
+                  try {
+                    var pbpResp2 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_pbp&gameId=' + nhlId);
+                    var pbpData2 = await pbpResp2.json();
+                    (pbpData2.rosterSpots || []).forEach(function(rs) {
+                      rosterMap2[rs.playerId] = (rs.firstName && rs.firstName.default ? rs.firstName.default.charAt(0) + '. ' : '') + (rs.lastName && rs.lastName.default ? rs.lastName.default : '');
+                    });
+                    goals2 = (pbpData2.plays || []).filter(function(p) { return p.typeDescKey === 'goal'; }).map(function(p) {
+                      var d = p.details || {};
+                      var periodLabel = p.periodDescriptor && p.periodDescriptor.number <= 3 ? 'P' + p.periodDescriptor.number : p.periodDescriptor && p.periodDescriptor.periodType === 'OT' ? 'PR' : p.periodDescriptor && p.periodDescriptor.periodType === 'SO' ? 'TB' : 'P' + (p.periodDescriptor && p.periodDescriptor.number);
+                      return { time: p.timeInPeriod || '', period: periodLabel, scorer: rosterMap2[d.scoringPlayerId] || '', assist1: rosterMap2[d.assist1PlayerId] || '', assist2: rosterMap2[d.assist2PlayerId] || '', teamId: d.eventOwnerTeamId, homeTeamId: data.homeTeam && data.homeTeam.id, awayTeamId: data.awayTeam && data.awayTeam.id, goalType: d.shotType || '', strength: d.strength || '', homeScore: d.homeScore, awayScore: d.awayScore };
+                    });
+                  } catch(e2) {}
+                  setBoxscore({ type: 'NHL', data: data, goals: goals2 });
+                }
+              }
+            } else if (matchLg === 'NFL') {
+              var _rawId2 = matchEventId || matchId || '';
+              var _cleanId2 = (_rawId2+'').replace('nfl_','');
+              if (_cleanId2) { var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId2); data = await r2.json(); if (data && data.boxscore) setBoxscore({ type: 'NFL', data: data }); }
+            }
+          } catch(e) { console.log('boxscore retry error:', e); }
+          setBxLoading(false);
+        })();
+      }, 2000);
+      return function() { clearTimeout(_retryTimer); };
+    }
+  }, [bxLoading, boxscore, match.id]);
   const lc = LG[matchData.lg].color;
   const dk = LG[matchData.lg].dark;
   const _bsHome = (boxscore && boxscore.data && boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) || '';
