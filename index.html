@@ -7383,10 +7383,15 @@ try {
   function init() {
     setTimeout(patchAll, 800);
     setTimeout(patchAll, 2000);
-    new MutationObserver(function() {
+    var _observer = new MutationObserver(function() {
       clearTimeout(window._patchTimer);
-      window._patchTimer = setTimeout(patchAll, 200);
-    }).observe(document.body, { childList: true, subtree: true });
+      window._patchTimer = setTimeout(function() {
+        _observer.disconnect();
+        patchAll();
+        _observer.observe(document.body, { childList: true, subtree: true });
+      }, 200);
+    });
+    _observer.observe(document.body, { childList: true, subtree: true });
   }
 
   if (document.readyState === 'loading') {
