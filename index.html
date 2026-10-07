@@ -6777,15 +6777,27 @@ function ZoneUS() {
   }, []);
   /* Résolution de l'article depuis le slug — seulement quand arts se charge */
   var _artResolved = React.useRef(false);
+  var _artTimeout = React.useRef(null);
   React.useEffect(function() {
     var params = new URLSearchParams(window.location.search);
     var artSlug = params.get('article');
-    if (artSlug && arts.length > 1 && !_artResolved.current) {
-      var found = arts.find(function(a) { var s = a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); return s === artSlug; });
-      if (found) { _artResolved.current = true; setSelArticle(found); }
-      else { _artResolved.current = true; setSelArticle(null); history.replaceState({}, '', '/'); }
+    if (artSlug && !_artResolved.current) {
+      if (arts.length > 1) {
+        var found = arts.find(function(a) { var s = a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); return s === artSlug; });
+        if (found) {
+          _artResolved.current = true;
+          if (_artTimeout.current) { clearTimeout(_artTimeout.current); _artTimeout.current = null; }
+          setSelArticle(found);
+        }
+      }
+      // Timeout de sécurité : si après 8s toujours pas résolu, retour home
+      if (!_artTimeout.current) {
+        _artTimeout.current = setTimeout(function() {
+          if (!_artResolved.current) { _artResolved.current = true; setSelArticle(null); }
+        }, 8000);
+      }
     }
-    if (!params.get('article')) { _artResolved.current = false; }
+    if (!params.get('article')) { _artResolved.current = false; if (_artTimeout.current) { clearTimeout(_artTimeout.current); _artTimeout.current = null; } }
   }, [arts]);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
