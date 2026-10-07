@@ -4828,7 +4828,7 @@ function RosterSection({ match, hc, ac }) {
 }
 function MatchPage({ match, onBack }) {
   var _bx = React.useState(null); var boxscore = _bx[0], setBoxscore = _bx[1];
-  var _bl = React.useState(false); var bxLoading = _bl[0], setBxLoading = _bl[1];
+  var _bl = React.useState(true); var bxLoading = _bl[0], setBxLoading = _bl[1];
   var _matchData = React.useState(match); var matchData = _matchData[0], setMatchData = _matchData[1];
   var _enriched = React.useRef(false);
   var _stTick = React.useState(0); var setStTick = _stTick[1];
