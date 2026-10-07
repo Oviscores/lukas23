@@ -6783,6 +6783,7 @@ function ZoneUS() {
     if (artSlug && arts.length > 1 && !_artResolved.current) {
       var found = arts.find(function(a) { var s = a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); return s === artSlug; });
       if (found) { _artResolved.current = true; setSelArticle(found); }
+      else { _artResolved.current = true; setSelArticle(null); history.replaceState({}, '', '/'); }
     }
     if (!params.get('article')) { _artResolved.current = false; }
   }, [arts]);
@@ -8042,7 +8043,15 @@ async function fetchSanityArticles() {
     var staticFiltered = (window.ARTICLES||[]).filter(function(a) { return sl.indexOf(a.league) === -1; });
     var merged = sanityArts;
     if (window.__setArts__) window.__setArts__(merged);
-    else setTimeout(function() { if(window.__setArts__) window.__setArts__(merged); }, 3000);
+    else {
+      var _retryArts = function(attempts) {
+        setTimeout(function() {
+          if (window.__setArts__) window.__setArts__(merged);
+          else if (attempts > 0) _retryArts(attempts - 1);
+        }, 500);
+      };
+      _retryArts(20);
+    }
   } catch(e) { console.log('Sanity error:', e.message); }
 }
 var NFL_DIV = {'BUF':'AFC Est','MIA':'AFC Est','NE':'AFC Est','NYJ':'AFC Est','BAL':'AFC Nord','CIN':'AFC Nord','CLE':'AFC Nord','PIT':'AFC Nord','HOU':'AFC Sud','IND':'AFC Sud','JAX':'AFC Sud','TEN':'AFC Sud','DEN':'AFC Ouest','KC':'AFC Ouest','LV':'AFC Ouest','LAC':'AFC Ouest','DAL':'NFC Est','NYG':'NFC Est','PHI':'NFC Est','WSH':'NFC Est','CHI':'NFC Nord','DET':'NFC Nord','GB':'NFC Nord','MIN':'NFC Nord','ATL':'NFC Sud','CAR':'NFC Sud','NO':'NFC Sud','TB':'NFC Sud','ARI':'NFC Ouest','LAR':'NFC Ouest','SF':'NFC Ouest','SEA':'NFC Ouest'};
