@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Zone US</title>
+  <script>
+    // Redirige vers index.html en préservant les query params
+    var search = window.location.search;
+    var hash = window.location.hash;
+    var url = '/';
+    if (search) url += search;
+    if (hash) url += hash;
+    window.location.replace(url);
+  </script>
+</head>
+<body></body>
+</html>
