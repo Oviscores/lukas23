@@ -3630,7 +3630,7 @@ function MatchScoreInArticle({ matchId, matchLg }) {
         ),
         React.createElement("div", { style: { textAlign: "center" } },
           React.createElement("div", { style: { color: "rgba(255,255,255,0.4)", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 700 } }, "FINAL" + (isOT?' — Prol.':isSO?' — TB':'')),
-          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 42, letterSpacing: 6, lineHeight: 1 } }, ht.score + ' – ' + at.score)
+          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 42, letterSpacing: 6, lineHeight: 1 } }, (ht.score != null ? ht.score : '0') + ' – ' + (at.score != null ? at.score : '0'))
         ),
         React.createElement("div", { style: { textAlign: "center" } },
           getTeamLogo(at.abbrev, 'NHL', 52),
@@ -4860,7 +4860,7 @@ function MatchPage({ match, onBack }) {
           if (nhlId) {
             var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId);
             data = await r3.json();
-            if (data && data.gameState) {
+            if (data && (data.gameState || data.homeTeam || data.awayTeam)) {
               /* Enrichit match avec homeTeam/awayTeam depuis l'API si absents */
               if (data.homeTeam && data.homeTeam.abbrev && !_enriched.current) {
                 _enriched.current = true;
@@ -4912,7 +4912,7 @@ function MatchPage({ match, onBack }) {
               if (nhlId) {
                 var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId);
                 data = await r3.json();
-                if (data && data.gameState) {
+                if (data && (data.gameState || data.homeTeam || data.awayTeam)) {
                   var goals2 = [];
                   var rosterMap2 = {};
                   try {
