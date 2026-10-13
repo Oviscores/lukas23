@@ -4908,47 +4908,74 @@ function MatchPage({ match, onBack }) {
         } else if (matchLg === 'NHL') {
           var nhlId = (matchId+'').replace('nhl_','');
           if (nhlId) {
-            var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId);
-            data = await r3.json();
+            /* Essai proxy d'abord, fallback direct NHL API (CORS public) */
+            try {
+              var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId);
+              data = await r3.json();
+            } catch(e3) { data = null; }
+            if (!data || (!data.gameState && !data.homeTeam && !data.awayTeam)) {
+              try {
+                var r3b = await fetch('https://api-web.nhle.com/v1/gamecenter/' + nhlId + '/boxscore');
+                data = await r3b.json();
+              } catch(e3b) {}
+            }
             if (data && (data.gameState || data.homeTeam || data.awayTeam)) {
               /* Enrichit match avec homeTeam/awayTeam depuis l'API si absents */
               if (data.homeTeam && data.homeTeam.abbrev && !_enriched.current) {
                 _enriched.current = true;
                 setMatchData(function(prev) { return Object.assign({}, prev, { homeTeam: data.homeTeam.abbrev, awayTeam: data.awayTeam.abbrev, homeScore: data.homeTeam.score, awayScore: data.awayTeam.score, status: data.gameState === 'OFF' ? 'FINAL' : data.gameState === 'LIVE' ? 'LIVE' : 'UPCOMING' }); });
               }
-              /* Fetch play-by-play pour les buts */
+              /* Buts depuis data.summary.scoring (boxscore direct) */
               var goals = [];
-              var rosterMap = {};
-              try {
-                var pbpResp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_pbp&gameId=' + nhlId);
-                var pbpData = await pbpResp.json();
-                (pbpData.rosterSpots || []).forEach(function(rs) {
-                  rosterMap[rs.playerId] = (rs.firstName && rs.firstName.default ? rs.firstName.default.charAt(0) + '. ' : '') + (rs.lastName && rs.lastName.default ? rs.lastName.default : '');
-                });
-                goals = (pbpData.plays || []).filter(function(p) { return p.typeDescKey === 'goal'; }).map(function(p) {
-                  var d = p.details || {};
-                  var periodLabel = p.periodDescriptor && p.periodDescriptor.number <= 3 ? 'P' + p.periodDescriptor.number : p.periodDescriptor && p.periodDescriptor.periodType === 'OT' ? 'PR' : p.periodDescriptor && p.periodDescriptor.periodType === 'SO' ? 'TB' : 'P' + (p.periodDescriptor && p.periodDescriptor.number);
-                  return { time: p.timeInPeriod || '', period: periodLabel, scorer: rosterMap[d.scoringPlayerId] || '', assist1: rosterMap[d.assist1PlayerId] || '', assist2: rosterMap[d.assist2PlayerId] || '', teamId: d.eventOwnerTeamId, homeTeamId: data.homeTeam && data.homeTeam.id, awayTeamId: data.awayTeam && data.awayTeam.id, goalType: d.shotType || '', strength: d.strength || '', homeScore: d.homeScore, awayScore: d.awayScore };
-                });
-              } catch(pbpErr) {
-                console.log('pbp error', pbpErr);
-                /* Retry PBP après 1.5s si erreur */
-                setTimeout(async function() {
-                  try {
-                    var pbpResp2 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_pbp&gameId=' + nhlId);
-                    var pbpData2 = await pbpResp2.json();
-                    var rosterMap2 = {};
-                    (pbpData2.rosterSpots || []).forEach(function(rs) {
-                      rosterMap2[rs.playerId] = (rs.firstName && rs.firstName.default ? rs.firstName.default.charAt(0) + '. ' : '') + (rs.lastName && rs.lastName.default ? rs.lastName.default : '');
+              function extractGoalsFromSummary(d) {
+                var out = [];
+                var scoring = d.summary && d.summary.scoring;
+                if (!scoring) return out;
+                var periodMap = { 1: 'P1', 2: 'P2', 3: 'P3' };
+                scoring.forEach(function(period) {
+                  var pNum = period.periodDescriptor && period.periodDescriptor.number;
+                  var pType = period.periodDescriptor && period.periodDescriptor.periodType;
+                  var pLabel = pType === 'OT' ? 'PR' : pType === 'SO' ? 'TB' : (periodMap[pNum] || ('P' + pNum));
+                  (period.goals || []).forEach(function(g) {
+                    var scorer = g.name && g.name.default || '';
+                    var assists = (g.assists || []).map(function(a) { return a.name && a.name.default || ''; });
+                    out.push({
+                      time: g.timeInPeriod || '',
+                      period: pLabel,
+                      scorer: scorer,
+                      assist1: assists[0] || '',
+                      assist2: assists[1] || '',
+                      teamId: g.teamAbbrev && g.teamAbbrev.default,
+                      homeTeamId: d.homeTeam && d.homeTeam.abbrev,
+                      awayTeamId: d.awayTeam && d.awayTeam.abbrev,
+                      goalType: g.shotType || '',
+                      strength: g.strength || '',
+                      homeScore: g.homeScore,
+                      awayScore: g.awayScore,
+                      fromSummary: true
                     });
-                    var goals2 = (pbpData2.plays || []).filter(function(p) { return p.typeDescKey === 'goal'; }).map(function(p) {
-                      var d = p.details || {};
-                      var periodLabel = p.periodDescriptor && p.periodDescriptor.number <= 3 ? 'P' + p.periodDescriptor.number : p.periodDescriptor && p.periodDescriptor.periodType === 'OT' ? 'PR' : p.periodDescriptor && p.periodDescriptor.periodType === 'SO' ? 'TB' : 'P' + (p.periodDescriptor && p.periodDescriptor.number);
-                      return { time: p.timeInPeriod || '', period: periodLabel, scorer: rosterMap2[d.scoringPlayerId] || '', assist1: rosterMap2[d.assist1PlayerId] || '', assist2: rosterMap2[d.assist2PlayerId] || '', teamId: d.eventOwnerTeamId, homeTeamId: data.homeTeam && data.homeTeam.id, awayTeamId: data.awayTeam && data.awayTeam.id, goalType: d.shotType || '', strength: d.strength || '', homeScore: d.homeScore, awayScore: d.awayScore };
-                    });
-                    if (goals2.length > 0) setBoxscore(function(prev) { return prev ? Object.assign({}, prev, { goals: goals2 }) : prev; });
-                  } catch(e2) {}
-                }, 1500);
+                  });
+                });
+                return out;
+              }
+              /* Essai 1 : extraire depuis summary.scoring du boxscore */
+              goals = extractGoalsFromSummary(data);
+              /* Essai 2 : PBP si summary vide */
+              if (goals.length === 0) {
+                try {
+                  var pbpResp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_pbp&gameId=' + nhlId);
+                  var pbpData = await pbpResp.json();
+                  var rosterMap = {};
+                  (pbpData.rosterSpots || []).forEach(function(rs) {
+                    rosterMap[rs.playerId] = (rs.firstName && rs.firstName.default ? rs.firstName.default.charAt(0) + '. ' : '') + (rs.lastName && rs.lastName.default ? rs.lastName.default : '');
+                  });
+                  var pbpGoals = (pbpData.plays || []).filter(function(p) { return p.typeDescKey === 'goal'; }).map(function(p) {
+                    var d2 = p.details || {};
+                    var periodLabel = p.periodDescriptor && p.periodDescriptor.number <= 3 ? 'P' + p.periodDescriptor.number : p.periodDescriptor && p.periodDescriptor.periodType === 'OT' ? 'PR' : p.periodDescriptor && p.periodDescriptor.periodType === 'SO' ? 'TB' : 'P' + (p.periodDescriptor && p.periodDescriptor.number);
+                    return { time: p.timeInPeriod || '', period: periodLabel, scorer: rosterMap[d2.scoringPlayerId] || '', assist1: rosterMap[d2.assist1PlayerId] || '', assist2: rosterMap[d2.assist2PlayerId] || '', teamId: d2.eventOwnerTeamId, homeTeamId: data.homeTeam && data.homeTeam.id, awayTeamId: data.awayTeam && data.awayTeam.id, goalType: d2.shotType || '', strength: d2.strength || '', homeScore: d2.homeScore, awayScore: d2.awayScore };
+                  });
+                  if (pbpGoals.length > 0) goals = pbpGoals;
+                } catch(pbpErr) { console.log('nhl pbp error', pbpErr); }
               }
               setBoxscore({ type: 'NHL', data: data, goals: goals });
             }
@@ -4979,23 +5006,27 @@ function MatchPage({ match, onBack }) {
             } else if (matchLg === 'NHL') {
               var nhlId = (matchId+'').replace('nhl_','');
               if (nhlId) {
-                var r3 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId);
-                data = await r3.json();
+                try { var r3r = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId); data = await r3r.json(); } catch(e3r) { data = null; }
+                if (!data || (!data.gameState && !data.homeTeam && !data.awayTeam)) {
+                  try { var r3rb = await fetch('https://api-web.nhle.com/v1/gamecenter/' + nhlId + '/boxscore'); data = await r3rb.json(); } catch(e3rb) {}
+                }
                 if (data && (data.gameState || data.homeTeam || data.awayTeam)) {
+                  /* Buts depuis summary.scoring d'abord */
                   var goals2 = [];
-                  var rosterMap2 = {};
-                  try {
-                    var pbpResp2 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_pbp&gameId=' + nhlId);
-                    var pbpData2 = await pbpResp2.json();
-                    (pbpData2.rosterSpots || []).forEach(function(rs) {
-                      rosterMap2[rs.playerId] = (rs.firstName && rs.firstName.default ? rs.firstName.default.charAt(0) + '. ' : '') + (rs.lastName && rs.lastName.default ? rs.lastName.default : '');
+                  var scoring2 = data.summary && data.summary.scoring;
+                  if (scoring2) {
+                    var periodMap2 = { 1: 'P1', 2: 'P2', 3: 'P3' };
+                    scoring2.forEach(function(period) {
+                      var pNum2 = period.periodDescriptor && period.periodDescriptor.number;
+                      var pType2 = period.periodDescriptor && period.periodDescriptor.periodType;
+                      var pLabel2 = pType2 === 'OT' ? 'PR' : pType2 === 'SO' ? 'TB' : (periodMap2[pNum2] || ('P' + pNum2));
+                      (period.goals || []).forEach(function(g) {
+                        var scorer2 = g.name && g.name.default || '';
+                        var assists2 = (g.assists || []).map(function(a) { return a.name && a.name.default || ''; });
+                        goals2.push({ time: g.timeInPeriod || '', period: pLabel2, scorer: scorer2, assist1: assists2[0] || '', assist2: assists2[1] || '', teamId: g.teamAbbrev && g.teamAbbrev.default, homeTeamId: data.homeTeam && data.homeTeam.abbrev, awayTeamId: data.awayTeam && data.awayTeam.abbrev, goalType: g.shotType || '', strength: g.strength || '', homeScore: g.homeScore, awayScore: g.awayScore, fromSummary: true });
+                      });
                     });
-                    goals2 = (pbpData2.plays || []).filter(function(p) { return p.typeDescKey === 'goal'; }).map(function(p) {
-                      var d = p.details || {};
-                      var periodLabel = p.periodDescriptor && p.periodDescriptor.number <= 3 ? 'P' + p.periodDescriptor.number : p.periodDescriptor && p.periodDescriptor.periodType === 'OT' ? 'PR' : p.periodDescriptor && p.periodDescriptor.periodType === 'SO' ? 'TB' : 'P' + (p.periodDescriptor && p.periodDescriptor.number);
-                      return { time: p.timeInPeriod || '', period: periodLabel, scorer: rosterMap2[d.scoringPlayerId] || '', assist1: rosterMap2[d.assist1PlayerId] || '', assist2: rosterMap2[d.assist2PlayerId] || '', teamId: d.eventOwnerTeamId, homeTeamId: data.homeTeam && data.homeTeam.id, awayTeamId: data.awayTeam && data.awayTeam.id, goalType: d.shotType || '', strength: d.strength || '', homeScore: d.homeScore, awayScore: d.awayScore };
-                    });
-                  } catch(e2) {}
+                  }
                   setBoxscore({ type: 'NHL', data: data, goals: goals2 });
                 }
               }
