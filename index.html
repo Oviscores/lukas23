@@ -8192,7 +8192,7 @@ function portableTextToHTML(body) {
 }
 async function fetchSanityArticles() {
   try {
-    var query = encodeURIComponent('*[_type == "article"] | order(ordre asc, publishedAt desc) [0...50] {_id, title, chapo, body, league, tag, franchise, hot, publishedAt, matchId, matchLg, teamId, teamLg, ordre, "imageUrl": image.asset->url}');
+    var query = encodeURIComponent('*[_type == "article"] | order(ordre asc, publishedAt desc) [0...100] {_id, title, chapo, body, league, tag, franchise, hot, publishedAt, matchId, matchLg, teamId, teamLg, ordre, "imageUrl": image.asset->url}');
     var resp = await fetch('https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query, { headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' } });
     var data = await resp.json();
     if (!data.result || !data.result.length) return;
@@ -8200,9 +8200,9 @@ async function fetchSanityArticles() {
       return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null, teamId: a.teamId||null, teamLg: a.teamLg||null };
     });
     window.__SANITY_ARTICLES__ = sanityArts;
-    var sl = sanityArts.map(function(a) { return a.league; });
-    var staticFiltered = (window.ARTICLES||[]).filter(function(a) { return sl.indexOf(a.league) === -1; });
-    var merged = sanityArts;
+    var sanityTitles = sanityArts.map(function(a) { return a.title.toLowerCase(); });
+    var staticFiltered = (window.ARTICLES||[]).filter(function(a) { return sanityTitles.indexOf(a.title.toLowerCase()) === -1; });
+    var merged = sanityArts.concat(staticFiltered);
     if (window.__setArts__) window.__setArts__(merged);
     else {
       var _retryArts = function(attempts) {
