@@ -8200,9 +8200,7 @@ async function fetchSanityArticles() {
       return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null, teamId: a.teamId||null, teamLg: a.teamLg||null };
     });
     window.__SANITY_ARTICLES__ = sanityArts;
-    var sanityTitles = sanityArts.map(function(a) { return a.title.toLowerCase(); });
-    var staticFiltered = (window.ARTICLES||[]).filter(function(a) { return sanityTitles.indexOf(a.title.toLowerCase()) === -1; });
-    var merged = sanityArts.concat(staticFiltered);
+    var merged = sanityArts;
     if (window.__setArts__) window.__setArts__(merged);
     else {
       var _retryArts = function(attempts) {
