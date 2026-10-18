@@ -7933,26 +7933,6 @@ async function fetchLeagueStats(lg) {
     return;
   }
 
-  if (lg === 'NFL') {
-    try {
-      var d = await fetch(PROXY+'?league=nfl_leaders&season=2026').then(function(r){return r.json();});
-      if (!d||!d.categories) { window.__STATS_LOADED__.NFL=false; return; }
-      var players = [];
-      (d.categories||[]).forEach(function(cat) {
-        var data = (cat.leaders||[]).slice(0,5).map(function(e) {
-          return {name:e.athlete&&(e.athlete.displayName||e.athlete.shortName)||'',ab:e.team&&e.team.abbreviation||'',val:e.displayValue||e.value||0};
-        });
-        if (data.length) players.push({label:cat.displayName||cat.name||'',data:data});
-      });
-      if (players.length>0) {
-        window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
-        window.STATS_PAGES.NFL.players = players;
-        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-      }
-      console.log('NFL stats OK - '+players.length+' cats');
-    } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
-    return;
-  }
 }
 
   if (lg === 'NFL') {
@@ -8197,7 +8177,11 @@ async function fetchSanityArticles() {
     var data = await resp.json();
     if (!data.result || !data.result.length) return;
     var sanityArts = data.result.map(function(a, i) {
-      return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null, teamId: a.teamId||null, teamLg: a.teamLg||null };
+      return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null, teamId: a.teamId||null, teamLg: a.teamLg||null, ordre: (a.ordre != null ? a.ordre : 9999) };
+    });
+    sanityArts.sort(function(a, b) {
+      if (a.ordre !== b.ordre) return a.ordre - b.ordre;
+      return (b.publishedAt||'').localeCompare(a.publishedAt||'');
     });
     window.__SANITY_ARTICLES__ = sanityArts;
     var merged = sanityArts;
