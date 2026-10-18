@@ -7933,8 +7933,6 @@ async function fetchLeagueStats(lg) {
     return;
   }
 
-}
-
   if (lg === 'NFL') {
     try {
       var nflCats = [
@@ -7968,6 +7966,7 @@ async function fetchLeagueStats(lg) {
     } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
     return;
   }
+
 }
 
 </script>
