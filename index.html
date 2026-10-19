@@ -7783,14 +7783,13 @@ async function fetchLeagueStats(lg) {
         {cat:'sacks',label:'Sacks'},
         {cat:'interceptions',label:'Interceptions déf.'}
       ];
-      var results = await Promise.all(nflCats.map(function(c) {
-        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026&_='+Date.now()+'')
-          .then(function(r){return r.json();}).catch(function(){return null;});
-      }));
-      var players = nflCats.map(function(c,i) {
-        var d = results[i];
-        if (!d || !d.leaders) return null;
-        var data = d.leaders.slice(0,5).map(function(e) {
+      var resp = await fetch(PROXY+'?league=nfl_leaders_all&season=2026&_='+Date.now());
+      var json = await resp.json();
+      var allData = json.result || {};
+      var players = nflCats.map(function(c) {
+        var leaders = allData[c.cat];
+        if (!leaders || !leaders.length) return null;
+        var data = leaders.map(function(e) {
           return {name:e.name||'',ab:e.teamAb||'',val:e.displayValue||String(e.value||0)};
         }).filter(function(e){return e.name;});
         return data.length ? {label:c.label,data:data} : null;
@@ -7938,14 +7937,13 @@ async function fetchLeagueStats(lg) {
         {cat:'sacks',label:'Sacks'},
         {cat:'interceptions',label:'Interceptions déf.'}
       ];
-      var results = await Promise.all(nflCats.map(function(c) {
-        return fetch(PROXY+'?league=nfl_leaders&cat='+c.cat+'&season=2026&_='+Date.now()+'')
-          .then(function(r){return r.json();}).catch(function(){return null;});
-      }));
-      var players = nflCats.map(function(c,i) {
-        var d = results[i];
-        if (!d || !d.leaders) return null;
-        var data = d.leaders.slice(0,5).map(function(e) {
+      var resp = await fetch(PROXY+'?league=nfl_leaders_all&season=2026&_='+Date.now());
+      var json = await resp.json();
+      var allData = json.result || {};
+      var players = nflCats.map(function(c) {
+        var leaders = allData[c.cat];
+        if (!leaders || !leaders.length) return null;
+        var data = leaders.map(function(e) {
           return {name:e.name||'',ab:e.teamAb||'',val:e.displayValue||String(e.value||0)};
         }).filter(function(e){return e.name;});
         return data.length ? {label:c.label,data:data} : null;
