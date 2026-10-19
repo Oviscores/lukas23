@@ -6684,7 +6684,7 @@ function StatsPage({ lg, onPlayerClick, onBack, onStatFull, statsVersion, onStat
       if (lg === 'NHL') {
         window.__NHL_STATS_LOADED__ = false;
         if (window.fetchNHLStats) await window.fetchNHLStats();
-      } else if (lg === 'MLB' || lg === 'NBA') {
+      } else if (lg === 'MLB' || lg === 'NBA' || lg === 'NFL') {
         if (!window.__STATS_LOADED__) window.__STATS_LOADED__ = {};
         window.__STATS_LOADED__[lg] = false;
         if (window.fetchLeagueStats) await window.fetchLeagueStats(lg);
