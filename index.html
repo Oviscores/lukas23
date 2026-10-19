@@ -7783,17 +7783,66 @@ async function fetchLeagueStats(lg) {
         {cat:'sacks',label:'Sacks'},
         {cat:'interceptions',label:'Interceptions déf.'}
       ];
-      var resp = await fetch(PROXY+'?league=nfl_leaders_all&season=2026&_='+Date.now());
+      // Appel direct depuis le client — sports.core.api.espn.com est accessible depuis le navigateur
+      // mais bloqué depuis Cloudflare Workers, donc on bypass le proxy ici
+      var resp = await fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/types/2/leaders?lang=en&region=us&_='+Date.now());
       var json = await resp.json();
-      var allData = json.result || {};
+      var categories = json.categories || [];
+
+      // Collecter tous les IDs uniques d'athlètes et d'équipes depuis les $ref
+      var athleteIds = new Set();
+      var teamIds = new Set();
+      var catMap = {};
+      nflCats.forEach(function(c) {
+        var catData = categories.find(function(x){return x.name===c.cat;});
+        if (!catData) return;
+        var top5 = (catData.leaders||[]).slice(0,5);
+        catMap[c.cat] = top5;
+        top5.forEach(function(e) {
+          var aRef = (e.athlete&&e.athlete['$ref']||'');
+          var tRef = (e.team&&e.team['$ref']||'');
+          var aId = (aRef.match(/athletes\/(\d+)/)||[])[1];
+          var tId = (tRef.match(/teams\/(\d+)/)||[])[1];
+          if (aId) athleteIds.add(aId);
+          if (tId) teamIds.add(tId);
+        });
+      });
+
+      // Résoudre athlètes et équipes en parallèle directement depuis le client
+      var athleteArr = Array.from(athleteIds);
+      var teamArr = Array.from(teamIds);
+      var athleteResults = await Promise.all(athleteArr.map(function(id) {
+        return fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/'+id+'?lang=en&region=us')
+          .then(function(r){return r.json();}).then(function(d){return [id,d];}).catch(function(){return [id,{}];});
+      }));
+      var teamResults = await Promise.all(teamArr.map(function(id) {
+        return fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/'+id+'?lang=en&region=us')
+          .then(function(r){return r.json();}).then(function(d){return [id,d];}).catch(function(){return [id,{}];});
+      }));
+      var athletes = {};
+      athleteResults.forEach(function(r){athletes[r[0]]=r[1];});
+      var teams = {};
+      teamResults.forEach(function(r){teams[r[0]]=r[1];});
+
+      // Construire les données finales
       var players = nflCats.map(function(c) {
-        var leaders = allData[c.cat];
-        if (!leaders || !leaders.length) return null;
-        var data = leaders.map(function(e) {
-          return {name:e.name||'',ab:e.teamAb||'',val:e.displayValue||String(e.value||0)};
+        if (!catMap[c.cat]) return null;
+        var data = catMap[c.cat].map(function(e) {
+          var aRef = (e.athlete&&e.athlete['$ref']||'');
+          var tRef = (e.team&&e.team['$ref']||'');
+          var aId = (aRef.match(/athletes\/(\d+)/)||[])[1];
+          var tId = (tRef.match(/teams\/(\d+)/)||[])[1];
+          var aData = aId ? (athletes[aId]||{}) : {};
+          var tData = tId ? (teams[tId]||{}) : {};
+          return {
+            name: aData.displayName||aData.shortName||'',
+            ab: tData.abbreviation||'',
+            val: e.displayValue||String(e.value||0)
+          };
         }).filter(function(e){return e.name;});
         return data.length ? {label:c.label,data:data} : null;
       }).filter(Boolean);
+
       if (players.length > 0) {
         window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
         window.STATS_PAGES.NFL.players = players;
@@ -7937,17 +7986,66 @@ async function fetchLeagueStats(lg) {
         {cat:'sacks',label:'Sacks'},
         {cat:'interceptions',label:'Interceptions déf.'}
       ];
-      var resp = await fetch(PROXY+'?league=nfl_leaders_all&season=2026&_='+Date.now());
+      // Appel direct depuis le client — sports.core.api.espn.com est accessible depuis le navigateur
+      // mais bloqué depuis Cloudflare Workers, donc on bypass le proxy ici
+      var resp = await fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/types/2/leaders?lang=en&region=us&_='+Date.now());
       var json = await resp.json();
-      var allData = json.result || {};
+      var categories = json.categories || [];
+
+      // Collecter tous les IDs uniques d'athlètes et d'équipes depuis les $ref
+      var athleteIds = new Set();
+      var teamIds = new Set();
+      var catMap = {};
+      nflCats.forEach(function(c) {
+        var catData = categories.find(function(x){return x.name===c.cat;});
+        if (!catData) return;
+        var top5 = (catData.leaders||[]).slice(0,5);
+        catMap[c.cat] = top5;
+        top5.forEach(function(e) {
+          var aRef = (e.athlete&&e.athlete['$ref']||'');
+          var tRef = (e.team&&e.team['$ref']||'');
+          var aId = (aRef.match(/athletes\/(\d+)/)||[])[1];
+          var tId = (tRef.match(/teams\/(\d+)/)||[])[1];
+          if (aId) athleteIds.add(aId);
+          if (tId) teamIds.add(tId);
+        });
+      });
+
+      // Résoudre athlètes et équipes en parallèle directement depuis le client
+      var athleteArr = Array.from(athleteIds);
+      var teamArr = Array.from(teamIds);
+      var athleteResults = await Promise.all(athleteArr.map(function(id) {
+        return fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/'+id+'?lang=en&region=us')
+          .then(function(r){return r.json();}).then(function(d){return [id,d];}).catch(function(){return [id,{}];});
+      }));
+      var teamResults = await Promise.all(teamArr.map(function(id) {
+        return fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/'+id+'?lang=en&region=us')
+          .then(function(r){return r.json();}).then(function(d){return [id,d];}).catch(function(){return [id,{}];});
+      }));
+      var athletes = {};
+      athleteResults.forEach(function(r){athletes[r[0]]=r[1];});
+      var teams = {};
+      teamResults.forEach(function(r){teams[r[0]]=r[1];});
+
+      // Construire les données finales
       var players = nflCats.map(function(c) {
-        var leaders = allData[c.cat];
-        if (!leaders || !leaders.length) return null;
-        var data = leaders.map(function(e) {
-          return {name:e.name||'',ab:e.teamAb||'',val:e.displayValue||String(e.value||0)};
+        if (!catMap[c.cat]) return null;
+        var data = catMap[c.cat].map(function(e) {
+          var aRef = (e.athlete&&e.athlete['$ref']||'');
+          var tRef = (e.team&&e.team['$ref']||'');
+          var aId = (aRef.match(/athletes\/(\d+)/)||[])[1];
+          var tId = (tRef.match(/teams\/(\d+)/)||[])[1];
+          var aData = aId ? (athletes[aId]||{}) : {};
+          var tData = tId ? (teams[tId]||{}) : {};
+          return {
+            name: aData.displayName||aData.shortName||'',
+            ab: tData.abbreviation||'',
+            val: e.displayValue||String(e.value||0)
+          };
         }).filter(function(e){return e.name;});
         return data.length ? {label:c.label,data:data} : null;
       }).filter(Boolean);
+
       if (players.length > 0) {
         window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
         window.STATS_PAGES.NFL.players = players;
