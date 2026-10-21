@@ -5111,13 +5111,15 @@ function MatchPage({ match, onBack }) {
           var nbaHomeLs = nbaHome && nbaHome.linescores || [];
           var nbaAwayLs = nbaAway && nbaAway.linescores || [];
           var nbaQCount = Math.max(nbaHomeLs.length, nbaAwayLs.length, 4);
-          /* Stats joueurs */
+          /* Stats joueurs — ESPN players[] n'a pas homeAway, on matche par team.abbreviation */
           var nbaPlayers = nbaBx.players || [];
-          var nbaHomeStats = (nbaPlayers.find(function(t){return t.homeAway==='home';}) || {}).statistics || [];
-          var nbaAwayStats = (nbaPlayers.find(function(t){return t.homeAway==='away';}) || {}).statistics || [];
-          var nbaHomePl = nbaHomeStats[0] && nbaHomeStats[0].athletes || [];
-          var nbaAwayPl = nbaAwayStats[0] && nbaAwayStats[0].athletes || [];
-          var nbaStatKeys = nbaHomeStats[0] && nbaHomeStats[0].keys || [];
+          var nbaHomeTeamObj = nbaPlayers.find(function(t){return t.team && t.team.abbreviation === nbaHomeAb;}) || nbaPlayers[0] || {};
+          var nbaAwayTeamObj = nbaPlayers.find(function(t){return t.team && t.team.abbreviation === nbaAwayAb;}) || nbaPlayers[1] || {};
+          var nbaHomeStats = nbaHomeTeamObj.statistics || [];
+          var nbaAwayStats = nbaAwayTeamObj.statistics || [];
+          var nbaHomePl = (nbaHomeStats[0] && nbaHomeStats[0].athletes) || [];
+          var nbaAwayPl = (nbaAwayStats[0] && nbaAwayStats[0].athletes) || [];
+          var nbaStatKeys = (nbaHomeStats[0] && nbaHomeStats[0].keys) || (nbaAwayStats[0] && nbaAwayStats[0].keys) || [];
           function getNbaStat(athlete, key) {
             var idx = nbaStatKeys.indexOf(key);
             if (idx === -1 || !athlete.stats) return '-';
