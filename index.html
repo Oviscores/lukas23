@@ -2565,31 +2565,33 @@ async function fetchLiveScores() {
     }
   } catch(e) { console.log('MLB API error:', e.message); }
 
-  // NBA
+  // NBA (ESPN scoreboard)
   try {
     const r = await fetch(PROXY + '?league=nba');
     const d = await r.json();
-    if (d.scoreboard && d.scoreboard.games) {
-      for (const g of d.scoreboard.games) {
-        const ht = g.homeTeam || {};
-        const at = g.awayTeam || {};
-        const status = g.gameStatus || 1;
-        const isLive = status === 2;
-        const isFinal = status === 3;
-        results.push({
-          id: 'nba_' + g.gameId,
-          lg: 'NBA',
-          status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING',
-          period: isLive ? 'Q' + (g.period || 1) : '',
-          homeTeam: ht.teamTricode || '',
-          awayTeam: at.teamTricode || '',
-          homeScore: isLive || isFinal ? (ht.score || 0) : null,
-          awayScore: isLive || isFinal ? (at.score || 0) : null,
-          time: g.gameTimeUTC ? new Date(g.gameTimeUTC).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
-          homeLogo: ht.teamId ? 'https://cdn.nba.com/logos/nba/' + ht.teamId + '/primary/L/logo.svg' : '',
-          awayLogo: at.teamId ? 'https://cdn.nba.com/logos/nba/' + at.teamId + '/primary/L/logo.svg' : ''
-        });
-      }
+    for (const g of (d.events || [])) {
+      const comp = g.competitions && g.competitions[0];
+      if (!comp) continue;
+      const home = comp.competitors.find(c => c.homeAway === 'home') || {};
+      const away = comp.competitors.find(c => c.homeAway === 'away') || {};
+      const statusType = comp.status && comp.status.type;
+      const isLive = statusType && statusType.state === 'in';
+      const isFinal = statusType && statusType.completed;
+      if (isFinal) continue;
+      results.push({
+        id: 'nba_' + g.id,
+        lg: 'NBA',
+        status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING',
+        period: isLive && comp.status && comp.status.period ? 'Q' + comp.status.period : '',
+        homeTeam: home.team ? home.team.abbreviation : '',
+        awayTeam: away.team ? away.team.abbreviation : '',
+        homeScore: isLive ? parseInt(home.score || 0) : null,
+        awayScore: isLive ? parseInt(away.score || 0) : null,
+        time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
+        startUTC: g.date ? new Date(g.date).getTime() : 0,
+        homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nba/500/' + home.team.abbreviation.toLowerCase() + '.png' : '',
+        awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nba/500/' + away.team.abbreviation.toLowerCase() + '.png' : ''
+      });
     }
   } catch(e) { console.log('NBA API error:', e.message); }
 
