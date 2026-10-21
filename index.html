@@ -7877,37 +7877,15 @@ async function fetchLeagueStats(lg) {
 
   if (lg === 'NBA') {
     try {
-      var nbaCats = [
-        {cat:'PTS',label:'Points'},
-        {cat:'REB',label:'Rebonds'},
-        {cat:'AST',label:'Passes'},
-        {cat:'STL',label:'Interceptions'},
-        {cat:'BLK',label:'Contres'},
-        {cat:'FG_PCT',label:'% Tirs'},
-        {cat:'FT_PCT',label:'% LF'},
-        {cat:'FG3_PCT',label:'% 3 pts'}
-      ];
-      var results = await Promise.all(nbaCats.map(function(c) {
-        return fetch(PROXY+'?league=nba_leaders&cat='+c.cat+'&season=2025-26').then(function(r){return r.json();}).catch(function(){return null;});
-      }));
-      var players = nbaCats.map(function(c,i) {
-        var d = results[i];
-        if (!d||!d.resultSet) return null;
-        var headers = d.resultSet.headers||[];
-        var rows = d.resultSet.rowSet||[];
-        var ni=headers.indexOf('PLAYER'), ti=headers.indexOf('TEAM'), vi=headers.indexOf(c.cat);
-        if (ni<0||vi<0) return null;
-        var data = rows.slice(0,5).map(function(r){return {name:r[ni]||'',ab:r[ti]||'',val:r[vi]||0};});
-        return data.length ? {label:c.label,data:data} : null;
-      }).filter(Boolean);
-      if (players.length>0) {
+      var d = await fetch(PROXY+'?league=nba_leaders').then(function(r){return r.json();});
+      var players = d.players || [];
+      if (players.length > 0) {
         window.STATS_PAGES.NBA = window.STATS_PAGES.NBA||{teams:[],players:[]};
         window.STATS_PAGES.NBA.players = players;
         syncGSTATS('NBA');
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
         if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
       }
-      syncGSTATS('NBA');
       console.log('NBA stats OK - '+players.length+' cats');
     } catch(e) { console.log('NBA stats error:',e); window.__STATS_LOADED__.NBA=false; }
     return;
@@ -8083,30 +8061,9 @@ async function fetchLeagueStats(lg) {
 
   if (lg === 'NBA') {
     try {
-      var nbaCats = [
-        {cat:'PTS',label:'Points'},
-        {cat:'REB',label:'Rebonds'},
-        {cat:'AST',label:'Passes'},
-        {cat:'STL',label:'Interceptions'},
-        {cat:'BLK',label:'Contres'},
-        {cat:'FG_PCT',label:'% Tirs'},
-        {cat:'FT_PCT',label:'% LF'},
-        {cat:'FG3_PCT',label:'% 3 pts'}
-      ];
-      var results = await Promise.all(nbaCats.map(function(c) {
-        return fetch(PROXY+'?league=nba_leaders&cat='+c.cat+'&season=2025-26').then(function(r){return r.json();}).catch(function(){return null;});
-      }));
-      var players = nbaCats.map(function(c,i) {
-        var d = results[i];
-        if (!d||!d.resultSet) return null;
-        var headers = d.resultSet.headers||[];
-        var rows = d.resultSet.rowSet||[];
-        var ni=headers.indexOf('PLAYER'), ti=headers.indexOf('TEAM'), vi=headers.indexOf(c.cat);
-        if (ni<0||vi<0) return null;
-        var data = rows.slice(0,5).map(function(r){return {name:r[ni]||'',ab:r[ti]||'',val:r[vi]||0};});
-        return data.length ? {label:c.label,data:data} : null;
-      }).filter(Boolean);
-      if (players.length>0) {
+      var d = await fetch(PROXY+'?league=nba_leaders').then(function(r){return r.json();});
+      var players = d.players || [];
+      if (players.length > 0) {
         window.STATS_PAGES.NBA = window.STATS_PAGES.NBA||{teams:[],players:[]};
         window.STATS_PAGES.NBA.players = players;
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
