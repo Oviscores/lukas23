@@ -4985,6 +4985,9 @@ function MatchPage({ match, onBack }) {
               setBoxscore({ type: 'NHL', data: data, goals: goals });
             }
           }
+        } else if (matchLg === 'NBA') {
+          var nbaEvId = (matchEventId || matchId || '').replace('nba_','');
+          if (nbaEvId) { var rNba = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_boxscore&eventId=' + nbaEvId); data = await rNba.json(); if (data && data.boxscore) setBoxscore({ type: 'NBA', data: data }); }
         } else if (matchLg === 'NFL') {
           var _rawId = matchEventId || matchId || '';
           var _cleanId = (_rawId+'').replace('nfl_','');
@@ -5036,6 +5039,9 @@ function MatchPage({ match, onBack }) {
                   setBoxscore({ type: 'NHL', data: data, goals: goals2 });
                 }
               }
+            } else if (matchLg === 'NBA') {
+              var nbaEvId2 = (matchEventId || matchId || '').replace('nba_','');
+              if (nbaEvId2) { var rNba2 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_boxscore&eventId=' + nbaEvId2); data = await rNba2.json(); if (data && data.boxscore) setBoxscore({ type: 'NBA', data: data }); }
             } else if (matchLg === 'NFL') {
               var _rawId2 = matchEventId || matchId || '';
               var _cleanId2 = (_rawId2+'').replace('nfl_','');
@@ -5092,6 +5098,125 @@ function MatchPage({ match, onBack }) {
         
         /* Loading */
         bxLoading && /* @__PURE__ */ React.createElement("div", { style: { padding: "16px", textAlign: "center", color: "#999", fontSize: 11 } }, "Chargement..."),
+        /* NBA Boxscore */
+        !bxLoading && boxscore && boxscore.type === 'NBA' && (function() {
+          var nbaD = boxscore.data;
+          var nbaBx = nbaD.boxscore || {};
+          var nbaComp = nbaD.header && nbaD.header.competitions && nbaD.header.competitions[0];
+          var nbaHome = nbaComp && nbaComp.competitors && nbaComp.competitors.find(function(c){return c.homeAway==='home';});
+          var nbaAway = nbaComp && nbaComp.competitors && nbaComp.competitors.find(function(c){return c.homeAway==='away';});
+          var nbaHomeAb = (nbaHome && nbaHome.team && nbaHome.team.abbreviation) || matchData.homeTeam || '';
+          var nbaAwayAb = (nbaAway && nbaAway.team && nbaAway.team.abbreviation) || matchData.awayTeam || '';
+          /* Linescores par quart */
+          var nbaHomeLs = nbaHome && nbaHome.linescores || [];
+          var nbaAwayLs = nbaAway && nbaAway.linescores || [];
+          var nbaQCount = Math.max(nbaHomeLs.length, nbaAwayLs.length, 4);
+          /* Stats joueurs */
+          var nbaPlayers = nbaBx.players || [];
+          var nbaHomeStats = (nbaPlayers.find(function(t){return t.homeAway==='home';}) || {}).statistics || [];
+          var nbaAwayStats = (nbaPlayers.find(function(t){return t.homeAway==='away';}) || {}).statistics || [];
+          var nbaHomePl = nbaHomeStats[0] && nbaHomeStats[0].athletes || [];
+          var nbaAwayPl = nbaAwayStats[0] && nbaAwayStats[0].athletes || [];
+          var nbaStatKeys = nbaHomeStats[0] && nbaHomeStats[0].keys || [];
+          function getNbaStat(athlete, key) {
+            var idx = nbaStatKeys.indexOf(key);
+            if (idx === -1 || !athlete.stats) return '-';
+            return athlete.stats[idx] || '-';
+          }
+          var thStyle = { padding: '4px 8px', textAlign: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: '#666', borderBottom: '2px solid rgba(0,0,0,0.08)' };
+          var tdStyle = { padding: '4px 8px', textAlign: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 };
+          var tdNameStyle = { padding: '4px 8px', textAlign: 'left', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap' };
+          function renderTeamStats(players, teamAb, col) {
+            if (!players.length) return null;
+            return React.createElement('div', { style: { marginBottom: 16 } },
+              React.createElement('div', { style: { background: col.bg, padding: '6px 12px', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', color: '#fff', display: 'flex', alignItems: 'center', gap: 8 } },
+                getTeamLogo(teamAb, 'NBA', 20),
+                React.createElement('span', null, teamAb)
+              ),
+              React.createElement('div', { style: { overflowX: 'auto' } },
+                React.createElement('table', { style: { width: '100%', borderCollapse: 'collapse' } },
+                  React.createElement('thead', null,
+                    React.createElement('tr', { style: { background: 'rgba(0,0,0,0.04)' } },
+                      React.createElement('th', { style: Object.assign({}, thStyle, { textAlign: 'left', minWidth: 120 }) }, 'JOUEUR'),
+                      React.createElement('th', { style: thStyle }, 'MIN'),
+                      React.createElement('th', { style: thStyle }, 'PTS'),
+                      React.createElement('th', { style: thStyle }, 'REB'),
+                      React.createElement('th', { style: thStyle }, 'AST'),
+                      React.createElement('th', { style: thStyle }, 'STL'),
+                      React.createElement('th', { style: thStyle }, 'BLK'),
+                      React.createElement('th', { style: thStyle }, 'TO'),
+                      React.createElement('th', { style: thStyle }, 'FG'),
+                      React.createElement('th', { style: thStyle }, '3P'),
+                      React.createElement('th', { style: thStyle }, 'FT'),
+                      React.createElement('th', { style: Object.assign({}, thStyle, { color: '#999' }) }, '+/-')
+                    )
+                  ),
+                  React.createElement('tbody', null,
+                    players.filter(function(p){ return p.athlete && p.stats && p.stats.length; }).map(function(p, i) {
+                      var isStarter = p.starter;
+                      return React.createElement('tr', { key: i, style: { borderTop: '1px solid rgba(0,0,0,0.05)', background: i%2===0?'#fff':'#fafafa' } },
+                        React.createElement('td', { style: Object.assign({}, tdNameStyle, { color: isStarter ? '#111' : '#555' }) },
+                          (isStarter ? '' : '') + (p.athlete && p.athlete.shortName || p.athlete && p.athlete.displayName || ''),
+                          !isStarter && React.createElement('span', { style: { color: '#bbb', fontWeight: 400, fontSize: 9, marginLeft: 4 } }, 'R')
+                        ),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'minutes')),
+                        React.createElement('td', { style: Object.assign({}, tdStyle, { fontWeight: 900, color: col.bg }) }, getNbaStat(p, 'points')),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'rebounds')),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'assists')),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'steals')),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'blocks')),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'turnovers')),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'fieldGoalsMade') + '-' + getNbaStat(p, 'fieldGoalsAttempted')),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'threePointFieldGoalsMade') + '-' + getNbaStat(p, 'threePointFieldGoalsAttempted')),
+                        React.createElement('td', { style: tdStyle }, getNbaStat(p, 'freeThrowsMade') + '-' + getNbaStat(p, 'freeThrowsAttempted')),
+                        React.createElement('td', { style: Object.assign({}, tdStyle, { color: '#999' }) }, getNbaStat(p, 'plusMinus'))
+                      );
+                    })
+                  )
+                )
+              )
+            );
+          }
+          return React.createElement('div', { style: { padding: '12px 16px' } },
+            /* Tableau par quart */
+            React.createElement('div', { style: { overflowX: 'auto', marginBottom: 16 } },
+              React.createElement('table', { style: { width: '100%', borderCollapse: 'collapse', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } },
+                React.createElement('thead', null,
+                  React.createElement('tr', { style: { background: 'rgba(0,0,0,0.06)' } },
+                    React.createElement('th', { style: Object.assign({}, thStyle, { textAlign: 'left' }) }, 'ÉQUIPE'),
+                    Array.from({ length: nbaQCount }, function(_, i) {
+                      return React.createElement('th', { key: i, style: thStyle }, i < 4 ? 'Q' + (i+1) : 'Pr');
+                    }),
+                    React.createElement('th', { style: Object.assign({}, thStyle, { color: lc, fontWeight: 900 }) }, 'TOT')
+                  )
+                ),
+                React.createElement('tbody', null,
+                  [['home', nbaHomeAb, nbaHomeLs, hc], ['away', nbaAwayAb, nbaAwayLs, ac]].map(function(row) {
+                    var side = row[0], ab = row[1], ls = row[2], col = row[3];
+                    var total = ls.reduce(function(s, q) { return s + (parseInt(q.displayValue||q.value||0)||0); }, 0);
+                    return React.createElement('tr', { key: side, style: { borderTop: '1px solid rgba(0,0,0,0.06)' } },
+                      React.createElement('td', { style: Object.assign({}, tdStyle, { textAlign: 'left', fontWeight: 900 }) },
+                        React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 6 } },
+                          getTeamLogo(ab, 'NBA', 18), ab
+                        )
+                      ),
+                      Array.from({ length: nbaQCount }, function(_, i) {
+                        var q = ls[i];
+                        var v = q ? (q.displayValue || q.value || '0') : '-';
+                        return React.createElement('td', { key: i, style: tdStyle }, v);
+                      }),
+                      React.createElement('td', { style: Object.assign({}, tdStyle, { fontWeight: 900, color: col.bg }) }, total || '-')
+                    );
+                  })
+                )
+              )
+            ),
+            /* Stats joueurs domicile */
+            renderTeamStats(nbaHomePl, nbaHomeAb, hc),
+            /* Stats joueurs visiteur */
+            renderTeamStats(nbaAwayPl, nbaAwayAb, ac)
+          );
+        })(),
         /* MLB Linescore */
         !bxLoading && boxscore && boxscore.type === 'MLB' && boxscore.data.linescore && /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 16px" } },
           /* Manches */
