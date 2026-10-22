@@ -8013,11 +8013,19 @@ async function fetchLeagueStats(lg) {
       { label: '% à 3 points',     src: 'stats', names: ['threePointFieldGoalPct','threePointPct','threePointFieldGoalPercentage'], pct: true }
     ];
     try {
-      /* Liste des équipes : id ESPN -> abréviation */
-      var teamsJson = await getJson(SITE + '/teams');
-      var teamList = ((((teamsJson.sports||[])[0]||{}).leagues||[])[0]||{}).teams || [];
-      var abById = {};
-      teamList.forEach(function(t){ if (t.team) abById[t.team.id] = siteAb(t.team.abbreviation); });
+      /* Équipes (id ESPN -> abréviation) via le classement : l'endpoint /teams d'ESPN est bloqué (CORS) */
+      var abById = {}; var standVals = {};
+      try {
+        var standJson = await getJson('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=' + NBA_SEASON);
+        (standJson.children || []).forEach(function(conf) {
+          ((conf.standings && conf.standings.entries) || []).forEach(function(en) {
+            if (!en.team) return;
+            abById[en.team.id] = siteAb(en.team.abbreviation);
+            var m = {}; (en.stats || []).forEach(function(s){ m[s.name] = s.value; });
+            standVals[en.team.id] = m;
+          });
+        });
+      } catch (se) { console.log('NBA classement error:', se); }
 
       /* ── Joueurs : leaders ESPN ── */
       var leadersJson = await getJson(CORE + '/seasons/' + NBA_SEASON + '/types/2/leaders?limit=10&lang=en&region=us');
@@ -8036,6 +8044,12 @@ async function fetchLeagueStats(lg) {
       (await Promise.all(Array.from(athleteIds).map(function(id) {
         return getJson(CORE + '/athletes/' + id + '?lang=en&region=us').then(function(d){ return [id, d]; }).catch(function(){ return [id, {}]; });
       }))).forEach(function(r){ athletes[r[0]] = r[1]; });
+      /* Équipes manquantes (classement indisponible) : résolution via l'API core */
+      var missingTeams = new Set();
+      Object.keys(catMap).forEach(function(k){ catMap[k].forEach(function(e){ var tId = idFrom(e.team && e.team['$ref'], 'teams'); if (tId && !abById[tId]) missingTeams.add(tId); }); });
+      (await Promise.all(Array.from(missingTeams).map(function(id) {
+        return getJson(CORE + '/seasons/' + NBA_SEASON + '/teams/' + id + '?lang=en&region=us').then(function(d){ return [id, d]; }).catch(function(){ return [id, {}]; });
+      }))).forEach(function(r){ if (r[1].abbreviation) abById[r[0]] = siteAb(r[1].abbreviation); });
       var players = nbaPlayerCats.map(function(c) {
         if (!catMap[c.label]) return null;
         var data = catMap[c.label].map(function(e) {
@@ -8050,14 +8064,10 @@ async function fetchLeagueStats(lg) {
       /* ── Équipes : classement (points pour/contre) + stats d'équipe ── */
       var teams = [];
       try {
-        var teamIds = Object.keys(abById);
-        var standJson = await getJson('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=' + NBA_SEASON);
-        var standVals = {};
-        (standJson.children || []).forEach(function(conf) {
-          ((conf.standings && conf.standings.entries) || []).forEach(function(en) {
-            var m = {}; (en.stats || []).forEach(function(s){ m[s.name] = s.value; });
-            if (en.team) standVals[en.team.id] = m;
-          });
+        /* On écarte les équipes qui n'ont pas encore joué (sinon 0 point encaissé = 1er) */
+        var teamIds = Object.keys(abById).filter(function(id) {
+          var m = standVals[id]; if (!m) return true;
+          return ((Number(m.wins) || 0) + (Number(m.losses) || 0)) > 0;
         });
         var statVals = {};
         (await Promise.all(teamIds.map(function(id) {
