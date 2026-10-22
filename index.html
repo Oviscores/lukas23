@@ -7894,199 +7894,6 @@ async function fetchStandings(lg) {
 }
 </script>
 <script>
-
-function syncGSTATS(lg) {
-  var sp = window.STATS_PAGES && window.STATS_PAGES[lg];
-  if (!sp || !sp.players || !sp.players.length) return;
-  GSTATS[lg] = sp.players.map(function(c) {
-    return {
-      label: c.label, unit: '',
-      players: c.data.map(function(p) { return { name: p.name, team: p.ab, val: p.val }; })
-    };
-  });
-}
-window.__NHL_STATS_LOADED__ = false;
-async function fetchNHLStats() {
-  if (window.__NHL_STATS_LOADED__) return;
-  window.__NHL_STATS_LOADED__ = true;
-  const P = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-  const S = '20262027';
-  function pp(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(p){var n=(p.firstName&&p.firstName.default||'')+' '+(p.lastName&&p.lastName.default||'');var ab=(p.teamAbbrevs&&p.teamAbbrevs.default)||p.teamAbbrev||'';return{name:n.trim(),ab:ab,val:p.value!==undefined?p.value:0};});}
-  function pg(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(g){var n=(g.firstName&&g.firstName.default||'')+' '+(g.lastName&&g.lastName.default||'');var ab=(g.teamAbbrevs&&g.teamAbbrevs.default)||(g.teamAbbrev&&g.teamAbbrev.default)||g.teamAbbrev||'';var v=g.value!==undefined?g.value:0;if(c==='savePctg')v=typeof v==='number'?v.toFixed(3):v;return{name:n.trim(),ab:ab,val:v};});}
-  function pt(d,c){if(!d||!d[c])return[];return d[c].slice(0,5).map(function(t){return{ab:(t.teamAbbrevs&&t.teamAbbrevs.default)||t.teamAbbrev||'',val:t.value!==undefined?t.value:0};});}
-  try {
-    var pC=['goals','assists','points','powerPlayPoints','hits','penaltyMinutes','plusMinus','gameWinningGoals','shots','blockedShots','timeOnIcePerGame'];
-    var tC=['teamPowerPlayPct','teamPenaltyKillPct','hits'];
-    var gC=['savePctg','wins','goalsAgainstAverage','shutouts'];
-    var pL={goals:'Buts',assists:'Passes',points:'Points',plusMinus:'+/-',penaltyMinutes:'Min. pénalité',powerPlayPoints:'Points PP',gameWinningGoals:'Buts vainqueurs',shots:'Tirs',hits:'Mises en échec',blockedShots:'Tirs bloqués',timeOnIcePerGame:'Temps de glace'};
-    var tL={teamPowerPlayPct:'Efficacité PP',teamPenaltyKillPct:'Efficacité PK',hits:'Hits - Équipes'};
-    var gL={savePctg:'SV%',wins:'Victoires',goalsAgainstAverage:'Moy. buts enc.',shutouts:'Jeux blancs'};
-    var all=await Promise.all([
-      ...pC.map(function(c){return fetch(P+'?league=nhl_leaders&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});}),
-      ...tC.map(function(c){return fetch(P+'?league=nhl_leaders&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});}),
-      ...gC.map(function(c){return fetch(P+'?league=nhl_goalies&cat='+c+'&season='+S).then(function(r){return r.json();}).catch(function(){return null;});})
-    ]);
-    var players=pC.map(function(c,i){return{label:pL[c]||c,data:pp(all[i],c)};}).filter(function(x){return x.data.length>0;});
-    var teams=tC.map(function(c,i){return{label:tL[c]||c,data:pt(all[pC.length+i],c)};}).filter(function(x){return x.data.length>0;});
-    var goalies=gC.map(function(c,i){return{label:gL[c]||c,data:pg(all[pC.length+tC.length+i],c)};}).filter(function(x){return x.data.length>0;});
-    if(window.STATS_PAGES){window.STATS_PAGES.NHL={teams:teams.length>0?teams:window.STATS_PAGES.NHL.teams,players:players.length>0?players:window.STATS_PAGES.NHL.players,goalies:goalies};}
-    if(window.__zoneus_refresh__)window.__zoneus_refresh__();
-    syncGSTATS('NHL');
-    console.log('NHL stats OK - sample:', window.STATS_PAGES.NHL && window.STATS_PAGES.NHL.players[0]);
-  } catch(e){console.log('NHL stats err',e);window.__NHL_STATS_LOADED__=false;}
-}
-</script>
-<script>
-// ============================================================
-// STATS MLB / NBA / NFL — ESPN Leaders API
-// ============================================================
-window.__STATS_LOADED__ = window.__STATS_LOADED__ || {};
-
-async function fetchLeagueStats(lg) {
-  if (lg !== 'NFL' && window.__STATS_LOADED__[lg]) return;
-  window.__STATS_LOADED__[lg] = true;
-  var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-
-  if (lg === 'MLB') {
-    try {
-      var mlbCats = [
-        {cat:'homeRuns',label:'Home Runs'},
-        {cat:'battingAverage',label:'Moyenne'},
-        {cat:'rbi',label:'Points produits'},
-        {cat:'stolenBases',label:'Buts volés'},
-        {cat:'hits',label:'Coups sûrs'},
-        {cat:'era',label:'ERA'},
-        {cat:'strikeouts',label:'Retraits sur 3 prises'},
-        {cat:'wins',label:'Victoires'},
-        {cat:'saves',label:'Sauvetages'}
-      ];
-      var results = await Promise.all(mlbCats.map(function(c) {
-        return fetch(PROXY+'?league=mlb_leaders&cat='+c.cat+'&season=2026').then(function(r){return r.json();}).catch(function(){return null;});
-      }));
-      var players = mlbCats.map(function(c,i) {
-        var d = results[i];
-        if (!d||!d.leagueLeaders||!d.leagueLeaders[0]) return null;
-        var data = (d.leagueLeaders[0].leaders||[]).slice(0,5).map(function(e) {
-          return {name:e.person&&e.person.fullName||'',ab:e.team&&e.team.abbreviation||'',val:e.value||0};
-        });
-        return data.length ? {label:c.label,data:data} : null;
-      }).filter(Boolean);
-      if (players.length>0) {
-        window.STATS_PAGES.MLB = window.STATS_PAGES.MLB||{teams:[],players:[]};
-        window.STATS_PAGES.MLB.players = players;
-        syncGSTATS('MLB');
-        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
-      }
-      syncGSTATS('MLB');
-      console.log('MLB stats OK - '+players.length+' cats');
-    } catch(e) { console.log('MLB stats error:',e); window.__STATS_LOADED__.MLB=false; }
-    return;
-  }
-
-  if (lg === 'NBA') {
-    try {
-      var d = await fetch(PROXY+'?league=nba_leaders').then(function(r){return r.json();});
-      var players = d.players || [];
-      if (players.length > 0) {
-        window.STATS_PAGES.NBA = window.STATS_PAGES.NBA||{teams:[],players:[]};
-        window.STATS_PAGES.NBA.players = players;
-        syncGSTATS('NBA');
-        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-        if (window.__stats_setTick__) window.__stats_setTick__(function(t){return t+1;});
-      }
-      console.log('NBA stats OK - '+players.length+' cats');
-    } catch(e) { console.log('NBA stats error:',e); window.__STATS_LOADED__.NBA=false; }
-    return;
-  }
-
-  if (lg === 'NFL') {
-    try {
-      var nflCats = [
-        {cat:'passingYards',label:'Yards passés'},
-        {cat:'passingTouchdowns',label:'TD passés'},
-        {cat:'rushingYards',label:'Yards course'},
-        {cat:'rushingTouchdowns',label:'TD course'},
-        {cat:'receivingYards',label:'Yards réception'},
-        {cat:'receivingTouchdowns',label:'TD réception'},
-        {cat:'sacks',label:'Sacks'},
-        {cat:'interceptions',label:'Interceptions déf.'}
-      ];
-      // Appel direct depuis le client — sports.core.api.espn.com est accessible depuis le navigateur
-      // mais bloqué depuis Cloudflare Workers, donc on bypass le proxy ici
-      var resp = await fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/types/2/leaders?lang=en&region=us&_='+Date.now());
-      var json = await resp.json();
-      var categories = json.categories || [];
-
-      // Collecter tous les IDs uniques d'athlètes et d'équipes depuis les $ref
-      var athleteIds = new Set();
-      var teamIds = new Set();
-      var catMap = {};
-      nflCats.forEach(function(c) {
-        var catData = categories.find(function(x){return x.name===c.cat;});
-        if (!catData) return;
-        var top5 = (catData.leaders||[]).slice(0,5);
-        catMap[c.cat] = top5;
-        top5.forEach(function(e) {
-          var aRef = (e.athlete&&e.athlete['$ref']||'');
-          var tRef = (e.team&&e.team['$ref']||'');
-          var aId = (aRef.match(/athletes\/(\d+)/)||[])[1];
-          var tId = (tRef.match(/teams\/(\d+)/)||[])[1];
-          if (aId) athleteIds.add(aId);
-          if (tId) teamIds.add(tId);
-        });
-      });
-
-      // Résoudre athlètes et équipes en parallèle directement depuis le client
-      var athleteArr = Array.from(athleteIds);
-      var teamArr = Array.from(teamIds);
-      var athleteResults = await Promise.all(athleteArr.map(function(id) {
-        return fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes/'+id+'?lang=en&region=us')
-          .then(function(r){return r.json();}).then(function(d){return [id,d];}).catch(function(){return [id,{}];});
-      }));
-      var teamResults = await Promise.all(teamArr.map(function(id) {
-        return fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/'+id+'?lang=en&region=us')
-          .then(function(r){return r.json();}).then(function(d){return [id,d];}).catch(function(){return [id,{}];});
-      }));
-      var athletes = {};
-      athleteResults.forEach(function(r){athletes[r[0]]=r[1];});
-      var teams = {};
-      teamResults.forEach(function(r){teams[r[0]]=r[1];});
-
-      // Construire les données finales
-      var players = nflCats.map(function(c) {
-        if (!catMap[c.cat]) return null;
-        var data = catMap[c.cat].map(function(e) {
-          var aRef = (e.athlete&&e.athlete['$ref']||'');
-          var tRef = (e.team&&e.team['$ref']||'');
-          var aId = (aRef.match(/athletes\/(\d+)/)||[])[1];
-          var tId = (tRef.match(/teams\/(\d+)/)||[])[1];
-          var aData = aId ? (athletes[aId]||{}) : {};
-          var tData = tId ? (teams[tId]||{}) : {};
-          return {
-            name: aData.displayName||aData.shortName||'',
-            ab: tData.abbreviation||'',
-            val: e.displayValue||String(e.value||0)
-          };
-        }).filter(function(e){return e.name;});
-        return data.length ? {label:c.label,data:data} : null;
-      }).filter(Boolean);
-
-      if (players.length > 0) {
-        window.STATS_PAGES.NFL = window.STATS_PAGES.NFL||{teams:[],players:[]};
-        window.STATS_PAGES.NFL.players = players;
-        syncGSTATS('NFL');
-        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-      }
-      console.log('NFL stats OK - '+players.length+' cats');
-    } catch(e) { console.log('NFL stats error:',e); window.__STATS_LOADED__.NFL=false; }
-    return;
-  }
-}
-
-
-</script>
-<script>
 window.__NHL_STATS_LOADED__ = false;
 window.__STATS_LOADED__ = {};
 
@@ -8161,6 +7968,7 @@ async function fetchLeagueStats(lg) {
       if (players.length>0) {
         window.STATS_PAGES.MLB = window.STATS_PAGES.MLB||{teams:[],players:[]};
         window.STATS_PAGES.MLB.players = players;
+        syncGSTATS('MLB');
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
       }
       console.log('MLB stats OK - '+players.length+' cats');
@@ -8169,16 +7977,128 @@ async function fetchLeagueStats(lg) {
   }
 
   if (lg === 'NBA') {
+    /* Stats NBA : appel direct ESPN depuis le navigateur (comme la NFL), proxy en secours.
+       Saison 2026-27 = 2027 chez ESPN. A incrémenter chaque automne. */
+    var NBA_SEASON = 2027;
+    var CORE = 'https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba';
+    var SITE = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba';
+    var espnToSite = { GS:'GSW', NY:'NYK', SA:'SAS', NO:'NOP', UTAH:'UTA', WSH:'WAS' };
+    var siteAb = function(a) { return espnToSite[a] || a || ''; };
+    var getJson = function(url, ms) {
+      var ctrl = new AbortController();
+      var t = setTimeout(function(){ ctrl.abort(); }, ms || 12000);
+      return fetch(url, { signal: ctrl.signal }).then(function(r){ return r.json(); }).finally(function(){ clearTimeout(t); });
+    };
+    var idFrom = function(ref, kind) { return ((ref||'').match(new RegExp(kind + '/(\\d+)'))||[])[1]; };
+    var fmt = function(v, pct) {
+      if (v === undefined || v === null || isNaN(v)) return null;
+      v = Number(v);
+      if (pct) { if (v <= 1) v = v * 100; return v.toFixed(1) + '%'; }
+      return (Math.round(v * 10) / 10).toFixed(1);
+    };
+    var nbaPlayerCats = [
+      { label: 'Points',              names: ['pointsPerGame','avgPoints','points'],             abbr: ['PTS'] },
+      { label: 'Rebonds',             names: ['reboundsPerGame','avgRebounds','rebounds'],       abbr: ['REB'] },
+      { label: 'Passes',              names: ['assistsPerGame','avgAssists','assists'],          abbr: ['AST'] },
+      { label: 'Interceptions',       names: ['stealsPerGame','avgSteals','steals'],             abbr: ['STL'] },
+      { label: 'Contres',             names: ['blocksPerGame','avgBlocks','blocks'],             abbr: ['BLK'] },
+      { label: 'Tirs à 3 pts réussis', names: ['threePointFieldGoalsMade','threePointsMade','avgThreePointFieldGoalsMade','threePointFieldGoalsMadePerGame'], abbr: ['3PM'] },
+      { label: '% aux tirs',          names: ['fieldGoalPercentage','fieldGoalPct'],             abbr: ['FG%'], pct: true }
+    ];
+    var nbaTeamCats = [
+      { label: 'Points marqués',   src: 'standings', names: ['avgPointsFor','pointsFor'] },
+      { label: 'Points encaissés', src: 'standings', names: ['avgPointsAgainst','pointsAgainst'], asc: true },
+      { label: 'Rebonds',          src: 'stats', names: ['avgRebounds','reboundsPerGame'] },
+      { label: 'Passes',           src: 'stats', names: ['avgAssists','assistsPerGame'] },
+      { label: '% à 3 points',     src: 'stats', names: ['threePointFieldGoalPct','threePointPct','threePointFieldGoalPercentage'], pct: true }
+    ];
     try {
-      var d = await fetch(PROXY+'?league=nba_leaders').then(function(r){return r.json();});
-      var players = d.players || [];
-      if (players.length > 0) {
-        window.STATS_PAGES.NBA = window.STATS_PAGES.NBA||{teams:[],players:[]};
-        window.STATS_PAGES.NBA.players = players;
-        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-      }
-      console.log('NBA stats OK - '+players.length+' cats');
-    } catch(e) { console.log('NBA stats error:',e); window.__STATS_LOADED__.NBA=false; }
+      /* Liste des équipes : id ESPN -> abréviation */
+      var teamsJson = await getJson(SITE + '/teams');
+      var teamList = ((((teamsJson.sports||[])[0]||{}).leagues||[])[0]||{}).teams || [];
+      var abById = {};
+      teamList.forEach(function(t){ if (t.team) abById[t.team.id] = siteAb(t.team.abbreviation); });
+
+      /* ── Joueurs : leaders ESPN ── */
+      var leadersJson = await getJson(CORE + '/seasons/' + NBA_SEASON + '/types/2/leaders?limit=10&lang=en&region=us');
+      var lCats = leadersJson.categories || [];
+      console.log('NBA leaders - catégories ESPN dispo :', lCats.map(function(c){ return c.name; }).join(', '));
+      var catMap = {}; var athleteIds = new Set();
+      nbaPlayerCats.forEach(function(c) {
+        var found = null;
+        for (var i = 0; i < c.names.length && !found; i++) found = lCats.find(function(x){ return x.name === c.names[i]; });
+        if (!found) found = lCats.find(function(x){ return c.abbr.indexOf(x.abbreviation) >= 0; });
+        if (!found) return;
+        catMap[c.label] = (found.leaders || []).slice(0, 10);
+        catMap[c.label].forEach(function(e){ var id = idFrom(e.athlete && e.athlete['$ref'], 'athletes'); if (id) athleteIds.add(id); });
+      });
+      var athletes = {};
+      (await Promise.all(Array.from(athleteIds).map(function(id) {
+        return getJson(CORE + '/athletes/' + id + '?lang=en&region=us').then(function(d){ return [id, d]; }).catch(function(){ return [id, {}]; });
+      }))).forEach(function(r){ athletes[r[0]] = r[1]; });
+      var players = nbaPlayerCats.map(function(c) {
+        if (!catMap[c.label]) return null;
+        var data = catMap[c.label].map(function(e) {
+          var a = athletes[idFrom(e.athlete && e.athlete['$ref'], 'athletes')] || {};
+          var tId = idFrom(e.team && e.team['$ref'], 'teams');
+          var val = c.pct ? fmt(e.value, true) : (e.displayValue || fmt(e.value));
+          return { name: a.displayName || a.shortName || '', ab: abById[tId] || '', val: val };
+        }).filter(function(e){ return e.name; });
+        return data.length ? { label: c.label, data: data } : null;
+      }).filter(Boolean);
+
+      /* ── Équipes : classement (points pour/contre) + stats d'équipe ── */
+      var teams = [];
+      try {
+        var teamIds = Object.keys(abById);
+        var standJson = await getJson('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=' + NBA_SEASON);
+        var standVals = {};
+        (standJson.children || []).forEach(function(conf) {
+          ((conf.standings && conf.standings.entries) || []).forEach(function(en) {
+            var m = {}; (en.stats || []).forEach(function(s){ m[s.name] = s.value; });
+            if (en.team) standVals[en.team.id] = m;
+          });
+        });
+        var statVals = {};
+        (await Promise.all(teamIds.map(function(id) {
+          return getJson(CORE + '/seasons/' + NBA_SEASON + '/types/2/teams/' + id + '/statistics?lang=en&region=us')
+            .then(function(d){ return [id, d]; }).catch(function(){ return [id, {}]; });
+        }))).forEach(function(r) {
+          var m = {};
+          (((r[1].splits || {}).categories) || []).forEach(function(cat){ (cat.stats || []).forEach(function(s){ if (m[s.name] === undefined) m[s.name] = s.value; }); });
+          statVals[r[0]] = m;
+        });
+        teams = nbaTeamCats.map(function(c) {
+          var src = c.src === 'standings' ? standVals : statVals;
+          var rows = teamIds.map(function(id) {
+            var m = src[id] || {}; var v;
+            for (var i = 0; i < c.names.length && v === undefined; i++) v = m[c.names[i]];
+            return (v === undefined || v === null || isNaN(v)) ? null : { ab: abById[id], raw: Number(v) };
+          }).filter(Boolean);
+          rows.sort(function(a, b){ return c.asc ? a.raw - b.raw : b.raw - a.raw; });
+          var data = rows.slice(0, 10).map(function(r){ return { ab: r.ab, val: fmt(r.raw, c.pct) }; });
+          return data.length ? { label: c.label, data: data } : null;
+        }).filter(Boolean);
+      } catch (te) { console.log('NBA stats équipes error:', te); }
+
+      if (!players.length) throw new Error('ESPN : aucun leader NBA pour la saison ' + NBA_SEASON);
+      window.STATS_PAGES.NBA = { teams: teams, players: players };
+      syncGSTATS('NBA');
+      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      if (window.__stats_setTick__) window.__stats_setTick__(function(t){ return t + 1; });
+      console.log('NBA stats OK (ESPN) - ' + players.length + ' cats joueurs, ' + teams.length + ' cats équipes');
+    } catch (e) {
+      console.log('NBA stats ESPN error, essai proxy :', e);
+      try {
+        var d = await getJson(PROXY + '?league=nba_leaders', 8000);
+        if (d && d.players && d.players.length) {
+          window.STATS_PAGES.NBA = { teams: d.teams || [], players: d.players };
+          syncGSTATS('NBA');
+          if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+          console.log('NBA stats OK (proxy)');
+        } else { window.__STATS_LOADED__.NBA = false; }
+      } catch (e2) { console.log('NBA stats proxy error:', e2); window.__STATS_LOADED__.NBA = false; }
+    }
     return;
   }
 
