@@ -3654,8 +3654,19 @@ function MatchScoreInArticle({ matchId, matchLg }) {
         .then(function(r){return r.json();})
         .then(function(d){setBx(d);setLoading(false);})
         .catch(function(){setLoading(false);});
+    } else if (matchLg === 'NBA') {
+      /* NBA : même source que la page match (proxy), avec repli direct sur ESPN basket */
+      var nbaId = (matchId+'').replace('nba_','');
+      var espnNba = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + nbaId;
+      fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_boxscore&eventId=' + nbaId)
+        .then(function(r){return r.json();})
+        .then(function(d){ if (d && d.header) return d; return fetch(espnNba).then(function(r){return r.json();}); })
+        .catch(function(){ return fetch(espnNba).then(function(r){return r.json();}); })
+        .then(function(d){setBx(d);setLoading(false);})
+        .catch(function(){setLoading(false);});
     } else {
-      var url = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + matchId;
+      var nflId = (matchId+'').replace('nfl_','');
+      var url = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + nflId;
       fetch(url).then(function(r){return r.json();}).then(function(d){setBx(d);setLoading(false);}).catch(function(){setLoading(false);});
     }
   }, [matchId]);
@@ -3815,10 +3826,108 @@ function MatchScoreInArticle({ matchId, matchLg }) {
     );
   }
 
-  /* ── Rendu NFL / MLB (inchangé) ── */
+  /* ── Rendu NBA ── */
+  if (matchLg === 'NBA') {
+    var nComp = bx.header && bx.header.competitions && bx.header.competitions[0];
+    var nHome = nComp && nComp.competitors && nComp.competitors.find(function(c){return c.homeAway==='home';});
+    var nAway = nComp && nComp.competitors && nComp.competitors.find(function(c){return c.homeAway==='away';});
+    if (!nHome || !nAway) return null;
+    var nHomeAb = (nHome.team && nHome.team.abbreviation) || '';
+    var nAwayAb = (nAway.team && nAway.team.abbreviation) || '';
+    /* ESPN utilise GS, NY, SA, NO, UTAH, WSH : on ramène aux codes du site pour les couleurs */
+    var espnToSite = { GS: 'GSW', NY: 'NYK', SA: 'SAS', NO: 'NOP', UTAH: 'UTA', WSH: 'WAS' };
+    var nhCol = TC[(espnToSite[nHomeAb]||nHomeAb)+'_NBA'] || {bg:'#333',fg:'#fff'};
+    var naCol = TC[(espnToSite[nAwayAb]||nAwayAb)+'_NBA'] || {bg:'#555',fg:'#fff'};
+    var nStatus = nComp.status && nComp.status.type;
+    var nStatusTxt = nStatus && nStatus.completed ? ('FINAL' + ((nHome.linescores||[]).length > 4 ? ' — Prol.' : '')) : (nStatus && nStatus.shortDetail || '');
+    var nHomeLs = nHome.linescores || []; var nAwayLs = nAway.linescores || [];
+    var nQ = Math.max(nHomeLs.length, nAwayLs.length, 4);
+    var nPlayers = (bx.boxscore && bx.boxscore.players) || [];
+    function nbaTeamBlock(ab) {
+      var t = nPlayers.find(function(x){return x.team && x.team.abbreviation === ab;}) || {};
+      var st = (t.statistics && t.statistics[0]) || {};
+      return { keys: st.keys || [], athletes: (st.athletes || []).filter(function(a){return a.athlete && a.stats && a.stats.length;}) };
+    }
+    var cell = { padding: '5px 6px', textAlign: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12 };
+    var head = Object.assign({}, cell, { fontWeight: 800, color: '#888', fontSize: 11 });
+    function renderNbaTeam(ab, col) {
+      var tb = nbaTeamBlock(ab);
+      if (!tb.athletes.length) return null;
+      var g = function(a, k){ var i = tb.keys.indexOf(k); return i === -1 ? '-' : (a.stats[i] || '-'); };
+      var cols = [['MIN','minutes'],['PTS','points'],['REB','rebounds'],['AST','assists'],['FG',null,'fieldGoalsMade','fieldGoalsAttempted'],['3P',null,'threePointFieldGoalsMade','threePointFieldGoalsAttempted'],['LF',null,'freeThrowsMade','freeThrowsAttempted']];
+      var hasSplit = tb.keys.indexOf('points') !== -1;
+      return React.createElement("div", { style: { background: "#fff" } },
+        React.createElement("div", { style: { background: col.bg, padding: "6px 12px", display: "flex", alignItems: "center", gap: 8, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.08em" } },
+          getTeamLogo(ab, 'NBA', 18), ab
+        ),
+        React.createElement("div", { style: { overflowX: "auto" } },
+          React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
+            React.createElement("thead", null, React.createElement("tr", { style: { background: "#f5f5f5" } },
+              React.createElement("th", { style: Object.assign({}, head, { textAlign: 'left', paddingLeft: 12 }) }, "JOUEUR"),
+              cols.map(function(c){ return React.createElement("th", { key: c[0], style: head }, c[0]); })
+            )),
+            React.createElement("tbody", null, tb.athletes.map(function(a, i) {
+              return React.createElement("tr", { key: i, style: { borderTop: "1px solid #f0f0f0", background: i%2===0?"#fff":"#fafafa" } },
+                React.createElement("td", { style: Object.assign({}, cell, { textAlign: 'left', paddingLeft: 12, fontWeight: 800, color: a.starter ? '#111' : '#666', whiteSpace: 'nowrap' }) },
+                  a.athlete.shortName || a.athlete.displayName || ''),
+                cols.map(function(c){
+                  var v;
+                  if (c[1]) v = g(a, c[1]);
+                  else if (tb.keys.indexOf(c[2] + '-' + c[3]) !== -1) v = g(a, c[2] + '-' + c[3]);
+                  else if (hasSplit) v = g(a, c[2]) + '-' + g(a, c[3]);
+                  else v = '-';
+                  return React.createElement("td", { key: c[0], style: Object.assign({}, cell, c[0]==='PTS' ? { fontWeight: 900, color: col.bg } : {}) }, v);
+                })
+              );
+            }))
+          )
+        )
+      );
+    }
+    return React.createElement("div", { style: { background: "rgba(255,255,255,0.9)", borderRadius: 8, overflow: "hidden", marginTop: 24 } },
+      React.createElement("div", { style: { background: lc, padding: "10px 14px" } },
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff" } }, "RÉSULTAT")
+      ),
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-around", alignItems: "center", padding: "16px 24px", background: "#111" } },
+        React.createElement("div", { style: { textAlign: "center" } },
+          getTeamLogo(nAwayAb, 'NBA', 52),
+          React.createElement("div", { style: { color: "rgba(255,255,255,0.6)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 13, marginTop: 4 } }, nAwayAb)
+        ),
+        React.createElement("div", { style: { textAlign: "center" } },
+          React.createElement("div", { style: { color: "rgba(255,255,255,0.4)", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 700 } }, nStatusTxt),
+          React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 42, letterSpacing: 4, lineHeight: 1 } }, (nAway.score || '0') + ' – ' + (nHome.score || '0'))
+        ),
+        React.createElement("div", { style: { textAlign: "center" } },
+          getTeamLogo(nHomeAb, 'NBA', 52),
+          React.createElement("div", { style: { color: "rgba(255,255,255,0.6)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 13, marginTop: 4 } }, nHomeAb)
+        )
+      ),
+      React.createElement("div", { style: { overflowX: "auto", background: "#fff", padding: "10px 12px" } },
+        React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
+          React.createElement("thead", null, React.createElement("tr", { style: { background: "#f5f5f5" } },
+            React.createElement("th", { style: Object.assign({}, head, { textAlign: 'left' }) }, ""),
+            Array.from({ length: nQ }, function(_, i){ return React.createElement("th", { key: i, style: head }, i < 4 ? 'Q'+(i+1) : 'Pr'+(nQ > 5 ? (i-3) : '')); }),
+            React.createElement("th", { style: Object.assign({}, head, { color: lc, fontWeight: 900 }) }, "TOT")
+          )),
+          React.createElement("tbody", null, [[nAwayAb, nAwayLs, nAway.score, naCol], [nHomeAb, nHomeLs, nHome.score, nhCol]].map(function(r) {
+            return React.createElement("tr", { key: r[0], style: { borderTop: "1px solid #f0f0f0" } },
+              React.createElement("td", { style: Object.assign({}, cell, { textAlign: 'left', fontWeight: 900, color: r[3].bg }) }, r[0]),
+              Array.from({ length: nQ }, function(_, i){ var q = r[1][i]; return React.createElement("td", { key: i, style: cell }, q ? (q.displayValue != null ? q.displayValue : q.value) : '-'); }),
+              React.createElement("td", { style: Object.assign({}, cell, { fontWeight: 900, color: lc }) }, r[2] || '-')
+            );
+          }))
+        )
+      ),
+      renderNbaTeam(nAwayAb, naCol),
+      renderNbaTeam(nHomeAb, nhCol)
+    );
+  }
+
+  /* ── Rendu NFL ── */
   var comp = bx.header && bx.header.competitions && bx.header.competitions[0];
   var home = comp && comp.competitors && comp.competitors.find(function(c){return c.homeAway==='home';});
   var away = comp && comp.competitors && comp.competitors.find(function(c){return c.homeAway==='away';});
+  if (!home || !away) return null;
   return React.createElement("div", { style: { background: "rgba(255,255,255,0.9)", borderRadius: 8, overflow: "hidden", marginTop: 24 } },
     React.createElement("div", { style: { background: lc, padding: "10px 14px" } },
       React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff" } }, "RÉSULTAT")
