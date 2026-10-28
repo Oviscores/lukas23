@@ -5112,7 +5112,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
           }
         } else if (matchLg === 'NBA') {
           var nbaEvId = (matchEventId || matchId || '').replace('nba_','');
-          if (nbaEvId) { var rNba = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_boxscore&eventId=' + nbaEvId); data = await rNba.json(); if (data && data.boxscore) setBoxscore({ type: 'NBA', data: data }); }
+          if (nbaEvId) { var rNba = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_boxscore&eventId=' + nbaEvId); data = await rNba.json(); if (data && data.boxscore) { setBoxscore({ type: 'NBA', data: data }); if (!_enriched.current) { var nbaComp0 = data.header && data.header.competitions && data.header.competitions[0]; var nbaH0 = nbaComp0 && nbaComp0.competitors && nbaComp0.competitors.find(function(c){return c.homeAway==='home';}); var nbaA0 = nbaComp0 && nbaComp0.competitors && nbaComp0.competitors.find(function(c){return c.homeAway==='away';}); var nbaHAb0 = nbaH0 && nbaH0.team && nbaH0.team.abbreviation; var nbaAAb0 = nbaA0 && nbaA0.team && nbaA0.team.abbreviation; if (nbaHAb0 && nbaAAb0) { _enriched.current = true; setMatchData(function(prev){ return Object.assign({}, prev, { homeTeam: nbaHAb0, awayTeam: nbaAAb0 }); }); } } } }
         } else if (matchLg === 'NFL') {
           var _rawId = matchEventId || matchId || '';
           var _cleanId = (_rawId+'').replace('nfl_','');
@@ -5166,7 +5166,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
               }
             } else if (matchLg === 'NBA') {
               var nbaEvId2 = (matchEventId || matchId || '').replace('nba_','');
-              if (nbaEvId2) { var rNba2 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_boxscore&eventId=' + nbaEvId2); data = await rNba2.json(); if (data && data.boxscore) setBoxscore({ type: 'NBA', data: data }); }
+              if (nbaEvId2) { var rNba2 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_boxscore&eventId=' + nbaEvId2); data = await rNba2.json(); if (data && data.boxscore) { setBoxscore({ type: 'NBA', data: data }); if (!_enriched.current) { var nbaComp0r = data.header && data.header.competitions && data.header.competitions[0]; var nbaH0r = nbaComp0r && nbaComp0r.competitors && nbaComp0r.competitors.find(function(c){return c.homeAway==='home';}); var nbaA0r = nbaComp0r && nbaComp0r.competitors && nbaComp0r.competitors.find(function(c){return c.homeAway==='away';}); var nbaHAb0r = nbaH0r && nbaH0r.team && nbaH0r.team.abbreviation; var nbaAAb0r = nbaA0r && nbaA0r.team && nbaA0r.team.abbreviation; if (nbaHAb0r && nbaAAb0r) { _enriched.current = true; setMatchData(function(prev){ return Object.assign({}, prev, { homeTeam: nbaHAb0r, awayTeam: nbaAAb0r }); }); } } } }
             } else if (matchLg === 'NFL') {
               var _rawId2 = matchEventId || matchId || '';
               var _cleanId2 = (_rawId2+'').replace('nfl_','');
@@ -5250,8 +5250,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
   const ac = TC[ak] || { bg: "#333", fg: "#fff" };
   const hName = TEAM_NAMES[hk] || _homeAb;
   const aName = TEAM_NAMES[ak] || _awayAb;
-  const h2hKey = matchData.awayTeam + "-" + matchData.homeTeam;
-  const h2hKeyAlt = matchData.homeTeam + "-" + matchData.awayTeam;
+  const h2hKey = _awayAb + "-" + _homeAb;
+  const h2hKeyAlt = _homeAb + "-" + _awayAb;
   const h2h = H2H[h2hKey] || H2H[h2hKeyAlt] || { wins: [0, 0], last5: [], avgGoals: 0 };
   const hStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === _homeAb);
   const aStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === _awayAb);
