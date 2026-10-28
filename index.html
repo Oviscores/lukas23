@@ -5472,11 +5472,6 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
                 upcoming.length===0?noData():upcoming.map(function(m2,i){return React.createElement(React.Fragment,{key:i},renderUpcomingRow(m2,teamAb,innerLc));})
               )
             ),
-            /* Stats leaders */
-            stats && stats.length>0 && React.createElement("div",null,
-              sectionLabel("Leaders — "+teamAb, innerLc),
-              renderStats(stats, col)
-            ),
             /* Blessés */
             React.createElement("div",null,
               sectionLabel("Blessés / Incertains", innerLc),
