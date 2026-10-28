@@ -5903,8 +5903,9 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       const isPlaying = s.ab === matchData.homeTeam || s.ab === matchData.awayTeam;
       const isH = s.ab === matchData.homeTeam;
       return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", padding: "6px 16px", gap: 8, borderBottom: "1px solid #f8f8f8", background: isPlaying ? isH ? hc.bg + "12" : ac.bg + "12" : "transparent" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, color: i === 0 ? lc : "#ccc", width: 14, textAlign: "center" } }, s.r), /* @__PURE__ */ getTeamLogo(s.ab, matchData.lg, 22), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: isPlaying ? 900 : 600, color: isPlaying ? "#111" : "#555", flex: 1 } }, TEAM_NAMES[s.ab + "_" + matchData.lg] || s.ab), isPlaying && /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 900, color: isH ? hc.bg : ac.bg, background: (isH ? hc.bg : ac.bg) + "18", padding: "1px 5px", borderRadius: 2 } }, isH ? "DOM" : "VIS"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 800, color: i === 0 ? lc : "#333" } }, matchData.lg === "NFL" ? s.w + "-" + s.l : matchData.lg === "NBA" || matchData.lg === "MLB" ? s.pct : s.pts));
-    }));
-,
+    })
+      );
+    }),
       /* ===== BLOC AVANT-MATCH COMPLET ===== */
       !isLive && !isFinal && (function() {
         var lg2 = matchData.lg;
@@ -6079,8 +6080,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
           renderTeamBlock(awayAb2,aName,ac,aUp,aRec,aSt2,aStats,aInj,aArts,false)
         );
       })()
-    )
-  })));
+  );
 }
 function MatchCard({ m, lc, lg, onMatchClick }) {
   const isFinal = m.st === "Final" || m.st.includes("Final") || m.st.includes("OT") || m.st.includes("P. Sup.");
@@ -7414,7 +7414,6 @@ function AllArticlesPage({ arts, onArticleClick, onBack }) {
         );
       })
     )
-  );
   );
 }
 
