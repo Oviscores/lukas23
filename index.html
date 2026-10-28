@@ -4640,6 +4640,21 @@ var NFL_ESPN_TEAMS = {
   'NYJ':'nyj','PHI':'phi','PIT':'pit','SEA':'sea','SF':'sf','TB':'tb',
   'TEN':'ten','WAS':'was'
 };
+var NBA_ESPN_TEAMS = {
+  'ATL':'atl','BKN':'bkn','BOS':'bos','CHA':'cha','CHI':'chi','CLE':'cle',
+  'DAL':'dal','DEN':'den','DET':'det','GSW':'gs','HOU':'hou','IND':'ind',
+  'LAC':'lac','LAL':'lal','MEM':'mem','MIA':'mia','MIL':'mil','MIN':'min',
+  'NOP':'no','NYK':'ny','OKC':'okc','ORL':'orl','PHI':'phi','PHX':'phx',
+  'POR':'por','SAC':'sac','SAS':'sa','TOR':'tor','UTA':'utah','WAS':'wsh'
+};
+var NHL_ESPN_TEAMS = {
+  'ANA':'ana','ARI':'ari','BOS':'bos','BUF':'buf','CGY':'cgy','CAR':'car',
+  'CHI':'chi','COL':'col','CBJ':'cbj','DAL':'dal','DET':'det','EDM':'edm',
+  'FLA':'fla','LAK':'la','MIN':'min','MTL':'mtl','NSH':'nsh','NJD':'nj',
+  'NYI':'nyi','NYR':'nyr','OTT':'ott','PHI':'phi','PIT':'pit','SJS':'sj',
+  'SEA':'sea','STL':'stl','TBL':'tb','TOR':'tor','VAN':'van','VGK':'vgk',
+  'WPG':'wpg','WSH':'wsh','UTA':'utah'
+};
 
 function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick, onMatchClick, onStandingsClick }) {
   var _db = window.TEAMS_DB || TEAMS_DB;
@@ -5195,6 +5210,34 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
     }
     fetchMLB(_homeAb0, setHMlbSched); fetchMLB(_awayAb0, setAMlbSched);
   }, [match.lg, _homeAb0, _awayAb0]);
+  var _hNba = React.useState(null); var hNbaSched = _hNba[0], setHNbaSched = _hNba[1];
+  var _aNba = React.useState(null); var aNbaSched = _aNba[0], setANbaSched = _aNba[1];
+  React.useEffect(function() {
+    if (match.lg !== 'NBA') return;
+    function fetchNBA(ab, setter) {
+      var slug = NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[ab]; if (!slug) return;
+      fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/'+slug+'/schedule').then(function(r){return r.json();}).then(function(d){
+        var today=new Date().toISOString().split('T')[0]; var upcoming=[],recent=[];
+        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=home.team&&home.team.abbreviation||'';var awayAb=away.team&&away.team.abbreviation||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NBA'});}else if(evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NBA'});}});
+        setter({upcoming:upcoming.slice(0,5),recent:recent.slice(-5).reverse()});
+      }).catch(function(){});
+    }
+    fetchNBA(_homeAb0, setHNbaSched); fetchNBA(_awayAb0, setANbaSched);
+  }, [match.lg, _homeAb0, _awayAb0]);
+  var _hNhl = React.useState(null); var hNhlSched = _hNhl[0], setHNhlSched = _hNhl[1];
+  var _aNhl = React.useState(null); var aNhlSched = _aNhl[0], setANhlSched = _aNhl[1];
+  React.useEffect(function() {
+    if (match.lg !== 'NHL') return;
+    function fetchNHL(ab, setter) {
+      var slug = NHL_ESPN_TEAMS && NHL_ESPN_TEAMS[ab]; if (!slug) return;
+      fetch('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/'+slug+'/schedule').then(function(r){return r.json();}).then(function(d){
+        var today=new Date().toISOString().split('T')[0]; var upcoming=[],recent=[];
+        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=home.team&&home.team.abbreviation||'';var awayAb=away.team&&away.team.abbreviation||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NHL'});}else if(evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NHL'});}});
+        setter({upcoming:upcoming.slice(0,5),recent:recent.slice(-5).reverse()});
+      }).catch(function(){});
+    }
+    fetchNHL(_homeAb0, setHNhlSched); fetchNHL(_awayAb0, setANhlSched);
+  }, [match.lg, _homeAb0, _awayAb0]);
   const lc = LG[matchData.lg].color;
   const dk = LG[matchData.lg].dark;
   const _bsHome = (boxscore && boxscore.data && boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) || '';
@@ -5246,15 +5289,12 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
         } else if (lg2 === 'MLB') {
           hUp = hMlbSched ? hMlbSched.upcoming : []; hRec = hMlbSched ? hMlbSched.recent : [];
           aUp = aMlbSched ? aMlbSched.upcoming : []; aRec = aMlbSched ? aMlbSched.recent : [];
-        } else {
-          var cal = CAL_SCHEDULE && CAL_SCHEDULE[lg2];
-          if (cal && cal.days) {
-            var ti2 = cal.todayIdx || 0;
-            for (var _i2 = ti2; _i2 < cal.days.length && hUp.length < 5; _i2++) (cal.days[_i2].matches||[]).forEach(function(m2){if((m2.home===homeAb2||m2.away===homeAb2)&&hUp.length<5)hUp.push(Object.assign({},m2,{dayLabel:cal.days[_i2].label}));});
-            for (var _j2 = ti2-1; _j2 >= 0 && hRec.length < 5; _j2--) (cal.days[_j2].matches||[]).forEach(function(m2){if((m2.home===homeAb2||m2.away===homeAb2)&&hRec.length<5)hRec.push(Object.assign({},m2,{dayLabel:cal.days[_j2].label}));});
-            for (var _i3 = ti2; _i3 < cal.days.length && aUp.length < 5; _i3++) (cal.days[_i3].matches||[]).forEach(function(m2){if((m2.home===awayAb2||m2.away===awayAb2)&&aUp.length<5)aUp.push(Object.assign({},m2,{dayLabel:cal.days[_i3].label}));});
-            for (var _j3 = ti2-1; _j3 >= 0 && aRec.length < 5; _j3--) (cal.days[_j3].matches||[]).forEach(function(m2){if((m2.home===awayAb2||m2.away===awayAb2)&&aRec.length<5)aRec.push(Object.assign({},m2,{dayLabel:cal.days[_j3].label}));});
-          }
+        } else if (lg2 === 'NBA') {
+          hUp = hNbaSched ? hNbaSched.upcoming : []; hRec = hNbaSched ? hNbaSched.recent : [];
+          aUp = aNbaSched ? aNbaSched.upcoming : []; aRec = aNbaSched ? aNbaSched.recent : [];
+        } else if (lg2 === 'NHL') {
+          hUp = hNhlSched ? hNhlSched.upcoming : []; hRec = hNhlSched ? hNhlSched.recent : [];
+          aUp = aNhlSched ? aNhlSched.upcoming : []; aRec = aNhlSched ? aNhlSched.recent : [];
         }
         /* --- Stats leaders par équipe (STATS_FULL) --- */
         function getTeamStats(ab) {
