@@ -5237,18 +5237,21 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
           var homeAb=(g.homeTeam&&g.homeTeam.abbrev)||'';
           var awayAb=(g.awayTeam&&g.awayTeam.abbrev)||'';
           var evDate=g.gameDate||'';
-          var finished=g.gameState==='OFF'||g.gameState==='FINAL';
-          var time=g.startTimeUTC?new Date(g.startTimeUTC).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+          var gs=g.gameState||'';
+          var finished=gs==='OFF'||gs==='FINAL'||gs==='F'||gs==='O';
+          var isUpcoming=gs==='FUT'||gs==='PRE'||(!finished&&evDate>=today);
+          var time=g.startTimeUTC?new Date(g.startTimeUTC).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
+          var dayFmt=evDate?new Date(evDate+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'';
           if(finished){
             var hS=g.homeTeam&&g.homeTeam.score!==undefined?g.homeTeam.score:null;
             var aS=g.awayTeam&&g.awayTeam.score!==undefined?g.awayTeam.score:null;
-            recent.push({id:g.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:evDate,lg:'NHL'});
-          } else if(evDate>=today){
-            upcoming.push({id:g.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:evDate,lg:'NHL'});
+            recent.push({id:g.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:dayFmt,lg:'NHL'});
+          } else if(isUpcoming){
+            upcoming.push({id:g.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:dayFmt,lg:'NHL'});
           }
         });
         setter({upcoming:upcoming.slice(0,5),recent:recent.slice(-5).reverse()});
-      }).catch(function(){});
+      }).catch(function(){setter({upcoming:[],recent:[]});});
     }
     fetchNHL(_homeAb0, setHNhlSched); fetchNHL(_awayAb0, setANhlSched);
   }, [match.lg, _homeAb0, _awayAb0]);
