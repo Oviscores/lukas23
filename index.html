@@ -5192,9 +5192,9 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       var slug = NFL_ESPN_TEAMS && NFL_ESPN_TEAMS[ab]; if (!slug) return;
       fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/'+slug+'/schedule').then(function(r){return r.json();}).then(function(d){
         var today=new Date().toISOString().split('T')[0]; var upcoming=[],recent=[];
-        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=home.team&&home.team.abbreviation||'';var awayAb=away.team&&away.team.abbreviation||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=ev.week&&ev.week.text?ev.week.text:evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NFL'});}else if(evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NFL'});}});
+        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=home.team&&home.team.abbreviation||'';var awayAb=away.team&&away.team.abbreviation||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=ev.week&&ev.week.text?ev.week.text:evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NFL'});}else if(!completed&&evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NFL'});}});
         setter({upcoming:upcoming.slice(0,5),recent:recent.slice(-5).reverse()});
-      }).catch(function(){});
+      }).catch(function(){setter({upcoming:[],recent:[]});});
     }
     fetchNFL(_homeAb0, setHEspnSched); fetchNFL(_awayAb0, setAEspnSched);
   }, [match.lg, _homeAb0, _awayAb0]);
@@ -5204,9 +5204,9 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       var mlbId=MLB_TEAM_IDS&&MLB_TEAM_IDS[ab]; if (!mlbId) return;
       fetch('https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId='+mlbId+'&season=2026&gameType=R&hydrate=linescore,team').then(function(r){return r.json();}).then(function(d){
         var today=new Date().toISOString().split('T')[0]; var upcoming=[],recent=[];
-        (d.dates||[]).forEach(function(dateObj){(dateObj.games||[]).forEach(function(game){var homeTeam=game.teams&&game.teams.home&&game.teams.home.team;var awayTeam=game.teams&&game.teams.away&&game.teams.away.team;if(!homeTeam||!awayTeam)return;var homeAb=homeTeam.abbreviation==='AZ'?'ARI':homeTeam.abbreviation;var awayAb=awayTeam.abbreviation==='AZ'?'ARI':awayTeam.abbreviation;var gameDate=dateObj.date;var status=game.status&&game.status.abstractGameState;var time=game.gameDate?new Date(game.gameDate).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';if(status==='Final'){var hS=game.teams.home.score!==undefined?game.teams.home.score:null;var aS=game.teams.away.score!==undefined?game.teams.away.score:null;recent.push({id:game.gamePk,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:gameDate,lg:'MLB'});}else if(gameDate>=today){upcoming.push({id:game.gamePk,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:gameDate,lg:'MLB'});}});});
+        (d.dates||[]).forEach(function(dateObj){(dateObj.games||[]).forEach(function(game){var homeTeam=game.teams&&game.teams.home&&game.teams.home.team;var awayTeam=game.teams&&game.teams.away&&game.teams.away.team;if(!homeTeam||!awayTeam)return;var homeAb=homeTeam.abbreviation==='AZ'?'ARI':homeTeam.abbreviation;var awayAb=awayTeam.abbreviation==='AZ'?'ARI':awayTeam.abbreviation;var gameDate=dateObj.date;var status=game.status&&game.status.abstractGameState;var time=game.gameDate?new Date(game.gameDate).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';if(status==='Final'){var hS=game.teams.home.score!==undefined?game.teams.home.score:null;var aS=game.teams.away.score!==undefined?game.teams.away.score:null;recent.push({id:game.gamePk,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:gameDate,lg:'MLB'});}else if(status!=='Final'&&gameDate>=today){upcoming.push({id:game.gamePk,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:gameDate,lg:'MLB'});}});});
         setter({upcoming:upcoming.slice(0,5),recent:recent.slice(-5).reverse()});
-      }).catch(function(){});
+      }).catch(function(){setter({upcoming:[],recent:[]});});
     }
     fetchMLB(_homeAb0, setHMlbSched); fetchMLB(_awayAb0, setAMlbSched);
   }, [match.lg, _homeAb0, _awayAb0]);
@@ -5218,9 +5218,9 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       var slug = NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[ab]; if (!slug) return;
       fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/'+slug+'/schedule').then(function(r){return r.json();}).then(function(d){
         var today=new Date().toISOString().split('T')[0]; var upcoming=[],recent=[];
-        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=home.team&&home.team.abbreviation||'';var awayAb=away.team&&away.team.abbreviation||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NBA'});}else if(evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NBA'});}});
+        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=home.team&&home.team.abbreviation||'';var awayAb=away.team&&away.team.abbreviation||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NBA'});}else if(!completed&&evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NBA'});}});
         setter({upcoming:upcoming.slice(0,5),recent:recent.slice(-5).reverse()});
-      }).catch(function(){});
+      }).catch(function(){setter({upcoming:[],recent:[]});});
     }
     fetchNBA(_homeAb0, setHNbaSched); fetchNBA(_awayAb0, setANbaSched);
   }, [match.lg, _homeAb0, _awayAb0]);
@@ -5229,10 +5229,24 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
   React.useEffect(function() {
     if (match.lg !== 'NHL') return;
     function fetchNHL(ab, setter) {
-      var slug = NHL_ESPN_TEAMS && NHL_ESPN_TEAMS[ab]; if (!slug) return;
-      fetch('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/'+slug+'/schedule').then(function(r){return r.json();}).then(function(d){
+      if (!ab) return;
+      /* API NHL officielle — pas de CORS, abréviations natives */
+      fetch('https://api-web.nhle.com/v1/club-schedule-season/' + ab + '/now').then(function(r){return r.json();}).then(function(d){
         var today=new Date().toISOString().split('T')[0]; var upcoming=[],recent=[];
-        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=home.team&&home.team.abbreviation||'';var awayAb=away.team&&away.team.abbreviation||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NHL'});}else if(evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NHL'});}});
+        (d.games||[]).forEach(function(g){
+          var homeAb=(g.homeTeam&&g.homeTeam.abbrev)||'';
+          var awayAb=(g.awayTeam&&g.awayTeam.abbrev)||'';
+          var evDate=g.gameDate||'';
+          var finished=g.gameState==='OFF'||g.gameState==='FINAL';
+          var time=g.startTimeUTC?new Date(g.startTimeUTC).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+          if(finished){
+            var hS=g.homeTeam&&g.homeTeam.score!==undefined?g.homeTeam.score:null;
+            var aS=g.awayTeam&&g.awayTeam.score!==undefined?g.awayTeam.score:null;
+            recent.push({id:g.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:evDate,lg:'NHL'});
+          } else if(evDate>=today){
+            upcoming.push({id:g.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:evDate,lg:'NHL'});
+          }
+        });
         setter({upcoming:upcoming.slice(0,5),recent:recent.slice(-5).reverse()});
       }).catch(function(){});
     }
@@ -5918,17 +5932,21 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
         var homeAb2 = _homeAb;
         var awayAb2 = _awayAb;
         /* --- Schedules 5 derniers / 5 prochains --- */
-        var hUp = [], hRec = [], aUp = [], aRec = [];
+        var hUp = [], hRec = [], aUp = [], aRec = [], hSchedLoading = false, aSchedLoading = false;
         if (lg2 === 'NFL') {
+          hSchedLoading = hEspnSched === null; aSchedLoading = aEspnSched === null;
           hUp = hEspnSched ? hEspnSched.upcoming : []; hRec = hEspnSched ? hEspnSched.recent : [];
           aUp = aEspnSched ? aEspnSched.upcoming : []; aRec = aEspnSched ? aEspnSched.recent : [];
         } else if (lg2 === 'MLB') {
+          hSchedLoading = hMlbSched === null; aSchedLoading = aMlbSched === null;
           hUp = hMlbSched ? hMlbSched.upcoming : []; hRec = hMlbSched ? hMlbSched.recent : [];
           aUp = aMlbSched ? aMlbSched.upcoming : []; aRec = aMlbSched ? aMlbSched.recent : [];
         } else if (lg2 === 'NBA') {
+          hSchedLoading = hNbaSched === null; aSchedLoading = aNbaSched === null;
           hUp = hNbaSched ? hNbaSched.upcoming : []; hRec = hNbaSched ? hNbaSched.recent : [];
           aUp = aNbaSched ? aNbaSched.upcoming : []; aRec = aNbaSched ? aNbaSched.recent : [];
         } else if (lg2 === 'NHL') {
+          hSchedLoading = hNhlSched === null; aSchedLoading = aNhlSched === null;
           hUp = hNhlSched ? hNhlSched.upcoming : []; hRec = hNhlSched ? hNhlSched.recent : [];
           aUp = aNhlSched ? aNhlSched.upcoming : []; aRec = aNhlSched ? aNhlSched.recent : [];
         }
@@ -5988,6 +6006,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
           );
         }
         function noData() { return React.createElement("div",{style:{padding:"14px",textAlign:"center",color:"#ccc",fontFamily:"'Barlow Condensed',sans-serif",fontSize:11}},"Aucune donnée"); }
+        function loadingRows() { return React.createElement("div",{style:{padding:"16px",textAlign:"center"}},React.createElement("div",{style:{display:"inline-block",width:18,height:18,border:"2px solid #f0f0f0",borderTopColor:"#999",borderRadius:"50%",animation:"spin 0.7s linear infinite"}})); }
         function sectionLabel(label, col) {
           return React.createElement("div",{style:{padding:"8px 14px",background:col+"08",borderBottom:"1px solid #f0f0f0",display:"flex",alignItems:"center",gap:6}},
             React.createElement("div",{style:{width:3,height:12,background:col,borderRadius:2}}),
@@ -6042,7 +6061,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
             );
           }));
         }
-        function renderTeamBlock(teamAb, teamName, col, upcoming, recent, stand, stats, inj, arts2, isHome) {
+        function renderTeamBlock(teamAb, teamName, col, upcoming, recent, stand, stats, inj, arts2, isHome, schedLoading) {
           var innerLc = col.bg;
           return React.createElement("div",{style:{background:"#fff",borderRadius:10,overflow:"hidden",boxShadow:"0 2px 16px rgba(0,0,0,0.08)",marginBottom:16}},
             /* Header couleur équipe */
@@ -6062,11 +6081,11 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
             React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",borderBottom:"1px solid #f0f0f0"}},
               React.createElement("div",{style:{borderRight:"1px solid #f0f0f0"}},
                 sectionLabel("Derniers résultats", innerLc),
-                recent.length===0?noData():recent.map(function(m2,i){return React.createElement(React.Fragment,{key:i},renderMatchRow(m2,teamAb,innerLc));})
+                schedLoading?loadingRows():recent.length===0?noData():recent.map(function(m2,i){return React.createElement(React.Fragment,{key:i},renderMatchRow(m2,teamAb,innerLc));})
               ),
               React.createElement("div",null,
                 sectionLabel("Prochains matchs", innerLc),
-                upcoming.length===0?noData():upcoming.map(function(m2,i){return React.createElement(React.Fragment,{key:i},renderUpcomingRow(m2,teamAb,innerLc));})
+                schedLoading?loadingRows():upcoming.length===0?noData():upcoming.map(function(m2,i){return React.createElement(React.Fragment,{key:i},renderUpcomingRow(m2,teamAb,innerLc));})
               )
             ),
             /* Blessés */
@@ -6082,8 +6101,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
           );
         }
         return React.createElement("div",null,
-          renderTeamBlock(homeAb2,hName,hc,hUp,hRec,hSt2,hStats,hInj,hArts,true),
-          renderTeamBlock(awayAb2,aName,ac,aUp,aRec,aSt2,aStats,aInj,aArts,false)
+          renderTeamBlock(homeAb2,hName,hc,hUp,hRec,hSt2,hStats,hInj,hArts,true,hSchedLoading),
+          renderTeamBlock(awayAb2,aName,ac,aUp,aRec,aSt2,aStats,aInj,aArts,false,aSchedLoading)
         );
       })(),
 Object.entries(CONF_STANDINGS[matchData.lg] || {}).map(([div, teams]) => {
