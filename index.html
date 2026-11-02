@@ -5304,7 +5304,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
     var _sc = React.useState(false); var copied = _sc[0]; var setCopied = _sc[1];
     return React.createElement("button", {
       onClick: function() {
-        var url = window.location.origin + window.location.pathname + "?match=" + encodeURIComponent(matchData.eventId || matchData.id || '') + "&ligue=" + (matchData.lg || '').toLowerCase();
+        var url = window.location.origin + window.location.pathname + "?match=" + (matchData.lg || '').toUpperCase() + '_' + encodeURIComponent(matchData.eventId || matchData.id || '');
         if (navigator.clipboard) {
           navigator.clipboard.writeText(url).then(function() { setCopied(true); setTimeout(function() { setCopied(false); }, 2000); });
         } else {
