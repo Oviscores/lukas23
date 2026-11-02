@@ -7481,24 +7481,29 @@ function ZoneUS() {
     if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
     if (equipeParam && ligueParam) setSelTeam({ teamId: equipeParam.toUpperCase(), lg: ligueParam.toUpperCase() });
     var matchParam = params.get('match');
-    if (matchParam && ligueParam) {
-      var _lgUp = ligueParam.toUpperCase();
+    if (matchParam) {
+      // Format unifié : NHL_2026020214 ou NFL_401872657 etc.
+      var _matchParts = matchParam.match(/^(NHL|NFL|NBA|MLB)_(.+)$/i);
+      var _lgUp = _matchParts ? _matchParts[1].toUpperCase() : (ligueParam ? ligueParam.toUpperCase() : '');
+      var _gameId = _matchParts ? _matchParts[2] : matchParam;
       var _calM = null;
       var _calSrc = (window.__CAL_CACHE__ && window.__CAL_CACHE__[_lgUp]) || CAL_SCHEDULE[_lgUp];
-      if (_calSrc && _calSrc.days) { _calSrc.days.forEach(function(d){ (d.matches||[]).forEach(function(m){ if ((m.id===matchParam||m.eventId===matchParam) && !_calM) _calM=m; }); }); }
-      setSelMatch({ id: matchParam, eventId: matchParam, lg: _lgUp, away: _calM ? (_calM.away||'') : '', home: _calM ? (_calM.home||'') : '', homeScore: _calM ? _calM.hs : null, awayScore: _calM ? _calM.as : null, status: _calM ? (_calM.hs!==null?'FINAL':'UPCOMING') : 'UPCOMING', time: _calM ? (_calM.time||'') : '', homeTeam: _calM ? (_calM.home||'') : '', awayTeam: _calM ? (_calM.away||'') : '' });
+      if (_calSrc && _calSrc.days) { _calSrc.days.forEach(function(d){ (d.matches||[]).forEach(function(m){ if ((m.id===_gameId||m.eventId===_gameId||m.id===matchParam||m.eventId===matchParam) && !_calM) _calM=m; }); }); }
+      setSelMatch({ id: _gameId, eventId: _gameId, lg: _lgUp, away: _calM ? (_calM.away||'') : '', home: _calM ? (_calM.home||'') : '', homeScore: _calM ? _calM.hs : null, awayScore: _calM ? _calM.as : null, status: _calM ? (_calM.hs!==null?'FINAL':'UPCOMING') : 'UPCOMING', time: _calM ? (_calM.time||'') : '', homeTeam: _calM ? (_calM.home||'') : '', awayTeam: _calM ? (_calM.away||'') : '' });
     }
     var onPop = function() {
       var p = new URLSearchParams(window.location.search);
       if (!p.get('article')) setSelArticle(null);
       if (!p.get('equipe')) setSelTeam(null);
       var mp = p.get('match'); var lp = p.get('ligue');
-      if (mp && lp) {
-        var _lgUp2 = lp.toUpperCase();
+      if (mp) {
+        var _mp2 = mp.match(/^(NHL|NFL|NBA|MLB)_(.+)$/i);
+        var _lgUp2 = _mp2 ? _mp2[1].toUpperCase() : (lp ? lp.toUpperCase() : '');
+        var _gid2 = _mp2 ? _mp2[2] : mp;
         var _calM2 = null;
         var _calSrc2 = (window.__CAL_CACHE__ && window.__CAL_CACHE__[_lgUp2]) || CAL_SCHEDULE[_lgUp2];
-        if (_calSrc2 && _calSrc2.days) { _calSrc2.days.forEach(function(d){ (d.matches||[]).forEach(function(m){ if ((m.id===mp||m.eventId===mp) && !_calM2) _calM2=m; }); }); }
-        setSelMatch({ id: mp, eventId: mp, lg: _lgUp2, away: _calM2?(_calM2.away||''):'', home: _calM2?(_calM2.home||''):'', homeScore: _calM2?_calM2.hs:null, awayScore: _calM2?_calM2.as:null, status: _calM2?(_calM2.hs!==null?'FINAL':'UPCOMING'):'UPCOMING', time: _calM2?(_calM2.time||''):'', homeTeam: _calM2?(_calM2.home||''):'', awayTeam: _calM2?(_calM2.away||''):'' });
+        if (_calSrc2 && _calSrc2.days) { _calSrc2.days.forEach(function(d){ (d.matches||[]).forEach(function(m){ if ((m.id===_gid2||m.eventId===_gid2||m.id===mp||m.eventId===mp) && !_calM2) _calM2=m; }); }); }
+        setSelMatch({ id: _gid2, eventId: _gid2, lg: _lgUp2, away: _calM2?(_calM2.away||''):'', home: _calM2?(_calM2.home||''):'', homeScore: _calM2?_calM2.hs:null, awayScore: _calM2?_calM2.as:null, status: _calM2?(_calM2.hs!==null?'FINAL':'UPCOMING'):'UPCOMING', time: _calM2?(_calM2.time||''):'', homeTeam: _calM2?(_calM2.home||''):'', awayTeam: _calM2?(_calM2.away||''):'' });
       } else setSelMatch(null);
       var pg2 = p.get('page');
       if (pg2) _setPage(pg2.toUpperCase().replace('-', ' '));
@@ -7649,7 +7654,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   }
   function goMatch(m) {
     setSelMatch(m); setSelArticle(null); setSelPlayer(null); setSelTeam(null); setPlayersList(null);
-    if (m && m.id) history.pushState({}, '', '?match=' + (m.eventId||m.id) + '&ligue=' + (m.lg||'').toLowerCase());
+    if (m && (m.eventId||m.id) && m.lg) history.pushState({}, '', '?match=' + (m.lg||'').toUpperCase() + '_' + (m.eventId||m.id));
   }
   function goTeam(id, lg) {
     setSelTeam({ teamId: id, lg }); setSelArticle(null); setSelPlayer(null); setPlayersList(null);
