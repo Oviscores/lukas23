@@ -5304,7 +5304,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
     var _sc = React.useState(false); var copied = _sc[0]; var setCopied = _sc[1];
     return React.createElement("button", {
       onClick: function() {
-        var url = window.location.origin + window.location.pathname + "?match=" + (matchData.lg || '').toUpperCase() + '_' + encodeURIComponent(matchData.eventId || matchData.id || '');
+        var _rid = ((matchData.eventId || matchData.id || '')+'').replace(/^(nhl|nfl|nba|mlb)_/i,''); var url = window.location.origin + window.location.pathname + "?match=" + (matchData.lg || '').toUpperCase() + '_' + encodeURIComponent(_rid);
         if (navigator.clipboard) {
           navigator.clipboard.writeText(url).then(function() { setCopied(true); setTimeout(function() { setCopied(false); }, 2000); });
         } else {
@@ -7654,7 +7654,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   }
   function goMatch(m) {
     setSelMatch(m); setSelArticle(null); setSelPlayer(null); setSelTeam(null); setPlayersList(null);
-    if (m && (m.eventId||m.id) && m.lg) history.pushState({}, '', '?match=' + (m.lg||'').toUpperCase() + '_' + (m.eventId||m.id));
+    if (m && (m.eventId||m.id) && m.lg) { var _rawId = (m.eventId||m.id)+''; var _cleanId = _rawId.replace(/^(nhl|nfl|nba|mlb)_/i,''); history.pushState({}, '', '?match=' + (m.lg||'').toUpperCase() + '_' + _cleanId); }
   }
   function goTeam(id, lg) {
     setSelTeam({ teamId: id, lg }); setSelArticle(null); setSelPlayer(null); setPlayersList(null);
