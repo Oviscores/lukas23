@@ -2861,10 +2861,9 @@ async function initAllCalendars() {
   await Promise.all(['NHL','MLB','NBA','NFL'].map(function(lg){ return loadCalendarRange(lg,null,28); }));
 }
 
-initAllCalendars();
-setInterval(function() {
-  ['NHL','MLB','NBA','NFL'].forEach(function(lg){ loadCalendarRange(lg,null,1); });
-}, 60000);
+// initAllCalendars() : chargé uniquement à la navigation vers le calendrier, pas au boot
+// (évite de saturer le Worker au démarrage et de bloquer la livebar)
+// setInterval calendrier désactivé au boot aussi
 
 
 
@@ -9168,22 +9167,8 @@ history.pushState = function() {
   _origPush.apply(history, arguments);
   updateCanonical();
 };
-setTimeout(function() { if (window.fetchLeagueStats) { if (window.__STATS_LOADED__) window.__STATS_LOADED__.NFL = false; window.fetchLeagueStats('NFL'); } }, 2000);
-
-// Refresh classements toutes les 60 secondes
-setInterval(function() {
-  if (window.fetchStandings) {
-    window.fetchStandings('NFL');
-    window.fetchStandings('MLB');
-  }
-}, 60000);
-// Premier fetch rapide
-setTimeout(function() {
-  if (window.fetchStandings) {
-    window.fetchStandings('NFL');
-    window.fetchStandings('MLB');
-  }
-}, 1500);
+// Stats NFL / classements : chargés uniquement à la navigation, pas au boot
+// (évite de saturer le Worker au démarrage et de bloquer la livebar)
 </script>
 </body>
 </html>
