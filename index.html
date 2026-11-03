@@ -258,7 +258,9 @@ const TC = {
   SF_MLB: { bg: "#FD5A1E", fg: "#fff" },
   TEX_MLB: { bg: "#003278", fg: "#fff" },
   BAL_MLB: { bg: "#DF4601", fg: "#fff" },
-  TOR_MLB: { bg: "#134A8E", fg: "#fff" }
+  TOR_MLB: { bg: "#134A8E", fg: "#fff" },
+  MIL_MLB: { bg: "#12284B", fg: "#FFC52F" },
+  TB_MLB: { bg: "#092C5C", fg: "#8FBCE6" }
 }
 window.TC = TC;;
 const TA = {
@@ -630,10 +632,11 @@ const SCORES = {
     { away: "OKC", home: "DAL", as: 131, hs: 118, st: "Final" }
   ],
   MLB: [
-    { away: "BOS", home: "NYY", as: 3, hs: 7, st: "Final" },
-    { away: "SF", home: "LAD", as: 4, hs: 5, st: "Final" },
-    { away: "TEX", home: "HOU", as: 6, hs: 9, st: "Final" },
-    { away: "TOR", home: "BAL", as: 5, hs: 3, st: "Final" }
+    { id: "849799", away: "MIL", home: "TB", as: 4, hs: 1, st: "Final" },
+    { id: "849803", away: "MIL", home: "TB", as: 3, hs: 4, st: "Final/12" },
+    { id: "849804", away: "MIL", home: "TB", as: 10, hs: 1, st: "Final" },
+    { id: "849802", away: "TB", home: "MIL", as: 4, hs: 5, st: "Final" },
+    { id: "849805", away: "TB", home: "MIL", as: 2, hs: 3, st: "Final" }
   ]
 };
 const STANDINGS = {
@@ -750,7 +753,7 @@ const LNEWS = {
   NHL: [{ time: "14h32", text: "McDavid absent 3 semaines" }, { time: "13h15", text: "Reinhart prolonge 8 ans" }, { time: "12h10", text: "Price prend sa retraite" }, { time: "11h40", text: "MacKinnon : retour semaine 2" }, { time: "10h55", text: "Ovechkin : 895 buts, record" }, { time: "09h30", text: "Leafs recrutent un D russe" }, { time: "08h45", text: "Playoffs : programme du soir" }, { time: "08h00", text: "Hellebuyck : meilleur gardien" }],
   NFL: [{ time: "14h10", text: "Lamar Jackson sur IR - saison potentiellement terminee" }, { time: "13h30", text: "Broncos leaders AFC Ouest apres victoire vs Chiefs (6-2)" }, { time: "12h45", text: "Cowboys s effondrent : 24-10 devient defaite OT vs ARI" }, { time: "11h55", text: "Burrow : 462 yds / 5 TD / 1 TD rushing en OT - historique" }, { time: "10h40", text: "Bucky Irving : 170 yds apres contact - Bucs gagnent 16-0" }, { time: "09h50", text: "Vikings (6-1) battus par Detroit - Kyler Murray bless" }, { time: "09h15", text: "Bo Nix : 15e game-winning drive - record 3 premieres saisons" }, { time: "08h30", text: "Trade deadline NFL fixee au 10 novembre" }],
   NBA: [{ time: "13h58", text: "LeBron confirme sa 22e saison" }, { time: "12h44", text: "Wembanyama : meilleur defenseur" }, { time: "11h35", text: "Doncic : 32.4 pts, leader" }, { time: "10h20", text: "Tatum prolonge 5 ans / 290M" }, { time: "09h50", text: "Lakers recrutent pivot serbe" }, { time: "09h15", text: "Knicks-Pacers : serie 2-2" }, { time: "08h40", text: "Curry annonce saison de plus" }, { time: "08h00", text: "Draft : 3 Francais au 1er tour" }],
-  MLB: [{ time: "12h44", text: "Ohtani : 18 HR en 55 matchs" }, { time: "11h28", text: "Soto signe aux Mets 765M" }, { time: "10h15", text: "Judge : 500 HR en carriere" }, { time: "09h40", text: "Dodgers : rotation remaniee" }, { time: "08h55", text: "Yankees : 11 victoires de suite" }, { time: "08h20", text: "Cole : meilleur lanceur AL" }, { time: "07h50", text: "Trout de retour apres 3 sem." }, { time: "07h30", text: "Braves recrutent un SS" }]
+  MLB: [{ time: "23h55", text: "BREWERS CHAMPIONS ! Milwaukee remporte la Serie mondiale 4-1 face aux Rays" }, { time: "23h30", text: "S.M. 5 : Brewers 4-1 Rays a Tampa — 1er titre de l'histoire pour Milwaukee" }, { time: "23h10", text: "S.M. 4 : Rays 4-3 Brewers (12 m.) — Williamson walkoff, serie 3-1" }, { time: "22h00", text: "S.M. 3 : Brewers 10-1 Rays a Tampa — Milwaukee mene 3-0" }, { time: "21h00", text: "S.M. 2 : Brewers 5-4 Rays — Milwaukee mene la serie 2-0" }, { time: "20h00", text: "S.M. 1 : Brewers 3-2 Rays — Milwaukee ouvre la serie a domicile" }]
 };
 const TICKER = [
   "NHL : Ovechkin 2 buts - Capitals eliminent Pittsburgh",
@@ -2984,47 +2987,23 @@ const CAL_SCHEDULE = {
   },
   MLB: {
     days: [
-      { date: "2026-05-30", label: "Ven 30 mai", matches: [
-        { id: "m1", away: "BOS", home: "NYY", as: 3, hs: 7, st: "Final", time: "19h05" },
-        { id: "m2", away: "SF", home: "LAD", as: 4, hs: 5, st: "Final", time: "22h10" },
-        { id: "m3", away: "TEX", home: "HOU", as: 6, hs: 9, st: "Final", time: "20h10" },
-        { id: "m4", away: "TOR", home: "BAL", as: 5, hs: 3, st: "Final", time: "19h05" },
-        { id: "m5", away: "MIN", home: "CLE", as: 2, hs: 4, st: "Final", time: "19h10" }
+      { date: "2026-10-23", label: "Ven 23 oct", matches: [
+        { id: "849805", away: "TB", home: "MIL", as: 2, hs: 3, st: "Final", time: "20h08" }
       ] },
-      { date: "2026-05-31", label: "Sam 31 mai", matches: [
-        { id: "m6", away: "NYY", home: "BOS", as: 5, hs: 8, st: "Final", time: "19h10" },
-        { id: "m7", away: "LAD", home: "ARI", as: 3, hs: 2, st: "Final", time: "21h40" },
-        { id: "m8", away: "HOU", home: "OAK", as: 7, hs: 4, st: "Final", time: "22h07" },
-        { id: "m9", away: "ATL", home: "PHI", as: 4, hs: 6, st: "Final", time: "18h05" },
-        { id: "m10", away: "MIL", home: "CHC", as: 3, hs: 5, st: "Final", time: "14h20" }
+      { date: "2026-10-24", label: "Sam 24 oct", matches: [
+        { id: "849802", away: "TB", home: "MIL", as: 4, hs: 5, st: "Final", time: "20h08" }
       ] },
-      { date: "2026-06-01", label: "Dim 1 juin", matches: [
-        { id: "m11", away: "BOS", home: "NYY", as: 2, hs: 6, st: "Final", time: "13h35" },
-        { id: "m12", away: "ATL", home: "NYM", as: 5, hs: 3, st: "Final", time: "13h40" },
-        { id: "m13", away: "LAD", home: "COL", as: 8, hs: 2, st: "Final", time: "20h10" },
-        { id: "m14", away: "HOU", home: "SEA", as: null, hs: null, st: "22h10", odd_away: "1.7", odd_home: "2.1", time: "22h10" }
+      { date: "2026-10-26", label: "Lun 26 oct", matches: [
+        { id: "849804", away: "MIL", home: "TB", as: 10, hs: 1, st: "Final", time: "20h08" }
       ] },
-      { date: "2026-06-02", label: "Lun 2 juin", matches: [
-        { id: "m15", away: "NYY", home: "TOR", as: null, hs: null, st: "19h07", odd_away: "1.56", odd_home: "2.24", time: "19h07" },
-        { id: "m16", away: "BOS", home: "BAL", as: null, hs: null, st: "19h05", odd_away: "1.72", odd_home: "2.08", time: "19h05" },
-        { id: "m17", away: "LAD", home: "SF", as: 4, hs: 2, st: "7e manche", time: "22h10" },
-        { id: "m18", away: "HOU", home: "OAK", as: null, hs: null, st: "22h07", odd_away: "1.62", odd_home: "2.18", time: "22h07" },
-        { id: "m19", away: "ATL", home: "MIA", as: null, hs: null, st: "18h40", odd_away: "1.79", odd_home: "2.01", time: "18h40" },
-        { id: "m20", away: "CHC", home: "STL", as: null, hs: null, st: "20h15", odd_away: "1.64", odd_home: "2.16", time: "20h15" }
+      { date: "2026-10-27", label: "Mar 27 oct", matches: [
+        { id: "849803", away: "MIL", home: "TB", as: 3, hs: 4, st: "Final/12", time: "20h08" }
       ] },
-      { date: "2026-06-03", label: "Mar 3 juin", matches: [
-        { id: "m21", away: "NYY", home: "TOR", as: null, hs: null, st: "19h07", odd_away: "1.53", odd_home: "2.27", time: "19h07" },
-        { id: "m22", away: "LAD", home: "SF", as: null, hs: null, st: "22h10", odd_away: "1.63", odd_home: "2.17", time: "22h10" },
-        { id: "m23", away: "HOU", home: "TEX", as: null, hs: null, st: "20h05", odd_away: "1.61", odd_home: "2.19", time: "20h05" },
-        { id: "m24", away: "ATL", home: "PHI", as: null, hs: null, st: "18h05", odd_away: "1.87", odd_home: "1.93", time: "18h05" }
-      ] },
-      { date: "2026-06-04", label: "Mer 4 juin", matches: [
-        { id: "m25", away: "NYY", home: "TOR", as: null, hs: null, st: "19h07", odd_away: "2.19", odd_home: "1.61", time: "19h07" },
-        { id: "m26", away: "LAD", home: "ARI", as: null, hs: null, st: "21h40", odd_away: "2.17", odd_home: "1.63", time: "21h40" },
-        { id: "m27", away: "MIN", home: "KC", as: null, hs: null, st: "20h10", odd_away: "2.21", odd_home: "1.59", time: "20h10" }
+      { date: "2026-10-28", label: "Mer 28 oct", matches: [
+        { id: "849799", away: "MIL", home: "TB", as: 4, hs: 1, st: "Final", time: "20h08" }
       ] }
     ],
-    todayIdx: 3
+    todayIdx: 4
   }
 };
 const ROSTERS = {
