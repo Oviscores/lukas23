@@ -2861,9 +2861,10 @@ async function initAllCalendars() {
   await Promise.all(['NHL','MLB','NBA','NFL'].map(function(lg){ return loadCalendarRange(lg,null,28); }));
 }
 
-// initAllCalendars() : chargé uniquement à la navigation vers le calendrier, pas au boot
-// (évite de saturer le Worker au démarrage et de bloquer la livebar)
-// setInterval calendrier désactivé au boot aussi
+// Charger les calendriers au boot avec délai pour ne pas bloquer la livebar (1.5s)
+setTimeout(initAllCalendars, 3000);
+// Rafraîchir toutes les 5 minutes
+setInterval(initAllCalendars, 300000);
 
 
 
