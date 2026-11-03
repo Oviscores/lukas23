@@ -6529,7 +6529,7 @@ function LeftCol({ onMatchClick, onStandingsClick }) {
       var scores = {};
       var MLB_ONLY = ['MLB'];
       var UPCOMING_LEAGUES = ['NFL','NHL','NBA'];
-      ['NFL','MLB','NHL','NBA'].forEach(function(l) {
+      ['NFL','NHL','NBA','MLB'].forEach(function(l) {
         var cache = window.__CAL_CACHE__ && window.__CAL_CACHE__[l];
         if (cache && cache.days) {
           var today = new Date().toISOString().split('T')[0];
