@@ -1,38 +1,79 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name='impact-site-verification' value='9d6519ec-1bbf-4af0-b572-3fe47cdf098e'>
-  <title>Zone US</title><meta name="description" content="Zone US, le media sportif francophone.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name='impact-site-verification' value='9d6519ec-1bbf-4af0-b572-3fe47cdf098e'>
   <meta name="robots" content="index, follow">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
-<link rel="canonical" href="https://zoneus.fr/">
-<!-- Google Analytics GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BF1HDYD8C0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-BF1HDYD8C0');
-</script>
-<!-- Fin Google Analytics -->
-<script>
-(function(){
-  var params = window.location.search;
-  if(params) {
-    var can = document.querySelector('link[rel="canonical"]');
-    if(can) can.setAttribute('href', 'https://zoneus.fr/' + params);
-  }
-})();
-</script>
-  <meta property="og:image" content="https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp">
-  <link rel="preconnect" href="https://a.espncdn.com"><link rel="preconnect" href="https://cdn.sanity.io">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+  <link rel="preconnect" href="https://a.espncdn.com">
+  <link rel="preconnect" href="https://cdn.sanity.io">
+
+  <!-- SEO : title/description/canonical/OG injectés avant React selon l'URL -->
+  <script>
+  (function(){
+    var p = new URLSearchParams(window.location.search);
+    var article = p.get('article');
+    var page = p.get('page');
+    var match = p.get('match');
+
+    var title = 'Zone US';
+    var desc  = 'Zone US, le media sportif francophone spécialisé NHL, NFL, NBA et MLB.';
+    var canonical = 'https://zoneus.fr/';
+    var ogImage = 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp';
+
+    if (article) {
+      var slug = article.replace(/-/g, ' ');
+      slug = slug.charAt(0).toUpperCase() + slug.slice(1);
+      title = slug + ' | Zone US';
+      desc  = 'Retrouvez l\'article ' + slug + ' sur Zone US, le media sportif francophone.';
+      canonical = 'https://zoneus.fr/?article=' + article;
+    } else if (page) {
+      var lg = page.toUpperCase();
+      var lgNames = { NHL: 'Hockey sur glace', NFL: 'Football américain', NBA: 'Basketball', MLB: 'Baseball' };
+      title = lg + ' | Zone US – ' + (lgNames[lg] || lg);
+      desc  = 'Scores, résultats et actualités ' + lg + ' en français sur Zone US.';
+      canonical = 'https://zoneus.fr/?page=' + page;
+      var banners = { NHL: 'banner-nhl.jpg', NFL: 'banner-nfl.jpg', NBA: 'banner-nba.jpg', MLB: 'banner-mlb.jpg' };
+      if (banners[lg]) ogImage = 'https://raw.githubusercontent.com/Oviscores/lukas23/main/' + banners[lg];
+    } else if (match) {
+      var lg2 = match.split('_')[0].toUpperCase();
+      title = 'Feuille de match ' + lg2 + ' | Zone US';
+      desc  = 'Résultat et statistiques du match ' + lg2 + ' sur Zone US.';
+      canonical = 'https://zoneus.fr/?match=' + match;
+    }
+
+    document.write('<title>' + title.replace(/</g,'&lt;') + '<\/title>');
+    document.write('<meta name="description" content="' + desc.replace(/"/g,'&quot;') + '">');
+    document.write('<link rel="canonical" href="' + canonical + '">');
+    document.write('<meta property="og:title" content="' + title.replace(/"/g,'&quot;') + '">');
+    document.write('<meta property="og:description" content="' + desc.replace(/"/g,'&quot;') + '">');
+    document.write('<meta property="og:url" content="' + canonical + '">');
+    document.write('<meta property="og:image" content="' + ogImage + '">');
+    document.write('<meta property="og:site_name" content="Zone US">');
+    document.write('<meta property="og:type" content="website">');
+    document.write('<meta name="twitter:card" content="summary_large_image">');
+    document.write('<meta name="twitter:title" content="' + title.replace(/"/g,'&quot;') + '">');
+    document.write('<meta name="twitter:description" content="' + desc.replace(/"/g,'&quot;') + '">');
+    document.write('<meta name="twitter:image" content="' + ogImage + '">');
+    window.__SEO_TITLE__ = title;
+    window.__SEO_DESC__ = desc;
+  })();
+  </script>
+
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BF1HDYD8C0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-BF1HDYD8C0');
+  </script>
+  <!-- Fin Google Analytics -->
   <link rel="icon" type="image/png" href="data:image/png;base64,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">
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zone US</title>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <style>
