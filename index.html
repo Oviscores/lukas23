@@ -3549,9 +3549,56 @@ function PBg({ lg, h, seed = 1, img }) {
     }
   ), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(135deg," + dk + " 0%," + lc + " 55%," + dk + " 100%)", display: "none", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: h * 0.22, opacity: 0.1 } }, em)));
 }
+function MatchInner({ a, hov, h }) {
+  const lg = a.league || 'NHL';
+  const lc = (LG[lg] && LG[lg].color) || '#D50A0A';
+  const sport = lg === 'NFL' ? 'nfl' : lg === 'NBA' ? 'nba' : lg === 'MLB' ? 'mlb' : 'nhl';
+  const isFinal = a._mStatus === 'final'; const isLive = a._mStatus === 'live'; const isPending = a._mStatus === 'upcoming';
+  const hWin = isFinal && a._mHs != null && a._mAs != null && a._mHs > a._mAs;
+  const aWin = isFinal && a._mHs != null && a._mAs != null && a._mAs > a._mHs;
+  const bgImg = lg === 'NFL' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/32adbd87-image.jpg' : lg === 'MLB' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/d517eae8-image.jpg' : lg === 'NBA' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/6d51a2c9-image.jpg' : 'https://raw.githubusercontent.com/Oviscores/lukas23/main/977b26b0-image.jpg';
+  const bgGrad = lg === 'NFL' ? 'linear-gradient(135deg,#1a1a2e,#0f3460)' : lg === 'MLB' ? 'linear-gradient(135deg,#1a0a0a,#6b0f0f)' : lg === 'NBA' ? 'linear-gradient(135deg,#0a0a1a,#2d1b8e)' : 'linear-gradient(135deg,#001a2e,#005fa3)';
+  const logoUrl = function(ab) { return 'https://a.espncdn.com/i/teamlogos/' + sport + '/500/' + (ab||'').toLowerCase() + '.png'; };
+  var timeStr = ''; var dateStr = '';
+  if (a._mDate) { var _dd = new Date(a._mDate); if (!isNaN(_dd)) { timeStr = _dd.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); dateStr = _dd.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); } }
+  const logoSz = h >= 280 ? 80 : 56;
+  const scoreSz = h >= 280 ? 44 : 32;
+  return React.createElement(React.Fragment, null,
+    React.createElement('img', { src: bgImg, style: { position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity:0.4 }, alt:'' }),
+    React.createElement('div', { style: { position:'absolute', inset:0, background:'rgba(0,0,0,0.42)' } }),
+    React.createElement('div', { style: { position:'absolute', top:0, left:0, right:0, height:3, background:lc } }),
+    React.createElement('div', { style: { position:'absolute', top:8, left:8, zIndex:2, display:'flex', alignItems:'center', gap:4 } },
+      React.createElement(LB, { lg, sz: h >= 280 ? 28 : 20 }),
+      isLive && React.createElement('span', { className:'livebadge', style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:900, color:'#fff', background:'#ef4444', padding:'1px 5px', borderRadius:2 } }, 'LIVE'),
+      isFinal && React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.7)', background:'rgba(255,255,255,0.12)', padding:'1px 5px', borderRadius:2 } }, 'FINAL'),
+      isPending && React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.7)' } }, dateStr)
+    ),
+    React.createElement('div', { style: { position:'relative', zIndex:1, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 16px', height:'100%' } },
+      React.createElement('div', { style:{ display:'flex', flexDirection:'column', alignItems:'center', gap:3, flex:1 } },
+        React.createElement('img', { src: logoUrl(a._mAway), style:{ width:logoSz, height:logoSz, objectFit:'contain', opacity: aWin?1:isFinal?0.45:1, filter:hov?'drop-shadow(0 2px 8px rgba(0,0,0,0.6))':'none', transition:'all 0.25s' }, onError:function(e){e.target.style.display='none';} }),
+        React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:900, color:aWin?'#fff':'rgba(255,255,255,0.65)', letterSpacing:'0.08em' } }, a._mAway)
+      ),
+      React.createElement('div', { style:{ display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:3, minWidth:70 } },
+        (isLive||isFinal) && a._mHs!=null && a._mAs!=null
+          ? React.createElement('div', { style:{ display:'flex', alignItems:'center', gap:6 } },
+              React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:scoreSz, fontWeight:900, color:aWin?'rgba(255,255,255,0.4)':'#fff', lineHeight:1 } }, a._mAs),
+              React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:scoreSz*0.5, fontWeight:400, color:'rgba(255,255,255,0.4)' } }, '-'),
+              React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:scoreSz, fontWeight:900, color:hWin?'rgba(255,255,255,0.4)':'#fff', lineHeight:1 } }, a._mHs)
+            )
+          : React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:scoreSz, fontWeight:900, color:'rgba(255,255,255,0.9)' } }, timeStr||'@')
+      ),
+      React.createElement('div', { style:{ display:'flex', flexDirection:'column', alignItems:'center', gap:3, flex:1 } },
+        React.createElement('img', { src: logoUrl(a._mHome), style:{ width:logoSz, height:logoSz, objectFit:'contain', opacity:hWin?1:isFinal?0.45:1, filter:hov?'drop-shadow(0 2px 8px rgba(0,0,0,0.6))':'none', transition:'all 0.25s' }, onError:function(e){e.target.style.display='none';} }),
+        React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:900, color:hWin?'#fff':'rgba(255,255,255,0.65)', letterSpacing:'0.08em' } }, a._mHome)
+      )
+    ),
+    a.chapo && React.createElement('div', { style:{ position:'absolute', bottom:0, left:0, right:0, padding:'0 12px 8px', fontFamily:"'Barlow',sans-serif", fontSize:10, color:'rgba(255,255,255,0.6)', zIndex:2, overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis' } }, a.chapo)
+  );
+}
 function HCard({ a, onClick }) {
   const [hov, setHov] = useState(false);
   const lc = LG[a.league].color;
+  if (a._isMatch) return /* @__PURE__ */ React.createElement("div", { onClick: () => onClick(a), onMouseEnter: () => setHov(true), onMouseLeave: () => setHov(false), style: { position:"relative", height:320, borderRadius:4, overflow:"hidden", cursor:"pointer", background:"#001a2e", boxShadow: hov?"0 6px 24px rgba(0,0,0,0.28)":"0 2px 10px rgba(0,0,0,0.12)", transition:"box-shadow 0.25s" } }, React.createElement(MatchInner, { a, hov, h:320 }));
   return /* @__PURE__ */ React.createElement(
     "div",
     {
@@ -3657,6 +3704,7 @@ function SanityMatchCard({ m, onClick }) {
 function NCard({ a, onClick }) {
   const [hov, setHov] = useState(false);
   const lc = LG[a.league].color;
+  if (a._isMatch) return /* @__PURE__ */ React.createElement("div", { onClick: () => onClick(a), onMouseEnter: () => setHov(true), onMouseLeave: () => setHov(false), style: { position:"relative", height:164, borderRadius:4, overflow:"hidden", cursor:"pointer", background:"#001a2e", boxShadow: hov?"0 6px 24px rgba(0,0,0,0.28)":"0 2px 10px rgba(0,0,0,0.12)", transition:"box-shadow 0.25s" } }, React.createElement(MatchInner, { a, hov, h:164 }));
   return /* @__PURE__ */ React.createElement(
     "div",
     {
@@ -7859,14 +7907,22 @@ function ZoneUS() {
     return function() { window.removeEventListener('hashchange', onHashChange); };
   }, []);
   const [arts, setArts] = useState(ARTICLES);
-  const [sanityMatches, setSanityMatches] = React.useState([]);
   var _saa = React.useState(false); var showAllArts = _saa[0], setShowAllArts = _saa[1];
   React.useEffect(function() {
     window.__setArts__ = setArts;
     return function() { window.__setArts__ = null; };
   }, []);
   React.useEffect(function() {
-    fetchSanityMatches().then(function(matches) { if (matches && matches.length) setSanityMatches(matches); });
+    fetchSanityMatches().then(function(matches) {
+      if (matches && matches.length) {
+        setArts(function(prev) {
+          var withoutOld = prev.filter(function(a) { return !a._isMatch; });
+          var merged = withoutOld.concat(matches);
+          merged.sort(function(a,b) { var oa=a.ordre!=null?a.ordre:9999, ob=b.ordre!=null?b.ordre:9999; if(oa!==ob)return oa-ob; return (b.publishedAt||'').localeCompare(a.publishedAt||''); });
+          return merged;
+        });
+      }
+    });
   }, []);
   React.useEffect(function() {
     /* Init depuis l'URL — une seule fois au montage */
@@ -7955,6 +8011,10 @@ function ZoneUS() {
   });
   const slugify = function(str) { return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); };
   const goArticle = function(a) {
+    if (a && a._isMatch) {
+      if (a._mMatchId) goScore({ id: a._mMatchId, lg: a.league, status: a._mStatus==='live'?'LIVE':a._mStatus==='final'?'FINAL':'UPCOMING', homeTeam: a._mHome, awayTeam: a._mAway, homeScore: a._mHs, awayScore: a._mAs });
+      return;
+    }
     if (a) {
       var slug = slugify(a.title);
       history.pushState({}, '', '/articles/' + slug);
@@ -8379,7 +8439,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
         )
       ), window.BANNERS[page] && !["home", "Fantasy", "AllNews", "AllStatuts", "NFL", "Cal-NFL", "Stats-NFL", "Fantasy-NFL", "NHL", "Cal-NHL", "Stats-NHL", "Fantasy-NHL", "NBA", "Cal-NBA", "Stats-NBA", "Fantasy-NBA", "MLB", "Cal-MLB", "Stats-MLB", "Fantasy-MLB"].includes(page) && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", overflow: "hidden", maxHeight: 80, lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNERS[page.replace("Stats-", "").replace("Cal-", "").replace("Fantasy-", "")], alt: page, style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover", objectPosition: "center center" } })), selMatch ? /* @__PURE__ */ React.createElement(MatchPage, { match: selMatch, onBack: goBack, articles: arts, onArticleClick: goArticle, onMatchClick: goScore }) : selTeam ? /* @__PURE__ */ React.createElement(TeamPage, { teamId: selTeam.teamId, lg: selTeam.lg, onBack: goBack, articles: arts, onArticleClick: goArticle, onPlayerClick: goPlayer, onMatchClick: goScore }) : selPlayer ? /* @__PURE__ */ React.createElement(PlayerPage, { playerId: selPlayer.playerId, lg: selPlayer.lg, onBack: goBack, articles: arts, onArticleClick: setSelArticle }) : playersList ? /* @__PURE__ */ React.createElement(PlayersListPage, { lg: playersList, onPlayerClick: goPlayer, onBack: goBack }) : selArticle && selArticle.id === '__pending__' ? /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" } }, React.createElement("div", { style: { width: 40, height: 40, border: "4px solid #eee", borderTop: "4px solid #D50A0A", borderRadius: "50%", animation: "spin 0.8s linear infinite" } })) : selArticle ? /* @__PURE__ */ React.createElement(ArticlePage, { article: selArticle, onBack: goBack, articles: arts, onPlayerClick: goPlayer, onTeamClick: goTeam, onArticleClick: goArticle }) : ["Stats-NHL", "Stats-NFL", "Stats-NBA", "Stats-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(StatsPage, { lg: page.replace("Stats-", ""), onPlayerClick: goPlayer, onBack: function(){ window.location.hash = "home"; }, statsVersion: statsVersion, onStatFull: function(ci, t) {
     setStatFull({ lg: page.replace("Stats-", ""), catIndex: ci, type: t });
-  }, onBack: goBack }) : ["Cal-NFL", "Cal-NBA", "Cal-NHL", "Cal-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(CalendarPage, { lg: page.replace("Cal-", ""), onBack: function(){ window.location.hash = "home"; }, onMatchClick: goMatch }) : ["NFL", "NBA", "NHL", "MLB"].includes(page) ? /* @__PURE__ */ React.createElement(LeaguePage, { lg: page, articles: arts, statsVersion: statsVersion, onBack: function(){ window.location.hash = "home"; }, onArticleClick: goArticle, onMatchClick: goScore, onTeamClick: (tid) => goTeam(tid, page), onStandingsClick: (lg) => setPage("Cal-" + lg), onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: (lg) => navigate("Fantasy-" + lg), onNavigate: setPage }) : ["Fantasy-NHL", "Fantasy-NFL", "Fantasy-NBA", "Fantasy-MLB"].includes(page) ? /* @__PURE__ */ React.createElement("div", null, page === "Fantasy-NHL" && /* @__PURE__ */ React.createElement(FantasyPageNHL, { lg: "NHL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NHL") }), page === "Fantasy-NFL" && /* @__PURE__ */ React.createElement(FantasyPageNFL, { lg: "NFL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NFL") }), page === "Fantasy-NBA" && /* @__PURE__ */ React.createElement(FantasyPageNBA, { lg: "NBA", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NBA") }), page === "Fantasy-MLB" && /* @__PURE__ */ React.createElement(FantasyPageMLB, { lg: "MLB", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "MLB") })) : page === "AllStatuts" ? /* @__PURE__ */ React.createElement(AllStatutsPage, { players: PLAYERS, onBack: () => setPage(prevPage || "home"), onPlayerClick: goPlayer }) : page === "AllNews" ? /* @__PURE__ */ React.createElement(AllNewsPage, { feed, onArticleClick: goArticle, onBack: () => setPage(prevPage || "home") }) : page === "Fantasy" ? /* @__PURE__ */ React.createElement(FantasyHome, { onNavigate: setPage }) : /* @__PURE__ */ React.createElement("div", { className: "col3", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "220px 1fr 220px", gap: 14, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(LeftCol, { onMatchClick: goScore, onStandingsClick: (lg) => setPage("Cal-" + lg) }), /* @__PURE__ */ React.createElement("main", { style: { display: "flex", flexDirection: "column", gap: 8, minWidth: 0 } }, hero && /* @__PURE__ */ React.createElement(HCard, { a: hero, onClick: goArticle }), rest.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(0, 3).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), sanityMatches.length > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, sanityMatches.slice(0, 3).map((m) => /* @__PURE__ */ React.createElement(SanityMatchCard, { key: m._id, m, onClick: function(sm) { if (sm.matchId) goScore({ id: sm.matchId, lg: sm.league, status: sm.status === 'live' ? 'LIVE' : sm.status === 'final' ? 'FINAL' : 'UPCOMING', homeTeam: sm.home, awayTeam: sm.away, homeScore: sm.hs, awayScore: sm.as }); } }))), rest.length > 3 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(3, 5).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 5 && /* @__PURE__ */ React.createElement(HCard, { a: rest[5], onClick: goArticle }), rest.length > 6 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(6, 9).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 9 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(9, 11).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 11 && /* @__PURE__ */ React.createElement(HCard, { a: rest[11], onClick: goArticle }), rest.length > 12 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(12).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle })))), /* @__PURE__ */ React.createElement(RightCol, { feed, statsVersion: statsVersion, onGen: generate, generating: gen, genLg, onArticleClick: goArticle, onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: function(lg) {
+  }, onBack: goBack }) : ["Cal-NFL", "Cal-NBA", "Cal-NHL", "Cal-MLB"].includes(page) ? /* @__PURE__ */ React.createElement(CalendarPage, { lg: page.replace("Cal-", ""), onBack: function(){ window.location.hash = "home"; }, onMatchClick: goMatch }) : ["NFL", "NBA", "NHL", "MLB"].includes(page) ? /* @__PURE__ */ React.createElement(LeaguePage, { lg: page, articles: arts, statsVersion: statsVersion, onBack: function(){ window.location.hash = "home"; }, onArticleClick: goArticle, onMatchClick: goScore, onTeamClick: (tid) => goTeam(tid, page), onStandingsClick: (lg) => setPage("Cal-" + lg), onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: (lg) => navigate("Fantasy-" + lg), onNavigate: setPage }) : ["Fantasy-NHL", "Fantasy-NFL", "Fantasy-NBA", "Fantasy-MLB"].includes(page) ? /* @__PURE__ */ React.createElement("div", null, page === "Fantasy-NHL" && /* @__PURE__ */ React.createElement(FantasyPageNHL, { lg: "NHL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NHL") }), page === "Fantasy-NFL" && /* @__PURE__ */ React.createElement(FantasyPageNFL, { lg: "NFL", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NFL") }), page === "Fantasy-NBA" && /* @__PURE__ */ React.createElement(FantasyPageNBA, { lg: "NBA", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "NBA") }), page === "Fantasy-MLB" && /* @__PURE__ */ React.createElement(FantasyPageMLB, { lg: "MLB", onMatchClick: goMatch, onPlayerClick: goPlayer, onBack: goBack, onTeamClick: (tid, teamLg) => goTeam(tid, teamLg || "MLB") })) : page === "AllStatuts" ? /* @__PURE__ */ React.createElement(AllStatutsPage, { players: PLAYERS, onBack: () => setPage(prevPage || "home"), onPlayerClick: goPlayer }) : page === "AllNews" ? /* @__PURE__ */ React.createElement(AllNewsPage, { feed, onArticleClick: goArticle, onBack: () => setPage(prevPage || "home") }) : page === "Fantasy" ? /* @__PURE__ */ React.createElement(FantasyHome, { onNavigate: setPage }) : /* @__PURE__ */ React.createElement("div", { className: "col3", style: { maxWidth: 1260, margin: "0 auto", padding: "14px 20px 40px", display: "grid", gridTemplateColumns: "220px 1fr 220px", gap: 14, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(LeftCol, { onMatchClick: goScore, onStandingsClick: (lg) => setPage("Cal-" + lg) }), /* @__PURE__ */ React.createElement("main", { style: { display: "flex", flexDirection: "column", gap: 8, minWidth: 0 } }, hero && /* @__PURE__ */ React.createElement(HCard, { a: hero, onClick: goArticle }), rest.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(0, 3).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))),  rest.length > 3 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(3, 5).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 5 && /* @__PURE__ */ React.createElement(HCard, { a: rest[5], onClick: goArticle }), rest.length > 6 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(6, 9).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 9 && /* @__PURE__ */ React.createElement("div", { className: "stats-grid", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 } }, rest.slice(9, 11).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle }))), rest.length > 11 && /* @__PURE__ */ React.createElement(HCard, { a: rest[11], onClick: goArticle }), rest.length > 12 && /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } }, rest.slice(12).map((a) => /* @__PURE__ */ React.createElement(NCard, { key: a.id, a, onClick: goArticle })))), /* @__PURE__ */ React.createElement(RightCol, { feed, statsVersion: statsVersion, onGen: generate, generating: gen, genLg, onArticleClick: goArticle, onMoreNews: () => navigate("AllNews"), onMorePlayers: () => navigate("Fantasy"), onMoreStats: function(lg) {
     setPage("Stats-" + lg);
   }, onPlayerClick: goPlayer, onMoreStats: (lg) => setPage("Stats-" + lg) })), arts.length > 25 && (page === 'home' || ['NHL','NFL','NBA','MLB'].includes(page)) && /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: "32px 0 8px" } },
       /* @__PURE__ */ React.createElement("button", { onClick: function() { setShowAllArts(true); }, style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 900, letterSpacing: "0.12em", color: "#fff", background: "#e30613", border: "none", borderRadius: 4, padding: "14px 40px", cursor: "pointer" } }, "PLUS D'ARTICLES \u2192")
@@ -9148,7 +9208,7 @@ async function fetchSanityMatches() {
     var data = await resp.json();
     if (!data.result || !data.result.length) return [];
     return data.result.map(function(m) {
-      return { _id: m._id, league: (m.league||'NHL').toUpperCase(), home: (m.homeTeam||'').toUpperCase(), away: (m.awayTeam||'').toUpperCase(), hs: m.homeScore != null ? m.homeScore : null, as: m.awayScore != null ? m.awayScore : null, status: m.status||'upcoming', gameDate: m.gameDate||'', matchId: m.matchId||null, chapo: m.chapo||'', publishedAt: m.publishedAt||m.gameDate||'' };
+      return { id: 'smatch_'+m._id, _id: m._id, _isMatch: true, league: (m.league||'NHL').toUpperCase(), tag: 'MATCH', franchise: '', hot: false, title: (m.homeTeam||'')+ ' vs '+(m.awayTeam||''), chapo: m.chapo||'', img: null, body: null, publishedAt: m.publishedAt||m.gameDate||'', ordre: (m.ordre != null ? m.ordre : 9999), _mHome: (m.homeTeam||'').toUpperCase(), _mAway: (m.awayTeam||'').toUpperCase(), _mHs: m.homeScore != null ? m.homeScore : null, _mAs: m.awayScore != null ? m.awayScore : null, _mStatus: m.status||'upcoming', _mDate: m.gameDate||'', _mMatchId: m.matchId||null };
     });
   } catch(e) { console.log('Sanity matches error:', e.message); return []; }
 }
