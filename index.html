@@ -7932,11 +7932,12 @@ function ZoneUS() {
     /* Init depuis l'URL — une seule fois au montage */
     var params = new URLSearchParams(window.location.search);
     var _pn2 = window.location.pathname; var _apMatch = _pn2.match(/^\/articles\/([^/]+)\/?$/);
+    var _mpMatch = _pn2.match(/^\/matchs\/([^/]+)\/?$/);
     var artSlug = (_apMatch && _apMatch[1]) || params.get('article'); var pageParam = params.get('page');
     var equipeParam = params.get('equipe'); var ligueParam = params.get('ligue');
     if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
     if (equipeParam && ligueParam) setSelTeam({ teamId: equipeParam.toUpperCase(), lg: ligueParam.toUpperCase() });
-    var matchParam = params.get('match');
+    var matchParam = (_mpMatch && _mpMatch[1]) || params.get('match');
     if (matchParam) {
       // Format unifié : NHL_2026020214 ou NFL_401872657 etc.
       var _matchParts = matchParam.match(/^(NHL|NFL|NBA|MLB)_(.+)$/i);
@@ -7949,11 +7950,11 @@ function ZoneUS() {
     }
     var onPop = function() {
       var p = new URLSearchParams(window.location.search);
-      var _pnPop = window.location.pathname; var _apPop = _pnPop.match(/^\/articles\/([^/]+)\/?$/);
+      var _pnPop = window.location.pathname; var _apPop = _pnPop.match(/^\/articles\/([^/]+)\/?$/); var _mpPop = _pnPop.match(/^\/matchs\/([^/]+)\/?$/);
       var _artPop = (_apPop && _apPop[1]) || p.get('article');
       if (!_artPop) setSelArticle(null);
       if (!p.get('equipe')) setSelTeam(null);
-      var mp = p.get('match'); var lp = p.get('ligue');
+      var mp = (_mpPop && _mpPop[1]) || p.get('match'); var lp = p.get('ligue');
       if (mp) {
         var _mp2 = mp.match(/^(NHL|NFL|NBA|MLB)_(.+)$/i);
         var _lgUp2 = _mp2 ? _mp2[1].toUpperCase() : (lp ? lp.toUpperCase() : '');
@@ -8131,7 +8132,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   }
   function goMatch(m) {
     setSelMatch(m); setSelArticle(null); setSelPlayer(null); setSelTeam(null); setPlayersList(null);
-    if (m && (m.eventId||m.id) && m.lg) { var _rawId = (m.eventId||m.id)+''; var _cleanId = _rawId.replace(/^(nhl|nfl|nba|mlb)_/i,''); history.pushState({}, '', '?match=' + (m.lg||'').toUpperCase() + '_' + _cleanId); }
+    if (m && (m.eventId||m.id) && m.lg) { var _rawId = (m.eventId||m.id)+''; var _cleanId = _rawId.replace(/^(nhl|nfl|nba|mlb)_/i,''); history.pushState({}, '', '/matchs/' + (m.lg||'').toUpperCase() + '_' + _cleanId); }
   }
   function goTeam(id, lg) {
     setSelTeam({ teamId: id, lg }); setSelArticle(null); setSelPlayer(null); setPlayersList(null);
@@ -8144,6 +8145,8 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     setPlayersList(null);
     setSelMatch(null);
     setCalLg(null);
+    var _pn = window.location.pathname;
+    if (_pn.startsWith('/articles/') || _pn.startsWith('/matchs/')) history.pushState({}, '', '/');
   }
   function goScore(g, lg) {
     var _eid = g.eventId || (lg === 'NFL' ? (g.id||'').replace('nfl_','') : null) || null;
