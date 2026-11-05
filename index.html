@@ -2549,8 +2549,6 @@ async function fetchLiveScores() {
             const state = g.gameState || 'FUT';
             const isLive = state === 'LIVE' || state === 'CRIT';
             const isFinal = state === 'OFF' || state === 'FINAL';
-            // Ne pas afficher les matchs terminés (pré-saison passée)
-            if (isFinal) continue;
             results.push({
               id: 'nhl_' + g.id,
               lg: 'NHL',
@@ -2622,7 +2620,6 @@ async function fetchLiveScores() {
       const statusType = comp.status && comp.status.type;
       const isLive = statusType && statusType.state === 'in';
       const isFinal = statusType && statusType.completed;
-      if (isFinal) continue;
       results.push({
         id: 'nba_' + g.id,
         lg: 'NBA',
@@ -2630,8 +2627,8 @@ async function fetchLiveScores() {
         period: isLive && comp.status && comp.status.period ? 'Q' + comp.status.period : '',
         homeTeam: home.team ? home.team.abbreviation : '',
         awayTeam: away.team ? away.team.abbreviation : '',
-        homeScore: isLive ? parseInt(home.score || 0) : null,
-        awayScore: isLive ? parseInt(away.score || 0) : null,
+        homeScore: isLive || isFinal ? parseInt(home.score || 0) : null,
+        awayScore: isLive || isFinal ? parseInt(away.score || 0) : null,
         time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
         startUTC: g.date ? new Date(g.date).getTime() : 0,
         homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nba/500/' + home.team.abbreviation.toLowerCase() + '.png' : '',
@@ -2651,8 +2648,7 @@ async function fetchLiveScores() {
       const status = comp.status && comp.status.type;
       const isLive = status && (status.state === 'in');
       const isFinal = status && status.completed;
-      if (isFinal) continue;
-      results.push({ id: 'nfl_' + g.id, eventId: g.id, lg: 'NFL', status: isLive ? 'LIVE' : 'UPCOMING', period: comp.status && comp.status.period ? 'Q' + comp.status.period : '', homeTeam: home.team ? home.team.abbreviation : '', awayTeam: away.team ? away.team.abbreviation : '', homeScore: isLive ? parseInt(home.score || 0) : null, awayScore: isLive ? parseInt(away.score || 0) : null, time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '', startUTC: g.date ? new Date(g.date).getTime() : 0, homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + home.team.abbreviation.toLowerCase() + '.png' : '', awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + away.team.abbreviation.toLowerCase() + '.png' : '' });
+      results.push({ id: 'nfl_' + g.id, eventId: g.id, lg: 'NFL', status: isLive ? 'LIVE' : isFinal ? 'FINAL' : 'UPCOMING', period: comp.status && comp.status.period ? 'Q' + comp.status.period : '', homeTeam: home.team ? home.team.abbreviation : '', awayTeam: away.team ? away.team.abbreviation : '', homeScore: isLive || isFinal ? parseInt(home.score || 0) : null, awayScore: isLive || isFinal ? parseInt(away.score || 0) : null, time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '', startUTC: g.date ? new Date(g.date).getTime() : 0, homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + home.team.abbreviation.toLowerCase() + '.png' : '', awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nfl/500scoreboard/' + away.team.abbreviation.toLowerCase() + '.png' : '' });
     }
   } catch(e) { console.log('NFL livebar error:', e.message); }
 
@@ -2671,11 +2667,9 @@ async function fetchLiveScores() {
 async function initLiveScores() {
   try {
     const scores = await fetchLiveScores();
-    if (scores.length > 0) {
-      window.LIVE_MATCHES = scores;
-      // Déclencher re-render si possible
-      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-    }
+    window.LIVE_MATCHES = scores;
+    // Déclencher re-render si possible
+    if (window.__zoneus_refresh__) window.__zoneus_refresh__();
   } catch(e) { console.log('initLiveScores error:', e); }
 }
 
