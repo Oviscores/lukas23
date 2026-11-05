@@ -9230,12 +9230,18 @@ async function fetchSanityArticles() {
       return (b.publishedAt||'').localeCompare(a.publishedAt||'');
     });
     window.__SANITY_ARTICLES__ = sanityArts;
-    var merged = sanityArts;
-    if (window.__setArts__) window.__setArts__(merged);
+    var mergeFn = function(prev) {
+      var matches = (prev || []).filter(function(a) { return a._isMatch; });
+      var withMatches = sanityArts.concat(matches);
+      withMatches = withMatches.map(function(a, i) { return a.ordre != null ? a : Object.assign({}, a, { ordre: i + 1 }); });
+      withMatches.sort(function(a, b) { if (a.ordre !== b.ordre) return a.ordre - b.ordre; return (b.publishedAt||'').localeCompare(a.publishedAt||''); });
+      return withMatches;
+    };
+    if (window.__setArts__) window.__setArts__(mergeFn);
     else {
       var _retryArts = function(attempts) {
         setTimeout(function() {
-          if (window.__setArts__) window.__setArts__(merged);
+          if (window.__setArts__) window.__setArts__(mergeFn);
           else if (attempts > 0) _retryArts(attempts - 1);
         }, 500);
       };
