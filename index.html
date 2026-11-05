@@ -8016,7 +8016,21 @@ function ZoneUS() {
   const slugify = function(str) { return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); };
   const goArticle = function(a) {
     if (a && a._isMatch) {
-      if (a._mMatchId) goScore({ id: a._mMatchId, lg: a.league, status: a._mStatus==='live'?'LIVE':a._mStatus==='final'?'FINAL':'UPCOMING', homeTeam: a._mHome, awayTeam: a._mAway, homeScore: a._mHs, awayScore: a._mAs });
+      var st = a._mStatus==='live'?'LIVE':a._mStatus==='final'?'FINAL':'UPCOMING';
+      goMatch({
+        id: a._mMatchId || (a._mAway + '-' + a._mHome),
+        eventId: a._mMatchId || null,
+        lg: a.league,
+        status: st,
+        period: st,
+        homeTeam: a._mHome,
+        awayTeam: a._mAway,
+        homeScore: a._mHs,
+        awayScore: a._mAs,
+        time: a._mDate || '',
+        arena: '',
+        city: ''
+      });
       return;
     }
     if (a) {
