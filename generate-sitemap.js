@@ -48,22 +48,22 @@ async function main() {
 
   // Pages fixes
   const staticPages = [
-    { loc: `${BASE_URL}/`,             lastmod: TODAY,        changefreq: 'daily',  priority: '1.0' },
-    { loc: `${BASE_URL}/?page=nhl`,    lastmod: TODAY,        changefreq: 'daily',  priority: '0.8' },
-    { loc: `${BASE_URL}/?page=nfl`,    lastmod: TODAY,        changefreq: 'daily',  priority: '0.8' },
-    { loc: `${BASE_URL}/?page=nba`,    lastmod: TODAY,        changefreq: 'daily',  priority: '0.8' },
-    { loc: `${BASE_URL}/?page=mlb`,    lastmod: TODAY,        changefreq: 'daily',  priority: '0.8' },
+    { loc: `${BASE_URL}/`,          lastmod: TODAY, changefreq: 'daily',  priority: '1.0' },
+    { loc: `${BASE_URL}/?page=nhl`, lastmod: TODAY, changefreq: 'daily',  priority: '0.8' },
+    { loc: `${BASE_URL}/?page=nfl`, lastmod: TODAY, changefreq: 'daily',  priority: '0.8' },
+    { loc: `${BASE_URL}/?page=nba`, lastmod: TODAY, changefreq: 'daily',  priority: '0.8' },
+    { loc: `${BASE_URL}/?page=mlb`, lastmod: TODAY, changefreq: 'daily',  priority: '0.8' },
   ]
 
-  // Articles
+  // Articles — URLs propres /articles/slug
   const articlePages = articles.map(a => {
     let slug = ''
     if (a.slug && typeof a.slug === 'object') slug = a.slug.current || ''
     else if (typeof a.slug === 'string') slug = a.slug
     if (!slug && a.title) slug = slugify(a.title)
     const lastmod = (a._createdAt || TODAY).slice(0, 10)
-    return { loc: `${BASE_URL}/?article=${slug}`, lastmod, changefreq: 'weekly', priority: '0.9' }
-  }).filter(p => p.loc.includes('=') && !p.loc.endsWith('='))
+    return { loc: `${BASE_URL}/articles/${slug}`, lastmod, changefreq: 'weekly', priority: '0.9' }
+  }).filter(p => !p.loc.endsWith('/articles/'))
 
   const allPages = [...staticPages, ...articlePages]
 
@@ -80,11 +80,7 @@ ${urls}
 </urlset>
 `
 
-  const outPath = path.join(__dirname, '..', '..', '..', '..', '..', 'home', 'claude', 'oviscores', 'lukas23', 'sitemap.xml')
-  // Si lancé depuis la racine du repo, écrire à la racine
-  const repoRoot = process.argv[2] || path.join(process.cwd())
-  const dest = path.join(repoRoot, 'sitemap.xml')
-
+  const dest = path.join(process.argv[2] || process.cwd(), 'sitemap.xml')
   fs.writeFileSync(dest, xml, 'utf8')
   console.log(`✓ sitemap.xml écrit → ${dest} (${allPages.length} URLs)`)
 }
