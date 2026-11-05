@@ -3592,7 +3592,9 @@ function MatchInner({ a, hov, h }) {
         React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:900, color:hWin?'#fff':'rgba(255,255,255,0.65)', letterSpacing:'0.08em' } }, a._mHome)
       )
     ),
-    a.chapo && React.createElement('div', { style:{ position:'absolute', bottom:0, left:0, right:0, padding:'0 12px 8px', fontFamily:"'Barlow',sans-serif", fontSize:10, color:'rgba(255,255,255,0.6)', zIndex:2, overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis' } }, a.chapo)
+    a.chapo && React.createElement('div', { style:{ position:'absolute', bottom:0, left:0, right:0, padding:'6px 10px 8px', zIndex:2, background:'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)' } },
+      React.createElement('h2', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize: h>=280 ? 20 : 14, fontWeight:900, lineHeight:1.05, color:'#fff', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' } }, a.chapo)
+    )
   );
 }
 function HCard({ a, onClick }) {
