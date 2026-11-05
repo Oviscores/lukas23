@@ -18,9 +18,10 @@
     var p = new URLSearchParams(window.location.search);
     var _pn = window.location.pathname;
     var _artFromPath = _pn.match(/^\/articles\/([^/]+)\/?$/);
+    var _matchFromPath = _pn.match(/^\/matchs\/([^/]+)\/?$/);
     var article = (_artFromPath && _artFromPath[1]) || p.get('article');
     var page = p.get('page');
-    var match = p.get('match');
+    var match = (_matchFromPath && _matchFromPath[1]) || p.get('match');
 
     var title = 'Zone US';
     var desc  = 'Zone US, le media sportif francophone spécialisé NHL, NFL, NBA et MLB.';
@@ -45,7 +46,7 @@
       var lg2 = match.split('_')[0].toUpperCase();
       title = 'Feuille de match ' + lg2 + ' | Zone US';
       desc  = 'Résultat et statistiques du match ' + lg2 + ' sur Zone US.';
-      canonical = 'https://zoneus.fr/?match=' + match;
+      canonical = 'https://zoneus.fr/matchs/' + match;
     }
 
     document.write('<title>' + title.replace(/</g,'&lt;') + '<\/title>');
