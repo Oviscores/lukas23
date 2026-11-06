@@ -5222,12 +5222,12 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
   var _matchData = React.useState(match); var matchData = _matchData[0], setMatchData = _matchData[1];
   var _enriched = React.useRef(false);
   var _retryDone = React.useRef(false);
-  var _retry2Done = React.useRef(false);
+  var _r2 = React.useState(false); var retry2Triggered = _r2[0], setRetry2Triggered = _r2[1];
   var _stTick = React.useState(0); var setStTick = _stTick[1];
   React.useEffect(function() {
     _enriched.current = false;
     _retryDone.current = false;
-    _retry2Done.current = false;
+    setRetry2Triggered(false);
     setMatchData(match);
     setBoxscore(null);
     setBxLoading(true);
@@ -5336,7 +5336,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       setBxLoading(false);
     })();
   }, [match.id]);
-  /* Retry si boxscore null après 1s (cold start worker) — une seule fois par match */
+  /* Retry 1 : 1s après échec du fetch initial (cold start) */
   React.useEffect(function() {
     if (!bxLoading && !boxscore && match.id && !_retryDone.current) {
       _retryDone.current = true;
@@ -5359,7 +5359,6 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
                   try { var r3r = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId); data = await r3r.json(); } catch(e3r) { data = null; }
                 }
                 if (data && (data.gameState || data.homeTeam || data.awayTeam)) {
-                  /* Buts depuis summary.scoring d'abord */
                   var goals2 = [];
                   var scoring2 = data.summary && data.summary.scoring;
                   if (scoring2) {
@@ -5386,15 +5385,17 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
               var _cleanId2 = (_rawId2+'').replace('nfl_','');
               if (_cleanId2) { var r2 = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId2); data = await r2.json(); if (data && data.boxscore) setBoxscore({ type: 'NFL', data: data }); }
             }
-          } catch(e) { console.log('boxscore retry error:', e); }
+          } catch(e) {}
           setBxLoading(false);
         })();
       }, 1000);
       return function() { clearTimeout(_retryTimer); };
     }
-    /* 2ème retry à 5s si toujours rien (NHL api-web.nhle.com lent au 1er appel) */
-    if (!bxLoading && !boxscore && match.id && _retryDone.current && !_retry2Done.current) {
-      _retry2Done.current = true;
+  }, [bxLoading, boxscore, match.id]);
+  /* Retry 2 : 5s supplémentaires — seulement après que bxLoading repasse false post-retry1 (retry2Triggered est un state donc ce useEffect ne fire qu'après le re-render) */
+  React.useEffect(function() {
+    if (!bxLoading && !boxscore && match.id && _retryDone.current && !retry2Triggered) {
+      setRetry2Triggered(true);
       var _retry2Timer = setTimeout(function() {
         setBxLoading(true);
         var matchId = match.id; var matchLg = match.lg; var matchEventId = match.eventId;
@@ -5423,7 +5424,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       }, 5000);
       return function() { clearTimeout(_retry2Timer); };
     }
-  }, [bxLoading, boxscore, match.id]);
+  }, [bxLoading, boxscore, match.id, retry2Triggered]);
 
   /* ===== POLLING LIVE — rafraîchit le boxscore toutes les 30s si match en cours ===== */
   React.useEffect(function() {
