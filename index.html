@@ -5139,21 +5139,19 @@ function RosterSection({ match, hc, ac }) {
 var YT_API_KEY = 'AIzaSyDKGObw39_hi_tU_1pN8n8GWUww1d2JMRY';
 var YT_CHANNELS = { NHL: 'UCqFMzb-4AUf6WAIbl132QKA', NFL: 'UCDInR2XVHHaAiASlyAOBelg', NBA: 'UCWJ2lWNubArHWmf3FIHbfcQ', MLB: 'UCoLrcjPV5PbUrUyXq5mjc_A' };
 
-function YouTubeHighlight({ matchData, isFinal, isLive, lc }) {
+function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
   var _vid = React.useState(null); var videoId = _vid[0], setVideoId = _vid[1];
   var _loading = React.useState(false); var loading = _loading[0], setLoading = _loading[1];
 
   var st = (matchData.status || '').toUpperCase();
-  var _isFinal = isFinal || st === 'FINAL' || st === 'OFF';
-  var _isLive = isLive || st === 'LIVE' || st === 'CRIT';
+  var _isFinal = isFinal || st === 'FINAL' || st === 'OFF' || st === 'STATUS_FINAL';
+  var _isLive = isLive || st === 'LIVE' || st === 'CRIT' || st === 'STATUS_IN_PROGRESS';
 
   React.useEffect(function() {
-    console.log('[YT] status=', matchData.status, 'lg=', matchData.lg, '_isFinal=', _isFinal, '_isLive=', _isLive);
     if (!_isFinal && !_isLive) return;
     var lg = matchData.lg;
-    var home = matchData.homeTeam || matchData.home || '';
-    var away = matchData.awayTeam || matchData.away || '';
-    console.log('[YT] home=', home, 'away=', away, 'lg=', lg);
+    var home = homeAb || matchData.homeTeam || matchData.home || '';
+    var away = awayAb || matchData.awayTeam || matchData.away || '';
     if (!home || !away) return;
     if (videoId) return; // déjà chargé
 
@@ -5167,10 +5165,8 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc }) {
     if (!channelId) return;
     var query = tn(home) + ' ' + tn(away) + ' highlights';
     var url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + channelId + '&q=' + encodeURIComponent(query) + '&type=video&order=relevance&maxResults=5&key=' + YT_API_KEY;
-    console.log('[YT] fetching:', url);
     setLoading(true);
     fetch(url).then(function(r) { return r.json(); }).then(function(d) {
-      console.log('[YT] response:', d);
       var items = d.items || [];
       var vid = null;
       for (var i = 0; i < items.length; i++) {
@@ -5182,16 +5178,16 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc }) {
       if (!vid && items.length > 0) vid = items[0].id && items[0].id.videoId;
       setVideoId(vid || null);
     }).catch(function() {}).finally(function() { setLoading(false); });
-  }, [matchData.id, matchData.homeTeam, matchData.home, _isFinal, _isLive]);
+  }, [matchData.id, homeAb, awayAb, matchData.homeTeam, matchData.home, _isFinal, _isLive]);
 
   if (!_isFinal && !_isLive) return null;
-  if (loading) return React.createElement('div', { style: { maxWidth: '50%', marginLeft: 'auto', background: 'rgba(255,255,255,0.85)', borderRadius: 6, boxShadow: '0 2px 10px rgba(0,0,0,0.07)', backdropFilter: 'blur(10px)', marginBottom: 14, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10 } },
+  if (loading) return React.createElement('div', { style: { maxWidth: '50%', margin: '0 auto', background: 'rgba(255,255,255,0.85)', borderRadius: 6, boxShadow: '0 2px 10px rgba(0,0,0,0.07)', backdropFilter: 'blur(10px)', marginBottom: 14, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10 } },
     React.createElement('div', { style: { width: 20, height: 20, border: '3px solid #eee', borderTop: '3px solid ' + lc, borderRadius: '50%', animation: 'spin 0.8s linear infinite', flexShrink: 0 } }),
     React.createElement('span', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, color: '#aaa' } }, 'Recherche du résumé vidéo...')
   );
   if (!videoId) return null;
 
-  return React.createElement('div', { style: { maxWidth: '50%', marginLeft: 'auto', background: '#000', borderRadius: 6, overflow: 'hidden', boxShadow: '0 2px 14px rgba(0,0,0,0.18)', marginBottom: 14 } },
+  return React.createElement('div', { style: { maxWidth: '50%', margin: '0 auto', background: '#000', borderRadius: 6, overflow: 'hidden', boxShadow: '0 2px 14px rgba(0,0,0,0.18)', marginBottom: 14 } },
     React.createElement('div', { style: { background: '#111', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 8 } },
       React.createElement('span', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: '0.12em', color: '#fff' } }, '▶ RÉSUMÉ DU MATCH'),
       React.createElement('span', { style: { marginLeft: 'auto', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: '#ff0000', fontWeight: 700 } }, 'YouTube')
@@ -5630,6 +5626,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       /* @__PURE__ */ renderStandMini(aStand, ac)
     )
   ), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 14 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 17, color: "rgba(255,255,255,0.5)" } }, "\u{1F4CD} ", matchData.arena, " \xB7 ", matchData.city)))),
+      /* ===== RÉSUMÉ VIDÉO YOUTUBE ===== */
+      React.createElement(YouTubeHighlight, { matchData: matchData, isFinal: isFinal, isLive: isLive, lc: lc, homeAb: _homeAb, awayAb: _awayAb }),
       (bxLoading || boxscore) && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } },
         /* Header */
         
@@ -6449,9 +6447,6 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
     const isH = r.startsWith(_homeAb);
     return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 8, padding: "5px 10px", background: i % 2 === 0 ? "#fafafa" : "transparent", borderRadius: 3 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 8, height: 8, borderRadius: "50%", background: isH ? hc.bg : ac.bg, flexShrink: 0 } }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 700, color: "#111", flex: 1 } }, r), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 700, color: isH ? hc.bg : ac.bg } }, isH ? _homeAb + " WIN" : _awayAb + " WIN"));
   })))),
-      /* ===== RÉSUMÉ VIDÉO YOUTUBE ===== */
-      React.createElement(YouTubeHighlight, { matchData: matchData, isFinal: isFinal, isLive: isLive, lc: lc }),
-
       /* ===== BLOC AVANT-MATCH COMPLET ===== */
       !isLive && !isFinal && (function() {
         var lg2 = matchData.lg;
