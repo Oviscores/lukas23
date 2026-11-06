@@ -5176,7 +5176,7 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
         var item = items[i];
         if (!item.id || item.id.kind !== 'youtube#video') continue;
         var t = (item.snippet && item.snippet.title || '').toLowerCase();
-        if (t.indexOf('highlight') !== -1 || t.indexOf('recap') !== -1 || t.indexOf('résumé') !== -1 || t.indexOf('nfl') !== -1 || t.indexOf('nba') !== -1 || t.indexOf('nhl') !== -1 || t.indexOf('mlb') !== -1) {
+        if (t.indexOf('highlight') !== -1 || t.indexOf('recap') !== -1 || t.indexOf('résumé') !== -1 || t.indexOf('temps forts') !== -1 || t.indexOf('semaine') !== -1 || t.indexOf('nfl') !== -1 || t.indexOf('nba') !== -1 || t.indexOf('nhl') !== -1 || t.indexOf('mlb') !== -1 || t.indexOf('vs') !== -1 || t.indexOf('contre') !== -1) {
           vid = item.id.videoId; break;
         }
       }
