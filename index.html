@@ -5142,6 +5142,7 @@ var YT_CHANNELS = { NHL: 'UCqFMzb-4AUf6WAIbl132QKA', NFL: 'UCDInR2XVHHaAiASlyAOB
 function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
   var _vid = React.useState(null); var videoId = _vid[0], setVideoId = _vid[1];
   var _loading = React.useState(false); var loading = _loading[0], setLoading = _loading[1];
+  var _fetchedFor = React.useRef(null); /* clé "matchId|home|away" pour éviter double-fetch */
 
   var st = (matchData.status || '').toUpperCase();
   var _isFinal = isFinal || st === 'FINAL' || st === 'OFF' || st === 'STATUS_FINAL';
@@ -5153,7 +5154,9 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
     var home = homeAb || matchData.homeTeam || matchData.home || '';
     var away = awayAb || matchData.awayTeam || matchData.away || '';
     if (!home || !away) return;
-    if (videoId) return; // déjà chargé
+    var fetchKey = matchData.id + '|' + home + '|' + away;
+    if (_fetchedFor.current === fetchKey) return; // déjà fetché pour ce match+équipes
+    _fetchedFor.current = fetchKey;
 
     var TEAM_NAMES_NHL = {ANA:'Anaheim Ducks',ARI:'Arizona Coyotes',BOS:'Boston Bruins',BUF:'Buffalo Sabres',CGY:'Calgary Flames',CAR:'Carolina Hurricanes',CHI:'Chicago Blackhawks',COL:'Colorado Avalanche',CBJ:'Columbus Blue Jackets',DAL:'Dallas Stars',DET:'Detroit Red Wings',EDM:'Edmonton Oilers',FLA:'Florida Panthers',LAK:'Los Angeles Kings',MIN:'Minnesota Wild',MTL:'Montreal Canadiens',NSH:'Nashville Predators',NJD:'New Jersey Devils',NYI:'New York Islanders',NYR:'New York Rangers',OTT:'Ottawa Senators',PHI:'Philadelphia Flyers',PIT:'Pittsburgh Penguins',STL:'St. Louis Blues',SJS:'San Jose Sharks',SEA:'Seattle Kraken',TBL:'Tampa Bay Lightning',TOR:'Toronto Maple Leafs',VAN:'Vancouver Canucks',VGK:'Vegas Golden Knights',WSH:'Washington Capitals',WPG:'Winnipeg Jets',UTA:'Utah Hockey Club'};
     var TEAM_NAMES_NFL = {ARI:'Arizona Cardinals',ATL:'Atlanta Falcons',BAL:'Baltimore Ravens',BUF:'Buffalo Bills',CAR:'Carolina Panthers',CHI:'Chicago Bears',CIN:'Cincinnati Bengals',CLE:'Cleveland Browns',DAL:'Dallas Cowboys',DEN:'Denver Broncos',DET:'Detroit Lions',GB:'Green Bay Packers',HOU:'Houston Texans',IND:'Indianapolis Colts',JAX:'Jacksonville Jaguars',KC:'Kansas City Chiefs',LV:'Las Vegas Raiders',LAC:'Los Angeles Chargers',LAR:'Los Angeles Rams',MIA:'Miami Dolphins',MIN:'Minnesota Vikings',NE:'New England Patriots',NO:'New Orleans Saints',NYG:'New York Giants',NYJ:'New York Jets',PHI:'Philadelphia Eagles',PIT:'Pittsburgh Steelers',SF:'San Francisco 49ers',SEA:'Seattle Seahawks',TB:'Tampa Bay Buccaneers',TEN:'Tennessee Titans',WSH:'Washington Commanders'};
@@ -5170,12 +5173,14 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
       var items = d.items || [];
       var vid = null;
       for (var i = 0; i < items.length; i++) {
-        var t = (items[i].snippet && items[i].snippet.title || '').toLowerCase();
-        if (t.indexOf('highlight') !== -1 || t.indexOf('recap') !== -1 || t.indexOf('résumé') !== -1) {
-          vid = items[i].id && items[i].id.videoId; break;
+        var item = items[i];
+        if (!item.id || item.id.kind !== 'youtube#video') continue;
+        var t = (item.snippet && item.snippet.title || '').toLowerCase();
+        if (t.indexOf('highlight') !== -1 || t.indexOf('recap') !== -1 || t.indexOf('résumé') !== -1 || t.indexOf('nfl') !== -1 || t.indexOf('nba') !== -1 || t.indexOf('nhl') !== -1 || t.indexOf('mlb') !== -1) {
+          vid = item.id.videoId; break;
         }
       }
-      if (!vid && items.length > 0) vid = items[0].id && items[0].id.videoId;
+      if (!vid) { for (var j = 0; j < items.length; j++) { if (items[j].id && items[j].id.kind === 'youtube#video') { vid = items[j].id.videoId; break; } } }
       setVideoId(vid || null);
     }).catch(function() {}).finally(function() { setLoading(false); });
   }, [matchData.id, homeAb, awayAb, matchData.homeTeam, matchData.home, _isFinal, _isLive]);
