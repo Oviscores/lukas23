@@ -5210,10 +5210,12 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
   var _matchData = React.useState(match); var matchData = _matchData[0], setMatchData = _matchData[1];
   var _enriched = React.useRef(false);
   var _retryDone = React.useRef(false);
+  var _retry2Done = React.useRef(false);
   var _stTick = React.useState(0); var setStTick = _stTick[1];
   React.useEffect(function() {
     _enriched.current = false;
     _retryDone.current = false;
+    _retry2Done.current = false;
     setMatchData(match);
     setBoxscore(null);
     setBxLoading(true);
@@ -5322,7 +5324,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       setBxLoading(false);
     })();
   }, [match.id]);
-  /* Retry si boxscore null après 2s (cold start worker) — une seule fois par match */
+  /* Retry si boxscore null après 1s (cold start worker) — une seule fois par match */
   React.useEffect(function() {
     if (!bxLoading && !boxscore && match.id && !_retryDone.current) {
       _retryDone.current = true;
@@ -5375,8 +5377,39 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
           } catch(e) { console.log('boxscore retry error:', e); }
           setBxLoading(false);
         })();
-      }, 2000);
+      }, 1000);
       return function() { clearTimeout(_retryTimer); };
+    }
+    /* 2ème retry à 5s si toujours rien (NHL api-web.nhle.com lent au 1er appel) */
+    if (!bxLoading && !boxscore && match.id && _retryDone.current && !_retry2Done.current) {
+      _retry2Done.current = true;
+      var _retry2Timer = setTimeout(function() {
+        setBxLoading(true);
+        var matchId = match.id; var matchLg = match.lg; var matchEventId = match.eventId;
+        (async function() {
+          try {
+            var data = null;
+            if (matchLg === 'NHL') {
+              var nhlId2 = (matchId+'').replace('nhl_','');
+              try { var r3c = await fetch('https://api-web.nhle.com/v1/gamecenter/' + nhlId2 + '/boxscore'); data = await r3c.json(); } catch(e) { data = null; }
+              if (!data || (!data.gameState && !data.homeTeam)) {
+                try { var r3d = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId2); data = await r3d.json(); } catch(e) { data = null; }
+              }
+              if (data && (data.gameState || data.homeTeam)) {
+                var g2 = []; var sc2 = data.summary && data.summary.scoring;
+                if (sc2) { var pm2 = {1:'P1',2:'P2',3:'P3'}; sc2.forEach(function(p){var pN=p.periodDescriptor&&p.periodDescriptor.number;var pT=p.periodDescriptor&&p.periodDescriptor.periodType;var pL=pT==='OT'?'PR':pT==='SO'?'TB':(pm2[pN]||('P'+pN));(p.goals||[]).forEach(function(g){var sc=g.name&&g.name.default||'';var as=(g.assists||[]).map(function(a){return a.name&&a.name.default||'';});g2.push({time:g.timeInPeriod||'',period:pL,scorer:sc,assist1:as[0]||'',assist2:as[1]||'',teamId:g.teamAbbrev&&g.teamAbbrev.default,homeTeamId:data.homeTeam&&data.homeTeam.abbrev,awayTeamId:data.awayTeam&&data.awayTeam.abbrev,goalType:g.shotType||'',strength:g.strength||'',homeScore:g.homeScore,awayScore:g.awayScore,fromSummary:true});});});}
+                setBoxscore({ type: 'NHL', data: data, goals: g2 });
+                if (data.homeTeam && data.homeTeam.abbrev && !_enriched.current) { _enriched.current = true; setMatchData(function(prev){return Object.assign({},prev,{homeTeam:data.homeTeam.abbrev,awayTeam:data.awayTeam.abbrev,homeScore:data.homeTeam.score,awayScore:data.awayTeam.score,status:data.gameState==='OFF'?'FINAL':data.gameState==='LIVE'?'LIVE':'UPCOMING'});}); }
+              }
+            } else if (matchLg === 'NFL') {
+              var _cleanId3 = (matchEventId||matchId||'').replace('nfl_','');
+              if (_cleanId3) { var r2b = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + _cleanId3); data = await r2b.json(); if (data && data.boxscore) setBoxscore({ type: 'NFL', data: data }); }
+            }
+          } catch(e) {}
+          setBxLoading(false);
+        })();
+      }, 5000);
+      return function() { clearTimeout(_retry2Timer); };
     }
   }, [bxLoading, boxscore, match.id]);
 
@@ -5537,8 +5570,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
   }, [match.lg, _homeAb0, _awayAb0]);
   const lc = LG[matchData.lg].color;
   const dk = LG[matchData.lg].dark;
-  const _bsHome = (boxscore && boxscore.data && boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) || '';
-  const _bsAway = (boxscore && boxscore.data && boxscore.data.awayTeam && boxscore.data.awayTeam.abbrev) || '';
+  const _bsHome = (boxscore && boxscore.data && boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) || (function(){ var c = boxscore && boxscore.data && boxscore.data.header && boxscore.data.header.competitions && boxscore.data.header.competitions[0]; var t = c && c.competitors && c.competitors.find(function(x){return x.homeAway==='home';}); return (t && t.team && t.team.abbreviation) || ''; })() || '';
+  const _bsAway = (boxscore && boxscore.data && boxscore.data.awayTeam && boxscore.data.awayTeam.abbrev) || (function(){ var c = boxscore && boxscore.data && boxscore.data.header && boxscore.data.header.competitions && boxscore.data.header.competitions[0]; var t = c && c.competitors && c.competitors.find(function(x){return x.homeAway==='away';}); return (t && t.team && t.team.abbreviation) || ''; })() || '';
   const _homeAb = _bsHome || matchData.homeTeam || matchData.home || '';
   const _awayAb = _bsAway || matchData.awayTeam || matchData.away || '';
   const hk = _homeAb + "_" + matchData.lg;
