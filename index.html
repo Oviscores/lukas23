@@ -19,8 +19,9 @@
     var _pn = window.location.pathname;
     var _artFromPath = _pn.match(/^\/articles\/([^/]+)\/?$/);
     var _matchFromPath = _pn.match(/^\/matchs\/([^/]+)\/?$/);
+    var _lgFromPath = _pn.match(/^\/(nhl|nfl|nba|mlb)\/?$/i);
     var article = (_artFromPath && _artFromPath[1]) || p.get('article');
-    var page = p.get('page');
+    var page = (_lgFromPath && _lgFromPath[1].toLowerCase()) || p.get('page');
     var match = (_matchFromPath && _matchFromPath[1]) || p.get('match');
 
     var title = 'Zone US';
@@ -39,7 +40,7 @@
       var lgNames = { NHL: 'Hockey sur glace', NFL: 'Football américain', NBA: 'Basketball', MLB: 'Baseball' };
       title = lg + ' | Zone US – ' + (lgNames[lg] || lg);
       desc  = 'Scores, résultats et actualités ' + lg + ' en français sur Zone US.';
-      canonical = 'https://zoneus.fr/?page=' + page;
+      canonical = 'https://zoneus.fr/' + page.toLowerCase();
       var banners = { NHL: 'banner-nhl.jpg', NFL: 'banner-nfl.jpg', NBA: 'banner-nba.jpg', MLB: 'banner-mlb.jpg' };
       if (banners[lg]) ogImage = 'https://raw.githubusercontent.com/Oviscores/lukas23/main/' + banners[lg];
     } else if (match) {
@@ -8008,7 +8009,9 @@ function ZoneUS() {
   React.useEffect(function() { var titles = { home: "Zone US", NHL: "NHL | Zone US", NFL: "NFL | Zone US", NBA: "NBA | Zone US", MLB: "MLB | Zone US" }; document.title = titles[page] || "Zone US"; }, [page]);
   const setPage = function(p) {
     _setPage(p);
-    if (p === 'home') history.pushState({}, '', window.location.pathname);
+    var _leagues = ['nhl','nfl','nba','mlb'];
+    if (p === 'home') history.pushState({}, '', '/');
+    else if (_leagues.indexOf(p.toLowerCase()) !== -1) history.pushState({}, '', '/' + p.toLowerCase());
     else history.pushState({}, '', '?page=' + p.toLowerCase().replace(' ', '-'));
   };
   const [prevPage, setPrevPage] = useState("home");
