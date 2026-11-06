@@ -5137,7 +5137,7 @@ function RosterSection({ match, hc, ac }) {
   return null;
 }
 var YT_API_KEY = 'AIzaSyDKGObw39_hi_tU_1pN8n8GWUww1d2JMRY';
-var YT_CHANNELS = { NHL: 'UCqFMzb-4AUf6WAIbl132QKA', NFL: 'UCDInR2XVHHaAiASlyAOBelg', NBA: 'UCWJ2lWNubArHWmf3FIHbfcQ', MLB: 'UCoLrcjPV5PbUrUyXq5mjc_A' };
+var YT_CHANNELS = { NHL: 'UCqFMzb-4AUf6WAIbl132QKA', NFL: 'UCDVYQ4Zhbm3S2dlz7P1GBDg', NBA: 'UCWJ2lWNubArHWmf3FIHbfcQ', MLB: 'UCoLrcjPV5PbUrUyXq5mjc_A' };
 
 function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
   var _vid = React.useState(null); var videoId = _vid[0], setVideoId = _vid[1];
@@ -5169,7 +5169,7 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
     var channelId = YT_CHANNELS[lg];
     if (!channelId) return;
     var query = tn(home) + ' ' + tn(away);
-    var url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + channelId + '&q=' + encodeURIComponent(query) + '&type=video&order=relevance&maxResults=5&key=' + YT_API_KEY;
+    var url = 'https://zoneus-proxy.vivienfrappier.workers.dev/yt?c=' + channelId + '&q=' + encodeURIComponent(query);
     console.log('[YT] fetching url='+url);
     setLoading(true);
     fetch(url).then(function(r) { return r.json(); }).then(function(d) {
