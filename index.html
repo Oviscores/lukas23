@@ -5199,19 +5199,19 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
   );
   if (!videoId) return null;
 
+  var ytUrl = 'https://www.youtube.com/watch?v=' + videoId;
+  var thumbUrl = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
+
   return React.createElement('div', { style: { maxWidth: '50%', margin: '0 auto', background: '#000', borderRadius: 6, overflow: 'hidden', boxShadow: '0 2px 14px rgba(0,0,0,0.18)', marginBottom: 14 } },
     React.createElement('div', { style: { background: '#111', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 8 } },
       React.createElement('span', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: '0.12em', color: '#fff' } }, '▶ RÉSUMÉ DU MATCH'),
       React.createElement('span', { style: { marginLeft: 'auto', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: '#ff0000', fontWeight: 700 } }, 'YouTube')
     ),
-    React.createElement('div', { style: { position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' } },
-      React.createElement('iframe', {
-        src: 'https://www.youtube.com/embed/' + videoId + '?autoplay=0&rel=0&modestbranding=1',
-        style: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' },
-        allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
-        allowFullScreen: true,
-        loading: 'lazy'
-      })
+    React.createElement('a', { href: ytUrl, target: '_blank', rel: 'noopener', style: { display: 'block', position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', cursor: 'pointer' } },
+      React.createElement('img', { src: thumbUrl, style: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }, alt: 'Résumé du match' }),
+      React.createElement('div', { style: { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 64, height: 44, background: '#ff0000', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' } },
+        React.createElement('div', { style: { width: 0, height: 0, borderTop: '12px solid transparent', borderBottom: '12px solid transparent', borderLeft: '20px solid #fff', marginLeft: 4 } })
+      )
     )
   );
 }
