@@ -5149,10 +5149,12 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
   var _isLive = isLive || st === 'LIVE' || st === 'CRIT' || st === 'STATUS_IN_PROGRESS';
 
   React.useEffect(function() {
+    console.log('[YT]', matchData.lg, 'status='+matchData.status, '_isFinal='+_isFinal, 'homeAb='+homeAb, 'awayAb='+awayAb, 'matchData.homeTeam='+matchData.homeTeam);
     if (!_isFinal && !_isLive) return;
     var lg = matchData.lg;
     var home = homeAb || matchData.homeTeam || matchData.home || '';
     var away = awayAb || matchData.awayTeam || matchData.away || '';
+    console.log('[YT] home='+home, 'away='+away);
     if (!home || !away) return;
     var fetchKey = matchData.id + '|' + home + '|' + away;
     if (_fetchedFor.current === fetchKey) return; // déjà fetché pour ce match+équipes
@@ -5168,8 +5170,10 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
     if (!channelId) return;
     var query = tn(home) + ' ' + tn(away) + ' highlights';
     var url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + channelId + '&q=' + encodeURIComponent(query) + '&type=video&order=relevance&maxResults=5&key=' + YT_API_KEY;
+    console.log('[YT] fetching url='+url);
     setLoading(true);
     fetch(url).then(function(r) { return r.json(); }).then(function(d) {
+      console.log('[YT] items='+JSON.stringify((d.items||[]).map(function(x){return {kind:x.id&&x.id.kind,title:x.snippet&&x.snippet.title};})));
       var items = d.items || [];
       var vid = null;
       for (var i = 0; i < items.length; i++) {
