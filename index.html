@@ -5672,7 +5672,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
     )
   ), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 14 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 17, color: "rgba(255,255,255,0.5)" } }, "\u{1F4CD} ", matchData.arena, " \xB7 ", matchData.city)))),
       /* ===== RÉSUMÉ VIDÉO YOUTUBE ===== */
-      React.createElement(YouTubeHighlight, { matchData: matchData, isFinal: isFinal, isLive: isLive, lc: lc, homeAb: _homeAb, awayAb: _awayAb }),
+      React.createElement(YouTubeHighlight, { matchData: matchData, isFinal: isFinal || ['FINAL','OFF','Final','STATUS_FINAL'].indexOf(matchData.status) !== -1, isLive: isLive || ['LIVE','CRIT','Live','STATUS_IN_PROGRESS'].indexOf(matchData.status) !== -1, lc: lc, homeAb: _homeAb, awayAb: _awayAb }),
       (bxLoading || boxscore) && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } },
         /* Header */
         
