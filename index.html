@@ -5168,7 +5168,7 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
     var tn = function(ab) { return (NAMES[lg] || {})[ab] || ab; };
     var channelId = YT_CHANNELS[lg];
     if (!channelId) return;
-    var query = tn(home) + ' ' + tn(away) + ' highlights';
+    var query = tn(home) + ' ' + tn(away);
     var url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + channelId + '&q=' + encodeURIComponent(query) + '&type=video&order=relevance&maxResults=5&key=' + YT_API_KEY;
     console.log('[YT] fetching url='+url);
     setLoading(true);
@@ -5176,15 +5176,18 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
       console.log('[YT] items='+JSON.stringify((d.items||[]).map(function(x){return {kind:x.id&&x.id.kind,title:x.snippet&&x.snippet.title};})));
       var items = d.items || [];
       var vid = null;
+      /* Priorité : titre avec mot-clé résumé/highlights */
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
-        if (!item.id || item.id.kind !== 'youtube#video') continue;
+        if (!item.id || item.id.kind !== 'youtube#video' || !item.id.videoId) continue;
         var t = (item.snippet && item.snippet.title || '').toLowerCase();
-        if (t.indexOf('highlight') !== -1 || t.indexOf('recap') !== -1 || t.indexOf('résumé') !== -1 || t.indexOf('temps forts') !== -1 || t.indexOf('semaine') !== -1 || t.indexOf('nfl') !== -1 || t.indexOf('nba') !== -1 || t.indexOf('nhl') !== -1 || t.indexOf('mlb') !== -1 || t.indexOf('vs') !== -1 || t.indexOf('contre') !== -1) {
+        if (t.indexOf('highlight') !== -1 || t.indexOf('recap') !== -1 || t.indexOf('temps forts') !== -1 || t.indexOf('résumé') !== -1 || t.indexOf('semaine') !== -1 || t.indexOf('week') !== -1) {
           vid = item.id.videoId; break;
         }
       }
-      if (!vid) { for (var j = 0; j < items.length; j++) { if (items[j].id && items[j].id.kind === 'youtube#video') { vid = items[j].id.videoId; break; } } }
+      /* Fallback : premier item vidéo quelle que soit son titre */
+      if (!vid) { for (var j = 0; j < items.length; j++) { if (items[j].id && items[j].id.kind === 'youtube#video' && items[j].id.videoId) { vid = items[j].id.videoId; break; } } }
+      console.log('[YT] vid='+vid);
       setVideoId(vid || null);
     }).catch(function() {}).finally(function() { setLoading(false); });
   }, [matchData.id, homeAb, awayAb, matchData.homeTeam, matchData.home, _isFinal, _isLive]);
