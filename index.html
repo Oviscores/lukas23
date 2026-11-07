@@ -3761,7 +3761,7 @@ function MatchScoreInArticle({ matchId, matchLg }) {
   React.useEffect(function() {
     if (!matchId) return;
     if (matchLg === 'NHL') {
-      var nhlId = (matchId+'').replace('nhl_','');
+      var nhlId = (matchId+'').replace(/nhl_/i,'');
       var proxy = 'https://zoneus-proxy.vivienfrappier.workers.dev';
       Promise.all([
         fetch(proxy + '?league=nhl_boxscore&gameId=' + nhlId).then(function(r){return r.json();}),
@@ -5246,7 +5246,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
           data = await r.json();
           if (data && data.liveData) setBoxscore({ type: 'MLB', data: data.liveData });
         } else if (matchLg === 'NHL') {
-          var nhlId = (matchId+'').replace('nhl_','');
+          var nhlId = (matchId+'').replace(/nhl_/i,'');
           if (nhlId) {
             /* NHL direct d'abord (pas de cold start), fallback proxy */
             try {
@@ -5348,7 +5348,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
               data = await r.json();
               if (data && data.liveData) setBoxscore({ type: 'MLB', data: data.liveData });
             } else if (matchLg === 'NHL') {
-              var nhlId = (matchId+'').replace('nhl_','');
+              var nhlId = (matchId+'').replace(/nhl_/i,'');
               if (nhlId) {
                 try { var r3rb = await fetch('https://api-web.nhle.com/v1/gamecenter/' + nhlId + '/boxscore'); data = await r3rb.json(); } catch(e3rb) { data = null; }
                 if (!data || (!data.gameState && !data.homeTeam && !data.awayTeam)) {
@@ -5399,7 +5399,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
           try {
             var data = null;
             if (matchLg === 'NHL') {
-              var nhlId2 = (matchId+'').replace('nhl_','');
+              var nhlId2 = (matchId+'').replace(/nhl_/i,'');
               try { var r3c = await fetch('https://api-web.nhle.com/v1/gamecenter/' + nhlId2 + '/boxscore'); data = await r3c.json(); } catch(e) { data = null; }
               if (!data || (!data.gameState && !data.homeTeam)) {
                 try { var r3d = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId2); data = await r3d.json(); } catch(e) { data = null; }
@@ -5430,7 +5430,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
       try {
         var data = null;
         if (matchLg === 'NHL') {
-          var nhlId = (matchId+'').replace('nhl_','');
+          var nhlId = (matchId+'').replace(/nhl_/i,'');
           try { var rp = await fetch('https://api-web.nhle.com/v1/gamecenter/' + nhlId + '/boxscore'); data = await rp.json(); } catch(e) { data = null; }
           if (!data || (!data.gameState && !data.homeTeam)) {
             try { var rp2 = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_boxscore&gameId=' + nhlId); data = await rp2.json(); } catch(e) { data = null; }
