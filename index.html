@@ -19,17 +19,25 @@
     var _pn = window.location.pathname;
     var _artFromPath = _pn.match(/^\/articles\/([^/]+)\/?$/);
     var _matchFromPath = _pn.match(/^\/matchs\/([^/]+)\/?$/);
+    var _videoFromPath = _pn.match(/^\/videos\/([^/]+)\/?$/);
     var _lgFromPath = _pn.match(/^\/(nhl|nfl|nba|mlb)\/?$/i);
     var article = (_artFromPath && _artFromPath[1]) || p.get('article');
     var page = (_lgFromPath && _lgFromPath[1].toLowerCase()) || p.get('page');
     var match = (_matchFromPath && _matchFromPath[1]) || p.get('match');
+    var video = (_videoFromPath && _videoFromPath[1]) || p.get('video');
 
     var title = 'Zone US';
     var desc  = 'Zone US, le media sportif francophone spécialisé NHL, NFL, NBA et MLB.';
     var canonical = 'https://zoneus.fr/';
     var ogImage = 'https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp';
 
-    if (article) {
+    if (video) {
+      var vslug = video.replace(/-/g, ' ');
+      vslug = vslug.charAt(0).toUpperCase() + vslug.slice(1);
+      title = vslug + ' | Zone US';
+      desc  = 'Regardez ' + vslug + ' sur Zone US, le media sportif francophone.';
+      canonical = 'https://zoneus.fr/videos/' + video;
+    } else if (article) {
       var slug = article.replace(/-/g, ' ');
       slug = slug.charAt(0).toUpperCase() + slug.slice(1);
       title = slug + ' | Zone US';
@@ -8118,7 +8126,19 @@ function ZoneUS() {
     var params = new URLSearchParams(window.location.search);
     var _pn2 = window.location.pathname; var _apMatch = _pn2.match(/^\/articles\/([^/]+)\/?$/);
     var _mpMatch = _pn2.match(/^\/matchs\/([^/]+)\/?$/);
+    var _vpMatch = _pn2.match(/^\/videos\/([^/]+)\/?$/);
     var artSlug = (_apMatch && _apMatch[1]) || params.get('article'); var pageParam = params.get('page');
+    var videoSlug = (_vpMatch && _vpMatch[1]) || params.get('video');
+    if (videoSlug) {
+      // On attend que les vidéos soient chargées pour résoudre
+      var _vidResolve = function() {
+        var vids = window.__SANITY_VIDEOS__ || [];
+        var found = vids.find(function(v) { return (v.slug === videoSlug) || (v.id === 'video_' + videoSlug) || (v.youtubeId === videoSlug); });
+        if (found) { setSelVideo(found); }
+        else if (vids.length === 0) { setTimeout(_vidResolve, 500); }
+      };
+      setTimeout(_vidResolve, 300);
+    }
     var equipeParam = params.get('equipe'); var ligueParam = params.get('ligue');
     if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
     if (equipeParam && ligueParam) setSelTeam({ teamId: equipeParam.toUpperCase(), lg: ligueParam.toUpperCase() });
@@ -8135,9 +8155,11 @@ function ZoneUS() {
     }
     var onPop = function() {
       var p = new URLSearchParams(window.location.search);
-      var _pnPop = window.location.pathname; var _apPop = _pnPop.match(/^\/articles\/([^/]+)\/?$/); var _mpPop = _pnPop.match(/^\/matchs\/([^/]+)\/?$/);
+      var _pnPop = window.location.pathname; var _apPop = _pnPop.match(/^\/articles\/([^/]+)\/?$/); var _mpPop = _pnPop.match(/^\/matchs\/([^/]+)\/?$/); var _vPop = _pnPop.match(/^\/videos\/([^/]+)\/?$/);
       var _artPop = (_apPop && _apPop[1]) || p.get('article');
+      var _vidPop = (_vPop && _vPop[1]) || p.get('video');
       if (!_artPop) setSelArticle(null);
+      if (!_vidPop) setSelVideo(null);
       if (!p.get('equipe')) setSelTeam(null);
       var mp = (_mpPop && _mpPop[1]) || p.get('match'); var lp = p.get('ligue');
       if (mp) {
@@ -8196,6 +8218,18 @@ function ZoneUS() {
   const [prevPage, setPrevPage] = useState("home");
   const [statFull, setStatFull] = useState(null);
   const navigate = (p) => { setPrevPage(page); setPage(p); };
+  const [selVideo, setSelVideo] = useState(null);
+  const goVideo = function(v) {
+    if (!v) { history.pushState({}, '', '/'); setSelVideo(null); return; }
+    var vslug = (v.slug) || v.id.replace('video_','');
+    history.pushState({}, '', '/videos/' + vslug);
+    document.title = (v.title || 'Vidéo') + ' | Zone US';
+    var ogImg = document.querySelector('meta[property="og:image"]');
+    var ytThumb = v.img || (v.youtubeId ? 'https://img.youtube.com/vi/' + v.youtubeId + '/maxresdefault.jpg' : null);
+    if (ogImg && ytThumb) ogImg.setAttribute('content', ytThumb);
+    setSelArticle(null); setSelMatch(null); setSelTeam(null); setSelPlayer(null);
+    setSelVideo(v);
+  };
   const [selArticle, setSelArticle] = useState(function() {
     var p = new URLSearchParams(window.location.search);
     var slug = p.get('article');
@@ -8203,6 +8237,7 @@ function ZoneUS() {
   });
   const slugify = function(str) { return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); };
   const goArticle = function(a) {
+    if (a && a._isVideo) { goVideo(a); return; }
     if (a && a._isMatch) {
       var st = a._mStatus==='live'?'LIVE':a._mStatus==='final'?'FINAL':'UPCOMING';
       goMatch({
@@ -8353,7 +8388,38 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     });
   }
   const bgStyle = { backgroundImage: "url(" + window.BG + ")", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center", minHeight: "100vh" };
-  const CSS = `@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0;}html,body{overflow-x:hidden;max-width:100%;}@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}.tick{animation:fadein 0.4s ease;}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}.dot{animation:pulse 1.8s ease infinite;}nav{scrollbar-width:none;}nav::-webkit-scrollbar{display:none;}.nitem:hover .ndd{opacity:1!important;visibility:visible!important;transform:translateY(0)!important;pointer-events:auto!important;}.livebar{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;align-items:stretch;}.livebar::-webkit-scrollbar{display:none;}@keyframes livepulse{0%,100%{opacity:1}50%{opacity:0.4}}.livebadge{animation:livepulse 1.4s ease infinite;}`;
+  // ─── PAGE VIDÉO PLEIN ÉCRAN ─────────────────────────────────
+  if (selVideo) {
+    var _vLc = (LG[selVideo.league] && LG[selVideo.league].color) || '#D50A0A';
+    var _vYtId = selVideo.youtubeId || '';
+    var _vThumb = selVideo.img || (_vYtId ? 'https://img.youtube.com/vi/' + _vYtId + '/maxresdefault.jpg' : null);
+    return React.createElement('div', { style: { minHeight: '100vh', background: '#0a0e1a' } },
+      React.createElement('div', { style: { maxWidth: 900, margin: '0 auto', padding: '24px 16px' } },
+        React.createElement('button', {
+          onClick: function() { history.back(); setSelVideo(null); },
+          style: { background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6 }
+        }, '← RETOUR'),
+        React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 } },
+          React.createElement('span', { style: { background: _vLc, color: '#fff', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', padding: '2px 7px', borderRadius: 3 } }, selVideo.league || 'NHL'),
+          selVideo.tag && React.createElement('span', { style: { color: '#888', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.08em' } }, selVideo.tag)
+        ),
+        React.createElement('h1', { style: { color: '#fff', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 800, lineHeight: 1.15, marginBottom: 8 } }, selVideo.title || ''),
+        selVideo.chapo && React.createElement('p', { style: { color: '#bbb', fontFamily: "'Barlow',sans-serif", fontSize: 15, lineHeight: 1.5, marginBottom: 20 } }, selVideo.chapo),
+        _vYtId
+          ? React.createElement('div', { style: { position: 'relative', paddingBottom: '56.25%', borderRadius: 6, overflow: 'hidden', background: '#000', boxShadow: '0 8px 32px rgba(0,0,0,0.6)' } },
+              React.createElement('div', { style: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: _vLc, zIndex: 3 } }),
+              React.createElement('iframe', {
+                src: 'https://www.youtube.com/embed/' + _vYtId + '?autoplay=1&rel=0&modestbranding=1',
+                style: { position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' },
+                allow: 'autoplay; fullscreen; picture-in-picture',
+                allowFullScreen: true
+              })
+            )
+          : (_vThumb && React.createElement('img', { src: _vThumb, alt: selVideo.title, style: { width: '100%', borderRadius: 6 } }))
+      )
+    );
+  }
+  const CSS =`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0;}html,body{overflow-x:hidden;max-width:100%;}@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}.tick{animation:fadein 0.4s ease;}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}.dot{animation:pulse 1.8s ease infinite;}nav{scrollbar-width:none;}nav::-webkit-scrollbar{display:none;}.nitem:hover .ndd{opacity:1!important;visibility:visible!important;transform:translateY(0)!important;pointer-events:auto!important;}.livebar{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;align-items:stretch;}.livebar::-webkit-scrollbar{display:none;}@keyframes livepulse{0%,100%{opacity:1}50%{opacity:0.4}}.livebadge{animation:livepulse 1.4s ease infinite;}`;
   const homeArts = arts.slice(0, 25); const hero = homeArts[0], rest = homeArts.slice(1);
   const fullScreen = selArticle || selPlayer || selTeam || playersList || selMatch;
   if (showAllArts) return React.createElement("div", { style: Object.assign({}, bgStyle, { minHeight: "100vh" }) }, React.createElement(AllArticlesPage, { arts: arts, onArticleClick: function(a) { setShowAllArts(false); goArticle(a); }, onBack: function() { setShowAllArts(false); } }));
@@ -9440,11 +9506,11 @@ async function fetchSanityArticles() {
 }
 async function fetchSanityVideos() {
   try {
-    var query = encodeURIComponent('*[_type == "video"] | order(publishedAt desc) [0...100] {_id, title, chapo, league, tag, franchise, hot, publishedAt, ordre, youtubeId, "imageUrl": image.asset->url}');
+    var query = encodeURIComponent('*[_type == "video"] | order(publishedAt desc) [0...100] {_id, "slug": slug.current, title, chapo, league, tag, franchise, hot, publishedAt, ordre, youtubeId, "imageUrl": image.asset->url}');
     var resp = await fetch('https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query, { headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' } });
     var data = await resp.json();
     window.__SANITY_VIDEOS__ = (data.result || []).map(function(v) {
-      return { id: 'video_'+v._id, _isVideo: true, league: v.league||'NHL', tag: v.tag||'VIDÉO', franchise: v.franchise||'', hot: v.hot||false, title: v.title||'', chapo: v.chapo||'', img: v.imageUrl||null, youtubeId: v.youtubeId||'', publishedAt: v.publishedAt||'', ordre: (v.ordre != null ? v.ordre : 9999) };
+      return { id: 'video_'+v._id, slug: v.slug||'', _isVideo: true, league: v.league||'NHL', tag: v.tag||'VIDÉO', franchise: v.franchise||'', hot: v.hot||false, title: v.title||'', chapo: v.chapo||'', img: v.imageUrl||null, youtubeId: v.youtubeId||'', publishedAt: v.publishedAt||'', ordre: (v.ordre != null ? v.ordre : 9999) };
     });
     mergeAndSetFeed();
   } catch(e) { console.log('Sanity videos error:', e.message); window.__SANITY_VIDEOS__ = []; }
