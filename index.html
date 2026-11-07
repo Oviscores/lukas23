@@ -8112,10 +8112,15 @@ function ZoneUS() {
       if (matches && matches.length) {
         setArts(function(prev) {
           var withoutOld = prev.filter(function(a) { return !a._isMatch; });
-          // Assigner un ordre implicite aux articles sans ordre (index+1 comme ordre naturel)
-          withoutOld = withoutOld.map(function(a, i) { return a.ordre != null ? a : Object.assign({}, a, { ordre: i + 1 }); });
           var merged = withoutOld.concat(matches);
-          merged.sort(function(a,b) { var oa=a.ordre!=null?a.ordre:9999, ob=b.ordre!=null?b.ordre:9999; if(oa!==ob)return oa-ob; return (b.publishedAt||'').localeCompare(a.publishedAt||''); });
+          merged.sort(function(a,b) {
+            var aHasOrdre = a.ordre != null && a.ordre !== 9999;
+            var bHasOrdre = b.ordre != null && b.ordre !== 9999;
+            if (aHasOrdre && bHasOrdre) { if (a.ordre !== b.ordre) return a.ordre - b.ordre; return (b.publishedAt||'').localeCompare(a.publishedAt||''); }
+            if (aHasOrdre) return -1;
+            if (bHasOrdre) return 1;
+            return (b.publishedAt||'').localeCompare(a.publishedAt||'');
+          });
           return merged;
         });
       }
