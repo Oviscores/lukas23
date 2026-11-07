@@ -3606,6 +3606,7 @@ function MatchInner({ a, hov, h }) {
 function HCard({ a, onClick }) {
   const [hov, setHov] = useState(false);
   const lc = LG[a.league].color;
+  if (a._isVideo) return React.createElement(VideoCard, { a, onClick });
   if (a._isMatch) return /* @__PURE__ */ React.createElement("div", { onClick: () => onClick(a), onMouseEnter: () => setHov(true), onMouseLeave: () => setHov(false), style: { position:"relative", height:320, borderRadius:4, overflow:"hidden", cursor:"pointer", background:"#001a2e", boxShadow: hov?"0 6px 24px rgba(0,0,0,0.28)":"0 2px 10px rgba(0,0,0,0.12)", transition:"box-shadow 0.25s" } }, React.createElement(MatchInner, { a, hov, h:320 }));
   return /* @__PURE__ */ React.createElement(
     "div",
@@ -3647,6 +3648,70 @@ function HCard({ a, onClick }) {
       WebkitBoxOrient: "vertical",
       overflow: "hidden"
     } }, a.chapo))
+  );
+}
+function VideoCard({ a, onClick }) {
+  const [playing, setPlaying] = React.useState(false);
+  const [hov, setHov] = React.useState(false);
+  const lc = (LG[a.league] && LG[a.league].color) || '#D50A0A';
+  const ytId = a.youtubeId || '';
+  const thumb = a.img || (ytId ? 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg' : null);
+  if (playing && ytId) {
+    return React.createElement('div', {
+      style: { position:'relative', height:320, borderRadius:4, overflow:'hidden', background:'#000', boxShadow:'0 6px 24px rgba(0,0,0,0.4)' }
+    },
+      React.createElement('div', { style:{ position:'absolute', top:0, left:0, right:0, height:3, background:lc, zIndex:3 } }),
+      React.createElement('iframe', {
+        src: 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1',
+        style: { position:'absolute', inset:0, width:'100%', height:'100%', border:'none' },
+        allow: 'autoplay; fullscreen; picture-in-picture',
+        allowFullScreen: true
+      }),
+      React.createElement('button', {
+        onClick: function(e) { e.stopPropagation(); setPlaying(false); },
+        style: { position:'absolute', top:10, right:10, zIndex:4, background:'rgba(0,0,0,0.6)', border:'none', borderRadius:4, color:'#fff', fontSize:12, fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, padding:'3px 8px', cursor:'pointer', letterSpacing:'0.05em' }
+      }, '✕ FERMER')
+    );
+  }
+  return React.createElement('div', {
+    onClick: function() { if (ytId) { setPlaying(true); } else { onClick(a); } },
+    onMouseEnter: function() { setHov(true); },
+    onMouseLeave: function() { setHov(false); },
+    style: { position:'relative', height:320, borderRadius:4, overflow:'hidden', cursor:'pointer', boxShadow: hov ? '0 6px 24px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.12)', transition:'box-shadow 0.25s' }
+  },
+    /* Thumbnail background */
+    thumb && React.createElement('div', { style:{ position:'absolute', inset:0, transform: hov ? 'scale(1.04)' : 'scale(1)', transition:'transform 0.5s' } },
+      React.createElement('img', { src: thumb, style:{ width:'100%', height:'100%', objectFit:'cover' }, alt:'' })
+    ),
+    /* Overlay gradient */
+    React.createElement('div', { style:{ position:'absolute', inset:0, background: hov ? 'linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.25) 50%,rgba(0,0,0,0.1) 100%)' : 'linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.35) 55%,rgba(0,0,0,0.05) 100%)', transition:'background 0.25s' } }),
+    /* Barre couleur ligue */
+    React.createElement('div', { style:{ position:'absolute', top:0, left:0, right:0, height:3, background:lc } }),
+    /* Badge ligue + VIDEO */
+    React.createElement('div', { style:{ position:'absolute', top:6, left:6, display:'flex', alignItems:'center', gap:6, zIndex:2 } },
+      React.createElement(LB, { lg: a.league, sz: 32 }),
+      a.franchise && getTeamLogo(a.franchise, a.league, 13),
+      React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:900, color:'#fff', background:'#ef4444', padding:'2px 6px', borderRadius:2, letterSpacing:'0.08em' } }, 'VIDÉO')
+    ),
+    /* Bouton PLAY centré */
+    ytId && React.createElement('div', { style:{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-58%)', zIndex:2, display:'flex', alignItems:'center', justifyContent:'center' } },
+      React.createElement('div', { style:{
+        width: hov ? 68 : 60,
+        height: hov ? 68 : 60,
+        borderRadius:'50%',
+        background: hov ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.88)',
+        display:'flex', alignItems:'center', justifyContent:'center',
+        boxShadow:'0 4px 20px rgba(0,0,0,0.5)',
+        transition:'all 0.2s'
+      } },
+        React.createElement('div', { style:{ width:0, height:0, borderTop:'13px solid transparent', borderBottom:'13px solid transparent', borderLeft: '22px solid #111', marginLeft:4 } })
+      )
+    ),
+    /* Titre + chapo */
+    React.createElement('div', { style:{ position:'absolute', bottom:0, left:0, right:0, padding:'6px 10px 10px' } },
+      React.createElement('h2', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:22, fontWeight:900, lineHeight:1.05, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', textDecoration: hov ? 'underline' : 'none' } }, a.title),
+      a.chapo && React.createElement('p', { style:{ fontFamily:"'Barlow',sans-serif", fontSize:14, color:'rgba(255,255,255,0.78)', lineHeight:1.35, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', margin:0 } }, a.chapo)
+    )
   );
 }
 function SanityMatchCard({ m, onClick }) {
@@ -9368,24 +9433,41 @@ async function fetchSanityArticles() {
       return (b.publishedAt||'').localeCompare(a.publishedAt||'');
     });
     window.__SANITY_ARTICLES__ = sanityArts;
-    var mergeFn = function(prev) {
-      var matches = (prev || []).filter(function(a) { return a._isMatch; });
-      var withMatches = sanityArts.concat(matches);
-      withMatches = withMatches.map(function(a, i) { return a.ordre != null ? a : Object.assign({}, a, { ordre: i + 1 }); });
-      withMatches.sort(function(a, b) { if (a.ordre !== b.ordre) return a.ordre - b.ordre; return (b.publishedAt||'').localeCompare(a.publishedAt||''); });
-      return withMatches;
-    };
-    if (window.__setArts__) window.__setArts__(mergeFn);
-    else {
-      var _retryArts = function(attempts) {
-        setTimeout(function() {
-          if (window.__setArts__) window.__setArts__(mergeFn);
-          else if (attempts > 0) _retryArts(attempts - 1);
-        }, 500);
-      };
-      _retryArts(20);
-    }
+    mergeAndSetFeed();
   } catch(e) { console.log('Sanity error:', e.message); }
+}
+async function fetchSanityVideos() {
+  try {
+    var query = encodeURIComponent('*[_type == "video"] | order(publishedAt desc) [0...100] {_id, title, chapo, league, tag, franchise, hot, publishedAt, ordre, youtubeId, "imageUrl": image.asset->url}');
+    var resp = await fetch('https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query, { headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' } });
+    var data = await resp.json();
+    if (!data.result || !data.result.length) return;
+    window.__SANITY_VIDEOS__ = data.result.map(function(v) {
+      return { id: 'video_'+v._id, _isVideo: true, league: v.league||'NHL', tag: v.tag||'VIDÉO', franchise: v.franchise||'', hot: v.hot||false, title: v.title||'', chapo: v.chapo||'', img: v.imageUrl||null, youtubeId: v.youtubeId||'', publishedAt: v.publishedAt||'', ordre: (v.ordre != null ? v.ordre : 9999) };
+    });
+    mergeAndSetFeed();
+  } catch(e) { console.log('Sanity videos error:', e.message); }
+}
+function mergeAndSetFeed() {
+  var arts = window.__SANITY_ARTICLES__ || [];
+  var vids = window.__SANITY_VIDEOS__ || [];
+  var mergeFn = function(prev) {
+    var matches = (prev || []).filter(function(a) { return a._isMatch; });
+    var all = arts.concat(vids).concat(matches);
+    all = all.map(function(a, i) { return a.ordre != null ? a : Object.assign({}, a, { ordre: i + 1 }); });
+    all.sort(function(a, b) { if (a.ordre !== b.ordre) return a.ordre - b.ordre; return (b.publishedAt||'').localeCompare(a.publishedAt||''); });
+    return all;
+  };
+  if (window.__setArts__) window.__setArts__(mergeFn);
+  else {
+    var _retry = function(attempts) {
+      setTimeout(function() {
+        if (window.__setArts__) window.__setArts__(mergeFn);
+        else if (attempts > 0) _retry(attempts - 1);
+      }, 500);
+    };
+    _retry(20);
+  }
 }
 var NFL_DIV = {'BUF':'AFC Est','MIA':'AFC Est','NE':'AFC Est','NYJ':'AFC Est','BAL':'AFC Nord','CIN':'AFC Nord','CLE':'AFC Nord','PIT':'AFC Nord','HOU':'AFC Sud','IND':'AFC Sud','JAX':'AFC Sud','TEN':'AFC Sud','DEN':'AFC Ouest','KC':'AFC Ouest','LV':'AFC Ouest','LAC':'AFC Ouest','DAL':'NFC Est','NYG':'NFC Est','PHI':'NFC Est','WSH':'NFC Est','CHI':'NFC Nord','DET':'NFC Nord','GB':'NFC Nord','MIN':'NFC Nord','ATL':'NFC Sud','CAR':'NFC Sud','NO':'NFC Sud','TB':'NFC Sud','ARI':'NFC Ouest','LAR':'NFC Ouest','SF':'NFC Ouest','SEA':'NFC Ouest'};
 window.fetchStandings = async function(lg) {
@@ -9413,7 +9495,9 @@ window.fetchStandings = async function(lg) {
   }
 };
 fetchSanityArticles();
+fetchSanityVideos();
 setInterval(fetchSanityArticles, 5*60*1000);
+setInterval(fetchSanityVideos, 5*60*1000);
 
 // Fetch injuries ESPN pour les 4 ligues
 window.__INJURIES__ = { NHL: [], NFL: [], NBA: [], MLB: [] };
