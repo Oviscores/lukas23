@@ -5167,7 +5167,7 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
     var channelId = YT_CHANNELS[lg];
     if (!channelId) return;
     var query = tn(home) + ' ' + tn(away);
-    var url = 'https://zoneus.fr/yt?c=' + channelId + '&q=' + encodeURIComponent(query);
+    var url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + channelId + '&q=' + encodeURIComponent(query) + '&type=video&order=relevance&maxResults=5&key=' + YT_API_KEY;
     setLoading(true);
     fetch(url).then(function(r) { return r.json(); }).then(function(d) {
       var items = d.items || [];
