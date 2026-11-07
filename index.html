@@ -3655,7 +3655,7 @@ function VideoCard({ a, onClick }) {
   const [hov, setHov] = React.useState(false);
   const lc = (LG[a.league] && LG[a.league].color) || '#D50A0A';
   const ytId = a.youtubeId || '';
-  const thumb = a.img || (ytId ? 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg' : null);
+  const thumb = a.img || (ytId ? 'https://img.youtube.com/vi/' + ytId + '/hqdefault.jpg' : null);
   if (playing && ytId) {
     return React.createElement('div', {
       style: { position:'relative', height:320, borderRadius:4, overflow:'hidden', background:'#000', boxShadow:'0 6px 24px rgba(0,0,0,0.4)' }
