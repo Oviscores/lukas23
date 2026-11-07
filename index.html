@@ -8109,21 +8109,8 @@ function ZoneUS() {
   }, []);
   React.useEffect(function() {
     fetchSanityMatches().then(function(matches) {
-      if (matches && matches.length) {
-        setArts(function(prev) {
-          var withoutOld = prev.filter(function(a) { return !a._isMatch; });
-          var merged = withoutOld.concat(matches);
-          merged.sort(function(a,b) {
-            var aHasOrdre = a.ordre != null && a.ordre !== 9999;
-            var bHasOrdre = b.ordre != null && b.ordre !== 9999;
-            if (aHasOrdre && bHasOrdre) { if (a.ordre !== b.ordre) return a.ordre - b.ordre; return (b.publishedAt||'').localeCompare(a.publishedAt||''); }
-            if (aHasOrdre) return -1;
-            if (bHasOrdre) return 1;
-            return (b.publishedAt||'').localeCompare(a.publishedAt||'');
-          });
-          return merged;
-        });
-      }
+      window.__SANITY_MATCHES__ = matches || [];
+      mergeAndSetFeed();
     });
   }, []);
   React.useEffect(function() {
@@ -9483,7 +9470,7 @@ function portableTextToHTML(body) {
 }
 async function fetchSanityMatches() {
   try {
-    var query = encodeURIComponent('*[_type == "match"] | order(gameDate desc) [0...50] {_id, league, homeTeam, awayTeam, homeScore, awayScore, status, gameDate, matchId, chapo, publishedAt}');
+    var query = encodeURIComponent('*[_type == "match"] | order(gameDate desc) [0...50] {_id, league, homeTeam, awayTeam, homeScore, awayScore, status, gameDate, matchId, chapo, publishedAt, ordre}');
     var resp = await fetch('https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query, { headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' } });
     var data = await resp.json();
     if (!data.result || !data.result.length) return [];
@@ -9500,10 +9487,6 @@ async function fetchSanityArticles() {
     if (!data.result || !data.result.length) return;
     var sanityArts = data.result.map(function(a, i) {
       return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null, teamId: a.teamId||null, teamLg: a.teamLg||null, ordre: (a.ordre != null ? a.ordre : 9999) };
-    });
-    sanityArts.sort(function(a, b) {
-      if (a.ordre !== b.ordre) return a.ordre - b.ordre;
-      return (b.publishedAt||'').localeCompare(a.publishedAt||'');
     });
     window.__SANITY_ARTICLES__ = sanityArts;
     mergeAndSetFeed();
@@ -9523,13 +9506,8 @@ async function fetchSanityVideos() {
 function mergeAndSetFeed() {
   var arts = window.__SANITY_ARTICLES__ || [];
   var vids = window.__SANITY_VIDEOS__ || [];
+  var matches = window.__SANITY_MATCHES__ || [];
   var mergeFn = function(prev) {
-    var matches = (prev || []).filter(function(a) { return a._isMatch; });
-    // Dédupliquer : on écarte du prev les IDs déjà dans arts ou vids
-    var knownIds = {};
-    arts.forEach(function(a){ knownIds[a.id] = true; });
-    vids.forEach(function(v){ knownIds[v.id] = true; });
-    matches = matches.filter(function(m){ return !knownIds[m.id]; });
     var all = arts.concat(vids).concat(matches);
     all.sort(function(a, b) {
       var aHasOrdre = a.ordre != null && a.ordre !== 9999;
