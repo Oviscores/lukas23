@@ -9519,7 +9519,12 @@ function mergeAndSetFeed() {
   var arts = window.__SANITY_ARTICLES__ || [];
   var vids = window.__SANITY_VIDEOS__ || [];
   var mergeFn = function(prev) {
-    var matches = (prev || []).filter(function(a) { return a._isMatch && !a._isVideo; });
+    var matches = (prev || []).filter(function(a) { return a._isMatch; });
+    // Dédupliquer : on écarte du prev les IDs déjà dans arts ou vids
+    var knownIds = {};
+    arts.forEach(function(a){ knownIds[a.id] = true; });
+    vids.forEach(function(v){ knownIds[v.id] = true; });
+    matches = matches.filter(function(m){ return !knownIds[m.id]; });
     var all = arts.concat(vids).concat(matches);
     all.sort(function(a, b) {
       var aHasOrdre = a.ordre != null && a.ordre !== 9999;
