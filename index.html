@@ -9433,7 +9433,6 @@ async function fetchSanityArticles() {
       return (b.publishedAt||'').localeCompare(a.publishedAt||'');
     });
     window.__SANITY_ARTICLES__ = sanityArts;
-    mergeAndSetFeed();
   } catch(e) { console.log('Sanity error:', e.message); }
 }
 async function fetchSanityVideos() {
@@ -9441,12 +9440,10 @@ async function fetchSanityVideos() {
     var query = encodeURIComponent('*[_type == "video"] | order(publishedAt desc) [0...100] {_id, title, chapo, league, tag, franchise, hot, publishedAt, ordre, youtubeId, "imageUrl": image.asset->url}');
     var resp = await fetch('https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query, { headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' } });
     var data = await resp.json();
-    if (!data.result || !data.result.length) return;
-    window.__SANITY_VIDEOS__ = data.result.map(function(v) {
+    window.__SANITY_VIDEOS__ = (data.result || []).map(function(v) {
       return { id: 'video_'+v._id, _isVideo: true, league: v.league||'NHL', tag: v.tag||'VIDÉO', franchise: v.franchise||'', hot: v.hot||false, title: v.title||'', chapo: v.chapo||'', img: v.imageUrl||null, youtubeId: v.youtubeId||'', publishedAt: v.publishedAt||'', ordre: (v.ordre != null ? v.ordre : 9999) };
     });
-    mergeAndSetFeed();
-  } catch(e) { console.log('Sanity videos error:', e.message); }
+  } catch(e) { console.log('Sanity videos error:', e.message); window.__SANITY_VIDEOS__ = []; }
 }
 function mergeAndSetFeed() {
   var arts = window.__SANITY_ARTICLES__ || [];
@@ -9505,10 +9502,8 @@ window.fetchStandings = async function(lg) {
     } catch(e) { console.log('NFL standings error:', e.message); }
   }
 };
-fetchSanityArticles();
-fetchSanityVideos();
-setInterval(fetchSanityArticles, 5*60*1000);
-setInterval(fetchSanityVideos, 5*60*1000);
+Promise.all([fetchSanityArticles(), fetchSanityVideos()]).then(mergeAndSetFeed);
+setInterval(function() { Promise.all([fetchSanityArticles(), fetchSanityVideos()]).then(mergeAndSetFeed); }, 5*60*1000);
 
 // Fetch injuries ESPN pour les 4 ligues
 window.__INJURIES__ = { NHL: [], NFL: [], NBA: [], MLB: [] };
