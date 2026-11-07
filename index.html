@@ -3650,15 +3650,16 @@ function HCard({ a, onClick }) {
     } }, a.chapo))
   );
 }
-function VideoCard({ a, onClick }) {
+function VideoCard({ a, onClick, small }) {
   const [playing, setPlaying] = React.useState(false);
   const [hov, setHov] = React.useState(false);
   const lc = (LG[a.league] && LG[a.league].color) || '#D50A0A';
   const ytId = a.youtubeId || '';
   const thumb = a.img || (ytId ? 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg' : null);
+  const h = small ? 164 : 320;
   if (playing && ytId) {
     return React.createElement('div', {
-      style: { position:'relative', height:320, borderRadius:4, overflow:'hidden', background:'#000', boxShadow:'0 6px 24px rgba(0,0,0,0.4)' }
+      style: { position:'relative', height:h, borderRadius:4, overflow:'hidden', background:'#000', boxShadow:'0 6px 24px rgba(0,0,0,0.4)' }
     },
       React.createElement('div', { style:{ position:'absolute', top:0, left:0, right:0, height:3, background:lc, zIndex:3 } }),
       React.createElement('iframe', {
@@ -3677,7 +3678,7 @@ function VideoCard({ a, onClick }) {
     onClick: function() { if (ytId) { setPlaying(true); } else { onClick(a); } },
     onMouseEnter: function() { setHov(true); },
     onMouseLeave: function() { setHov(false); },
-    style: { position:'relative', height:320, borderRadius:4, overflow:'hidden', cursor:'pointer', boxShadow: hov ? '0 6px 24px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.12)', transition:'box-shadow 0.25s' }
+    style: { position:'relative', height:h, borderRadius:4, overflow:'hidden', cursor:'pointer', boxShadow: hov ? '0 6px 24px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.12)', transition:'box-shadow 0.25s' }
   },
     /* Thumbnail background */
     thumb && React.createElement('div', { style:{ position:'absolute', inset:0, transform: hov ? 'scale(1.04)' : 'scale(1)', transition:'transform 0.5s' } },
@@ -3694,23 +3695,23 @@ function VideoCard({ a, onClick }) {
       React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:900, color:'#fff', background:'#ef4444', padding:'2px 6px', borderRadius:2, letterSpacing:'0.08em' } }, 'VIDÉO')
     ),
     /* Bouton PLAY centré */
-    ytId && React.createElement('div', { style:{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-58%)', zIndex:2, display:'flex', alignItems:'center', justifyContent:'center' } },
+    ytId && React.createElement('div', { style:{ position:'absolute', top:'50%', left:'50%', transform: small ? 'translate(-50%,-65%)' : 'translate(-50%,-58%)', zIndex:2, display:'flex', alignItems:'center', justifyContent:'center' } },
       React.createElement('div', { style:{
-        width: hov ? 68 : 60,
-        height: hov ? 68 : 60,
+        width: small ? (hov ? 44 : 38) : (hov ? 68 : 60),
+        height: small ? (hov ? 44 : 38) : (hov ? 68 : 60),
         borderRadius:'50%',
         background: hov ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.88)',
         display:'flex', alignItems:'center', justifyContent:'center',
         boxShadow:'0 4px 20px rgba(0,0,0,0.5)',
         transition:'all 0.2s'
       } },
-        React.createElement('div', { style:{ width:0, height:0, borderTop:'13px solid transparent', borderBottom:'13px solid transparent', borderLeft: '22px solid #111', marginLeft:4 } })
+        React.createElement('div', { style:{ width:0, height:0, borderTop: small ? '8px solid transparent' : '13px solid transparent', borderBottom: small ? '8px solid transparent' : '13px solid transparent', borderLeft: small ? '14px solid #111' : '22px solid #111', marginLeft: small ? 2 : 4 } })
       )
     ),
     /* Titre + chapo */
-    React.createElement('div', { style:{ position:'absolute', bottom:0, left:0, right:0, padding:'6px 10px 10px' } },
-      React.createElement('h2', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:22, fontWeight:900, lineHeight:1.05, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', textDecoration: hov ? 'underline' : 'none' } }, a.title),
-      a.chapo && React.createElement('p', { style:{ fontFamily:"'Barlow',sans-serif", fontSize:14, color:'rgba(255,255,255,0.78)', lineHeight:1.35, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', margin:0 } }, a.chapo)
+    React.createElement('div', { style:{ position:'absolute', bottom:0, left:0, right:0, padding: small ? '4px 7px' : '6px 10px 10px' } },
+      React.createElement(small ? 'h3' : 'h2', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize: small ? 16 : 22, fontWeight: small ? 800 : 900, lineHeight:1.05, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', textDecoration: hov ? 'underline' : 'none' } }, a.title),
+      !small && a.chapo && React.createElement('p', { style:{ fontFamily:"'Barlow',sans-serif", fontSize:14, color:'rgba(255,255,255,0.78)', lineHeight:1.35, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', margin:0 } }, a.chapo)
     )
   );
 }
@@ -3777,6 +3778,7 @@ function SanityMatchCard({ m, onClick }) {
 function NCard({ a, onClick }) {
   const [hov, setHov] = useState(false);
   const lc = LG[a.league].color;
+  if (a._isVideo) return React.createElement(VideoCard, { a, onClick, small: true });
   if (a._isMatch) return /* @__PURE__ */ React.createElement("div", { onClick: () => onClick(a), onMouseEnter: () => setHov(true), onMouseLeave: () => setHov(false), style: { position:"relative", height:164, borderRadius:4, overflow:"hidden", cursor:"pointer", background:"#001a2e", boxShadow: hov?"0 6px 24px rgba(0,0,0,0.28)":"0 2px 10px rgba(0,0,0,0.12)", transition:"box-shadow 0.25s" } }, React.createElement(MatchInner, { a, hov, h:164 }));
   return /* @__PURE__ */ React.createElement(
     "div",
