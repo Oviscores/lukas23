@@ -3647,7 +3647,8 @@ function HCard({ a, onClick }) {
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
-      textDecoration: hov ? "underline" : "none"
+      textDecoration: hov ? "underline" : "none",
+      textTransform: "uppercase"
     } }, a.title), /* @__PURE__ */ React.createElement("p", { style: {
       fontFamily: "'Barlow',sans-serif",
       fontSize: 14,
@@ -3722,7 +3723,7 @@ function VideoCard({ a, onClick, small }) {
     ),
     /* Titre + chapo */
     React.createElement('div', { style:{ position:'absolute', bottom:0, left:0, right:0, padding: small ? '4px 7px' : '6px 10px 10px' } },
-      React.createElement(small ? 'h3' : 'h2', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize: small ? 16 : 22, fontWeight: small ? 800 : 900, lineHeight:1.05, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', textDecoration: hov ? 'underline' : 'none' } }, a.title),
+      React.createElement(small ? 'h3' : 'h2', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize: small ? 16 : 22, fontWeight: small ? 800 : 900, lineHeight:1.05, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', textDecoration: hov ? 'underline' : 'none', textTransform:'uppercase' } }, a.title),
       !small && a.chapo && React.createElement('p', { style:{ fontFamily:"'Barlow',sans-serif", fontSize:14, color:'rgba(255,255,255,0.78)', lineHeight:1.35, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', margin:0 } }, a.chapo)
     )
   );
@@ -3822,7 +3823,8 @@ function NCard({ a, onClick }) {
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
-      textDecoration: hov ? "underline" : "none"
+      textDecoration: hov ? "underline" : "none",
+      textTransform: "uppercase"
     } }, a.title))
   );
 }
@@ -4202,7 +4204,7 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick, on
   const linkedTeam = article.franchise ? lgTeams.filter(function(t) {
     return t.id === article.franchise;
   })[0] || null : null;
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99, img: article.img }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6 } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "transparent", padding: "12px 16px 4px", borderRadius: 0, boxShadow: "none" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh" } }, /* @__PURE__ */ React.createElement("header", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(Logo, { w: 55 })), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "20px 20px 60px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", height: 260, borderRadius: "4px 4px 0 0", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(PBg, { lg, h: 260, seed: article.id || 99, img: article.img }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, left: 10, display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement(LB, { lg, sz: 20 }), article.franchise && /* @__PURE__ */ getTeamLogo(article.franchise, lg, 16)), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: 20, left: 20, right: 20 } }, /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, lineHeight: 1.1, color: "#fff", marginBottom: 6, textTransform: "uppercase" } }, article.title))), /* @__PURE__ */ React.createElement("div", { style: { background: "transparent", padding: "12px 16px 4px", borderRadius: 0, boxShadow: "none" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
       React.createElement("span", { style: { fontFamily: "Barlow,sans-serif", fontSize: 12, color: "#999" } }, article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("fr-FR") : ""),
       React.createElement("span", { style: { color: "#ddd" } }, "|"),
       React.createElement("span", { style: { fontFamily: "Barlow,sans-serif", fontSize: 12, fontWeight: 700, color: "#555" } }, "Redaction Zone US")
@@ -6721,7 +6723,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick }) {
               style:{padding:"10px 14px",borderBottom:"1px solid #f5f5f5",cursor:"pointer",background:i%2===0?"#fff":"#fafafa"},
               onMouseEnter:function(e){e.currentTarget.style.background=col.bg+"12";},
               onMouseLeave:function(e){e.currentTarget.style.background=i%2===0?"#fff":"#fafafa";}},
-              React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:800,color:"#111",lineHeight:1.3,marginBottom:3}},a.title),
+              React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:800,color:"#111",lineHeight:1.3,marginBottom:3,textTransform:"uppercase"}},a.title),
               React.createElement("div",{style:{fontFamily:"'Barlow',sans-serif",fontSize:11,color:"#888",lineHeight:1.5}},a.chapo?a.chapo.slice(0,90)+"…":"")
             );
           }));
@@ -8278,7 +8280,7 @@ function ZoneUS() {
     if (a) {
       var slug = slugify(a.title);
       history.pushState({}, '', '/articles/' + slug);
-      var titleStr = (a.title.charAt(0).toUpperCase() + a.title.slice(1).toLowerCase()) + ' | Zone US';
+      var titleStr = (a.title || '') + ' | Zone US';
       document.title = titleStr;
       var metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc) metaDesc.setAttribute('content', a.chapo || a.content && a.content.substring(0,160) || titleStr);
