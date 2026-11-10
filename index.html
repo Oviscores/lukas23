@@ -5489,11 +5489,12 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
           ),
           React.createElement("tbody", null,
             (tabs.find(function(t){return t.key===activeTab;}) || tabs[0]).players.map(function(p, i) {
-              var s = statsMap[p.playerId] || {};
+              var pid = p.id || p.playerId;
+              var s = statsMap[pid] || {};
               var nom = (p.firstName && p.firstName.default || '') + ' ' + (p.lastName && p.lastName.default || '');
               var bg = i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.025)";
               if (activeTab === 'goalies') {
-                return React.createElement("tr", { key: p.playerId, onClick: function(){ if(onPlayerClick) onPlayerClick(p.playerId, 'NHL'); }, style: { borderBottom: "1px solid rgba(0,0,0,0.05)", background: bg, cursor: "pointer" },
+                return React.createElement("tr", { key: pid, onClick: function(){ if(onPlayerClick && pid) onPlayerClick(pid, 'NHL'); }, style: { borderBottom: "1px solid rgba(0,0,0,0.05)", background: bg, cursor: "pointer" },
                   onMouseEnter: function(e){ e.currentTarget.style.background = lc + "12"; }, onMouseLeave: function(e){ e.currentTarget.style.background = bg; } },
                   React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", color: "#999" } }, p.sweaterNumber),
                   React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800 } }, nom),
@@ -5507,7 +5508,7 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
               }
               var pm = s.plusMinus || 0;
               var pmColor = pm > 0 ? "#16a34a" : pm < 0 ? "#dc2626" : "#999";
-              return React.createElement("tr", { key: p.playerId, onClick: function(){ if(onPlayerClick) onPlayerClick(p.playerId, 'NHL'); }, style: { borderBottom: "1px solid rgba(0,0,0,0.05)", background: bg, cursor: "pointer" },
+              return React.createElement("tr", { key: pid, onClick: function(){ if(onPlayerClick && pid) onPlayerClick(pid, 'NHL'); }, style: { borderBottom: "1px solid rgba(0,0,0,0.05)", background: bg, cursor: "pointer" },
                 onMouseEnter: function(e){ e.currentTarget.style.background = lc + "12"; }, onMouseLeave: function(e){ e.currentTarget.style.background = bg; } },
                 React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", color: "#999" } }, p.sweaterNumber),
                 React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800 } }, nom),
