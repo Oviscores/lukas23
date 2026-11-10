@@ -4508,7 +4508,8 @@ function PlayerArticlesBlock({ related, lg, lc, onArticleClick }) {
   );
 }
 // ─── PLAYER PAGE — fetch live data for all 4 leagues ───────────────────────
-function PlayerPage({ playerId, lg, onBack, articles, onArticleClick, onTeamClick, onPlayerClick }) {
+function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClick, onTeamClick, onPlayerClick }) {
+  var playerId = String(playerIdRaw || '');
   var _loading = React.useState(true); var loading = _loading[0], setLoading = _loading[1];
   var _liveData = React.useState(null); var liveData = _liveData[0], setLiveData = _liveData[1];
   var _error = React.useState(null); var fetchError = _error[0], setFetchError = _error[1];
@@ -9580,16 +9581,18 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   }
 
   function goPlayer(id, lg) {
-    setSelPlayer({ playerId: id, lg });
+    if (!id) return;
+    var idStr = String(id);
+    setSelPlayer({ playerId: idStr, lg });
     setSelArticle(null);
     setSelTeam(null);
     setPlayersList(null);
     setSelMatch(null);
     // URL SEO : /nhl/toronto-maple-leafs/connor-mcdavid
-    var p = (PLAYERS_DB[lg] || []).find(function(x){ return x.id === id; });
-    var pSlug = playerSlugFromId(id, lg);
-    var tSlug = p ? teamSlug(p.team, lg) : 'equipe';
-    history.pushState({}, '', '/' + (lg||'').toLowerCase() + '/' + tSlug + '/' + pSlug);
+    var pStatic = (PLAYERS_DB[lg] || []).find(function(x){ return x.id === idStr; });
+    var pSlug = pStatic ? slugify(pStatic.name) : slugify(idStr.replace(/^(nhl|nfl|nba|mlb)-/i,''));
+    var tSlug = pStatic ? teamSlug(pStatic.team, lg) : 'equipe';
+    if (pSlug) history.pushState({}, '', '/' + (lg||'').toLowerCase() + '/' + tSlug + '/' + pSlug);
   }
   function goMatch(m) {
     setSelMatch(m); setSelArticle(null); setSelPlayer(null); setSelTeam(null); setPlayersList(null);
