@@ -9384,19 +9384,25 @@ function ZoneUS() {
     var artSlug = (_ap3 && _ap3[1]) || params.get('article');
     if (artSlug && !_artResolved.current) {
       if (arts.length > 1) {
-        var found = arts.find(function(a) { var s = a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); return s === artSlug; });
+        var found = arts.find(function(a) {
+          var s1 = slugify(a.title).slice(0, 80);
+          var s2 = a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+          return s1 === artSlug || s2 === artSlug;
+        });
         if (found) {
           _artResolved.current = true;
           if (_artTimeout.current) { clearTimeout(_artTimeout.current); _artTimeout.current = null; }
           setSelArticle(found);
+        } else {
+          // Arts chargés mais article introuvable → retour home après 2s
+          if (!_artTimeout.current) {
+            _artTimeout.current = setTimeout(function() {
+              if (!_artResolved.current) { _artResolved.current = true; setSelArticle(null); }
+            }, 2000);
+          }
         }
       }
-      // Timeout de sécurité : si après 8s toujours pas résolu, retour home
-      if (!_artTimeout.current) {
-        _artTimeout.current = setTimeout(function() {
-          if (!_artResolved.current) { _artResolved.current = true; setSelArticle(null); }
-        }, 8000);
-      }
+      // Pas encore chargé : on attend sans timeout agressif
     }
     if (!artSlug) { _artResolved.current = false; if (_artTimeout.current) { clearTimeout(_artTimeout.current); _artTimeout.current = null; } }
   }, [arts]);
