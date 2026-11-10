@@ -5458,6 +5458,9 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
     var statsMap = {};
     (liveRoster.stats && liveRoster.stats.skaters || []).forEach(function(s) { statsMap[s.playerId] = s; });
     (liveRoster.stats && liveRoster.stats.goalies || []).forEach(function(s) { statsMap[s.playerId] = s; });
+    // Alimenter le cache roster pour goPlayer
+    if (!window.__ROSTER_CACHE__) window.__ROSTER_CACHE__ = {};
+    ['forwards','defensemen','goalies'].forEach(function(grp){ (roster[grp]||[]).forEach(function(p){ var pid=p.id||p.playerId; if(pid) window.__ROSTER_CACHE__[String(pid)]={name:(p.firstName&&p.lastName)?(p.firstName.default||p.firstName)+' '+(p.lastName.default||p.lastName):(p.fullName||''), team:team}; }); });
     var tabs = [
       { key: 'forwards', label: 'ATTAQUANTS', players: roster.forwards || [] },
       { key: 'defensemen', label: 'DÉFENSEURS', players: roster.defensemen || [] },
@@ -5552,6 +5555,11 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
   // ─── NBA ROSTER ─────────────────────────────────────────
   if (liveRoster && lg === 'NBA') {
     var nbaAthletes = (liveRoster.athletes || (liveRoster.roster && liveRoster.roster.athletes) || []);
+    // Alimenter le cache roster pour goPlayer
+    if (!window.__ROSTER_CACHE__) window.__ROSTER_CACHE__ = {};
+    nbaAthletes.forEach(function(ath) {
+      if (ath.id) window.__ROSTER_CACHE__[String(ath.id)] = { name: ath.displayName || ath.fullName || '', team: team };
+    });
     var bs3 = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", backdropFilter: "blur(8px)" };
     return React.createElement("div", { style: bs3 },
       React.createElement("div", { style: { background: "#111", padding: "10px 16px" } },
@@ -9625,8 +9633,10 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
         || String(x.espnId || '') === idStr
         || String(x.mlbId || '') === idStr;
     });
-    var pSlug = pStatic ? slugify(pStatic.name) : slugify(idStr.replace(/^(nhl|nfl|nba|mlb)-/i,''));
-    var tSlug = pStatic ? teamSlug(pStatic.team, lg) : 'equipe';
+    // Fallback: chercher dans le cache roster live (alimenté au rendu)
+    var pCache = (!pStatic && window.__ROSTER_CACHE__) ? window.__ROSTER_CACHE__[idStr] : null;
+    var pSlug = pStatic ? slugify(pStatic.name) : (pCache && pCache.name ? slugify(pCache.name) : slugify(idStr.replace(/^(nhl|nfl|nba|mlb)-/i,'')));
+    var tSlug = pStatic ? teamSlug(pStatic.team, lg) : (pCache && pCache.team ? teamSlug(pCache.team, lg) : 'equipe');
     if (pSlug) history.pushState({}, '', '/' + (lg||'').toLowerCase() + '/' + tSlug + '/' + pSlug);
   }
   function goMatch(m) {
