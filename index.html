@@ -9598,7 +9598,13 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     setPlayersList(null);
     setSelMatch(null);
     // URL SEO : /nhl/toronto-maple-leafs/connor-mcdavid
-    var pStatic = (PLAYERS_DB[lg] || []).find(function(x){ return x.id === idStr; });
+    // Cherche par id slug OU par nhlId/espnId/mlbId numérique (roster live)
+    var pStatic = (PLAYERS_DB[lg] || []).find(function(x){
+      return x.id === idStr
+        || String(x.nhlId || '') === idStr
+        || String(x.espnId || '') === idStr
+        || String(x.mlbId || '') === idStr;
+    });
     var pSlug = pStatic ? slugify(pStatic.name) : slugify(idStr.replace(/^(nhl|nfl|nba|mlb)-/i,''));
     var tSlug = pStatic ? teamSlug(pStatic.team, lg) : 'equipe';
     if (pSlug) history.pushState({}, '', '/' + (lg||'').toLowerCase() + '/' + tSlug + '/' + pSlug);
