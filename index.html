@@ -21,6 +21,8 @@
     var _matchFromPath = _pn.match(/^\/matchs\/([^/]+)\/?$/);
     var _videoFromPath = _pn.match(/^\/videos\/([^/]+)\/?$/);
     var _lgFromPath = _pn.match(/^\/(nhl|nfl|nba|mlb)\/?$/i);
+    var _playerFromPath = _pn.match(/^\/(nhl|nfl|nba|mlb)\/([^/]+)\/([^/]+)\/?$/i);
+    var _teamFromPath = _pn.match(/^\/(nhl|nfl|nba|mlb)\/([^/]+)\/?$/i);
     var article = (_artFromPath && _artFromPath[1]) || p.get('article');
     var page = (_lgFromPath && _lgFromPath[1].toLowerCase()) || p.get('page');
     var match = (_matchFromPath && _matchFromPath[1]) || p.get('match');
@@ -43,6 +45,23 @@
       title = slug + ' | Zone US';
       desc  = 'Retrouvez l\'article ' + slug + ' sur Zone US, le media sportif francophone.';
       canonical = 'https://zoneus.fr/articles/' + article;
+    } else if (_playerFromPath) {
+      var lgP = _playerFromPath[1].toUpperCase();
+      var teamSlugP = _playerFromPath[2];
+      var playerSlug = _playerFromPath[3];
+      var playerName = playerSlug.replace(/-/g, ' ');
+      playerName = playerName.charAt(0).toUpperCase() + playerName.slice(1);
+      title = playerName + ' | ' + lgP + ' – Zone US';
+      desc  = 'Stats et profil de ' + playerName + ' en ' + lgP + ' sur Zone US.';
+      canonical = 'https://zoneus.fr/' + _playerFromPath[1].toLowerCase() + '/' + teamSlugP + '/' + playerSlug;
+    } else if (_teamFromPath) {
+      var lgT = _teamFromPath[1].toUpperCase();
+      var teamSlug = _teamFromPath[2];
+      var teamName = teamSlug.replace(/-/g, ' ');
+      teamName = teamName.charAt(0).toUpperCase() + teamName.slice(1);
+      title = teamName + ' | ' + lgT + ' – Zone US';
+      desc  = 'Roster, stats et résultats des ' + teamName + ' en ' + lgT + ' sur Zone US.';
+      canonical = 'https://zoneus.fr/' + _teamFromPath[1].toLowerCase() + '/' + teamSlug;
     } else if (page) {
       var lg = page.toUpperCase();
       var lgNames = { NHL: 'Hockey sur glace', NFL: 'Football américain', NBA: 'Basketball', MLB: 'Baseball' };
@@ -10881,10 +10900,11 @@ setTimeout(function() { if (new URLSearchParams(window.location.search).get('mat
 function updateCanonical() {
   var can = document.querySelector('link[rel="canonical"]');
   if (!can) return;
-  var params = new URLSearchParams(window.location.search);
-  var base = 'https://zoneus.fr/';
-  var search = window.location.search;
-  can.setAttribute('href', search ? base + search : base);
+  var pn = window.location.pathname;
+  var href = 'https://zoneus.fr' + (pn === '/' ? '/' : pn.replace(/\/$/, ''));
+  can.setAttribute('href', href);
+  var ogUrl = document.querySelector('meta[property="og:url"]');
+  if (ogUrl) ogUrl.setAttribute('content', href);
 }
 updateCanonical();
 window.addEventListener('popstate', updateCanonical);
