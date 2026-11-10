@@ -4211,11 +4211,10 @@ function TeamCardInArticle({ teamId, teamLg, onTeamClick }) {
 function linkifyBody(html, lg, onPlayerClick, onTeamClick) {
   if (!html) return null;
   var players = PLAYERS_DB[lg] || [];
-  var teams = TEAMS_DB[lg] || [];
   var lc = LG[lg] ? LG[lg].color : '#D50A0A';
 
-  // Construire la liste des entités à détecter (nom complet + nom de famille si > 3 cars)
-  // Trier par longueur décroissante pour éviter les collisions (McDavid avant Davis)
+  // Joueurs seulement (pas les équipes — évite les liens parasites sur noms de villes)
+  // Nom complet EN PRIORITÉ, puis nom de famille seul si > 3 cars
   var entities = [];
   players.forEach(function(p) {
     var parts = p.name.split(' ');
@@ -4225,11 +4224,7 @@ function linkifyBody(html, lg, onPlayerClick, onTeamClick) {
       entities.push({ text: lastName, type: 'player', id: p.id, slug: p.name });
     }
   });
-  teams.forEach(function(t) {
-    if (t.name) entities.push({ text: t.name, type: 'team', id: t.id, slug: t.name });
-    if (t.city) entities.push({ text: t.city, type: 'team', id: t.id, slug: t.name });
-  });
-  // Dédupliquer + trier par longueur décroissante
+  // Dédupliquer + trier par longueur décroissante (nom complet avant nom de famille)
   var seen = {};
   entities = entities.filter(function(e) {
     var key = e.text.toLowerCase();
@@ -4292,46 +4287,69 @@ function linkifyBody(html, lg, onPlayerClick, onTeamClick) {
     });
   });
 
-  // Maintenant construire les éléments React
-  var reactChildren = [];
-  var htmlBuffer = '';
+  // Construire les éléments React paragraphe par paragraphe
+  // On groupe le résultat en "blocs" séparés par <p>/<br> pour éviter les spans block-level
+  var paraStyle = { fontFamily: "'Barlow',sans-serif", fontSize: 16, color: '#111', lineHeight: 1.9, fontWeight: 500, margin: '0 0 14px 0' };
+  var linkStyle = { color: lc, fontWeight: 700, cursor: 'pointer', borderBottom: '1px solid ' + lc + '55', textDecoration: 'none' };
 
-  function flushHtml() {
-    if (htmlBuffer) {
-      reactChildren.push(React.createElement('span', { key: 'h' + reactChildren.length, dangerouslySetInnerHTML: { __html: htmlBuffer } }));
-      htmlBuffer = '';
+  // On reconstruit en paragraphes : on split sur les <p> et </p>
+  // Stratégie : construire une liste de "paragraphes" = tableaux de React children
+  var paragraphs = [[]]; // tableau de tableaux
+
+  var htmlBuf = '';
+  function flushBuf(target) {
+    if (htmlBuf) {
+      target.push(React.createElement('span', { key: 'h' + target.length, dangerouslySetInnerHTML: { __html: htmlBuf } }));
+      htmlBuf = '';
     }
   }
 
   result.forEach(function(item, i) {
     if (typeof item === 'string') {
-      htmlBuffer += item;
+      // Détecter les délimiteurs de paragraphes
+      var cur = paragraphs[paragraphs.length - 1];
+      if (item === '<p>' || item === '<p' || item.match(/^<p[ >]/)) {
+        // Ouvre un nouveau paragraphe
+        flushBuf(cur);
+        paragraphs.push([]);
+      } else if (item === '</p>') {
+        // Ferme le paragraphe courant
+        flushBuf(paragraphs[paragraphs.length - 1]);
+        // Le prochain contenu ira dans un nouveau para
+        paragraphs.push([]);
+      } else if (item === '<br>' || item === '<br/>' || item === '<br />') {
+        flushBuf(cur);
+        cur.push(React.createElement('br', { key: 'br' + i }));
+      } else {
+        htmlBuf += item;
+      }
     } else {
-      flushHtml();
+      var cur2 = paragraphs[paragraphs.length - 1];
+      flushBuf(cur2);
       var ent = item.entity;
-      var clickFn = ent.type === 'player'
-        ? function() { if (onPlayerClick) onPlayerClick(ent.id, lg); }
-        : function() { if (onTeamClick) onTeamClick(ent.id, lg); };
-      reactChildren.push(React.createElement('span', {
+      var eId = ent.id; var eLg = lg;
+      cur2.push(React.createElement('span', {
         key: 'l' + i,
-        onClick: clickFn,
-        style: {
-          color: lc,
-          fontWeight: 700,
-          cursor: 'pointer',
-          borderBottom: '1px solid ' + lc + '55',
-          textDecoration: 'none',
-          display: 'inline'
-        },
-        title: ent.type === 'player' ? 'Fiche joueur : ' + ent.slug : 'Fiche équipe : ' + ent.slug
+        onClick: function() { if (onPlayerClick) onPlayerClick(eId, eLg); },
+        style: linkStyle,
+        title: 'Fiche joueur : ' + ent.slug
       }, item.match));
     }
   });
-  flushHtml();
+  // Flush dernier buffer
+  var lastPara = paragraphs[paragraphs.length - 1];
+  flushBuf(lastPara);
 
-  return React.createElement('div', {
-    style: { fontFamily: "'Barlow',sans-serif", fontSize: 16, color: '#111', lineHeight: 1.9, fontWeight: 500 }
-  }, reactChildren);
+  // Nettoyer les paragraphes vides
+  var validParas = paragraphs.filter(function(p) { return p.length > 0; });
+
+  if (validParas.length === 0) return null;
+
+  return React.createElement('div', null,
+    validParas.map(function(children, pi) {
+      return React.createElement('p', { key: 'p' + pi, style: paraStyle }, children);
+    })
+  );
 }
 
 
@@ -9287,6 +9305,24 @@ function ZoneUS() {
     var equipeParam = params.get('equipe'); var ligueParam = params.get('ligue');
     if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
     if (equipeParam && ligueParam) setSelTeam({ teamId: equipeParam.toUpperCase(), lg: ligueParam.toUpperCase() });
+    // ─── URLs SEO propres ──────────────────────────────────────────────────
+    // /nhl/toronto-maple-leafs → TeamPage
+    // /nhl/toronto-maple-leafs/connor-mcdavid → PlayerPage
+    var _lgSlugMatch = _pn2.match(/^\/(nhl|nfl|nba|mlb)\/([^/]+)(?:\/([^/]+))?\/?$/i);
+    if (_lgSlugMatch && !_apMatch && !_mpMatch && !_vpMatch) {
+      var _lgSeo = _lgSlugMatch[1].toUpperCase();
+      var _teamSeoSlug = _lgSlugMatch[2];
+      var _playerSeoSlug = _lgSlugMatch[3];
+      if (_playerSeoSlug) {
+        // Fiche joueur
+        var _pid = resolvePlayerSlug(_playerSeoSlug, _lgSeo);
+        setSelPlayer({ playerId: _pid, lg: _lgSeo });
+      } else {
+        // Fiche équipe
+        var _tid = resolveTeamSlug(_teamSeoSlug, _lgSeo);
+        setSelTeam({ teamId: _tid, lg: _lgSeo });
+      }
+    }
     var matchParam = (_mpMatch && _mpMatch[1]) || params.get('match');
     if (matchParam) {
       // Format unifié : NHL_2026020214 ou NFL_401872657 etc.
@@ -9305,6 +9341,21 @@ function ZoneUS() {
       var _vidPop = (_vPop && _vPop[1]) || p.get('video');
       if (!_artPop) setSelArticle(null);
       if (!_vidPop) setSelVideo(null);
+      // Gestion URLs SEO /nhl/team et /nhl/team/player sur popstate
+      var _lgPopMatch = _pnPop.match(/^\/(nhl|nfl|nba|mlb)\/([^/]+)(?:\/([^/]+))?\/?$/i);
+      if (_lgPopMatch && !_apPop && !_mpPop && !_vPop) {
+        var _lgP = _lgPopMatch[1].toUpperCase();
+        var _tSlugP = _lgPopMatch[2];
+        var _pSlugP = _lgPopMatch[3];
+        if (_pSlugP) {
+          setSelPlayer({ playerId: resolvePlayerSlug(_pSlugP, _lgP), lg: _lgP });
+          setSelTeam(null); setSelMatch(null); setSelArticle(null);
+        } else {
+          setSelTeam({ teamId: resolveTeamSlug(_tSlugP, _lgP), lg: _lgP });
+          setSelPlayer(null); setSelMatch(null); setSelArticle(null);
+        }
+        return;
+      }
       if (!p.get('equipe')) setSelTeam(null);
       var mp = (_mpPop && _mpPop[1]) || p.get('match'); var lp = p.get('ligue');
       if (mp) {
@@ -9380,7 +9431,6 @@ function ZoneUS() {
     var slug = p.get('article');
     return slug ? { __slug: slug, id: '__pending__', title: slug, league: 'NHL', body: null } : null;
   });
-  const slugify = function(str) { return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); };
   const goArticle = function(a) {
     if (a && a._isVideo) { goVideo(a); return; }
     if (a && a._isMatch) {
@@ -9490,12 +9540,56 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
       setGenLg(null);
     });
   }
+  // ─── Helpers slug SEO ───────────────────────────────────────────────────────
+  function slugify(str) {
+    return (str || '').toLowerCase()
+      .replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
+      .replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ç]/g,'c')
+      .replace(/[ñ]/g,'n').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  }
+  function teamSlug(teamId, lg) {
+    var key = teamId + '_' + lg;
+    var full = TEAM_NAMES[key] || teamId;
+    return slugify(full);
+  }
+  function playerSlugFromId(playerId, lg) {
+    // id style "nhl-mcdavid" → "connor-mcdavid" (nom slugifié)
+    var p = (PLAYERS_DB[lg] || []).find(function(x){ return x.id === playerId; });
+    if (p) return slugify(p.name);
+    return slugify(playerId.replace(/^(nhl|nfl|nba|mlb)-/i,''));
+  }
+  // Résout un slug d'équipe → teamId (abréviation)
+  function resolveTeamSlug(slug, lg) {
+    var teams = TEAMS_DB[lg] || [];
+    // Cherche dans TEAM_NAMES : TEAM_NAMES["TOR_NHL"] = "Toronto Maple Leafs"
+    var found = null;
+    Object.keys(TEAM_NAMES).forEach(function(k) {
+      if (k.endsWith('_' + lg) && slugify(TEAM_NAMES[k]) === slug) {
+        found = k.replace('_' + lg, '');
+      }
+    });
+    if (found) return found;
+    // Fallback : cherche dans TEAMS_DB par name
+    var t = teams.find(function(t2){ return slugify(t2.name||'') === slug || (t2.id||'').toLowerCase() === slug; });
+    return t ? t.id : slug.toUpperCase();
+  }
+  // Résout un slug joueur → playerId
+  function resolvePlayerSlug(playerSlug, lg) {
+    var p = (PLAYERS_DB[lg] || []).find(function(x){ return slugify(x.name) === playerSlug; });
+    return p ? p.id : playerSlug;
+  }
+
   function goPlayer(id, lg) {
     setSelPlayer({ playerId: id, lg });
     setSelArticle(null);
     setSelTeam(null);
     setPlayersList(null);
     setSelMatch(null);
+    // URL SEO : /nhl/toronto-maple-leafs/connor-mcdavid
+    var p = (PLAYERS_DB[lg] || []).find(function(x){ return x.id === id; });
+    var pSlug = playerSlugFromId(id, lg);
+    var tSlug = p ? teamSlug(p.team, lg) : 'equipe';
+    history.pushState({}, '', '/' + (lg||'').toLowerCase() + '/' + tSlug + '/' + pSlug);
   }
   function goMatch(m) {
     setSelMatch(m); setSelArticle(null); setSelPlayer(null); setSelTeam(null); setPlayersList(null);
@@ -9503,7 +9597,8 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   }
   function goTeam(id, lg) {
     setSelTeam({ teamId: id, lg }); setSelArticle(null); setSelPlayer(null); setPlayersList(null);
-    history.pushState({}, '', '?equipe=' + id.toLowerCase() + '&ligue=' + (lg||'').toLowerCase());
+    // URL SEO : /nhl/toronto-maple-leafs
+    history.pushState({}, '', '/' + (lg||'').toLowerCase() + '/' + teamSlug(id, lg));
   }
   function goBack() {
     setSelArticle(null);
@@ -9513,7 +9608,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     setSelMatch(null);
     setCalLg(null);
     var _pn = window.location.pathname;
-    if (_pn.startsWith('/articles/') || _pn.startsWith('/matchs/')) history.pushState({}, '', '/');
+    if (_pn !== '/') history.pushState({}, '', '/');
   }
   function goScore(g, lg) {
     var _eid = g.eventId || (lg === 'NFL' ? (g.id||'').replace('nfl_','') : null) || null;
