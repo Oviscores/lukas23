@@ -1181,7 +1181,13 @@ const PLAYERS_DB = {
   ]
 };
 function findPlayer(lg, id) {
-  return (PLAYERS_DB[lg] || []).find((p) => p.id === id);
+  var sid = String(id);
+  return (PLAYERS_DB[lg] || []).find(function(p) {
+    return p.id === sid
+      || String(p.nhlId || '') === sid
+      || String(p.espnId || '') === sid
+      || String(p.mlbId || '') === sid;
+  });
 }
 function getStatVals(p, s, lg) {
   if (lg === "NHL") return [s.gp, s.g, s.a, s.pts, s.plusMinus, s.pim, s.ppg];
@@ -4779,7 +4785,18 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
   // ─── Render NHL ──────────────────────────────────
   if (liveData && liveData.type === 'nhl') {
     var nhl = liveData.player || {};
-    var cs = p.currentSeason || {};
+    // currentSeason peut venir du payload live ou être dérivé de la dernière saison career (fallback statique)
+    var lastCareerNHL = (p.career || []).slice(-1)[0] || {};
+    var cs = (p.currentSeason && (p.currentSeason.gamesPlayed || p.currentSeason.goals)) ? p.currentSeason : {
+      gamesPlayed: lastCareerNHL.gp || 0,
+      goals: lastCareerNHL.g || 0,
+      assists: lastCareerNHL.a || 0,
+      points: lastCareerNHL.pts || 0,
+      plusMinus: lastCareerNHL.pm !== undefined ? lastCareerNHL.pm : 0,
+      wins: lastCareerNHL.w || 0,
+      savePctg: lastCareerNHL.sv ? parseFloat('0' + lastCareerNHL.sv) : null,
+      goalsAgainstAvg: lastCareerNHL.gaa ? parseFloat(lastCareerNHL.gaa) : null,
+    };
     var ct = p.careerTotals || {};
     var gamelog = (liveData.gamelog && liveData.gamelog.gameLog) ? liveData.gamelog.gameLog.slice(0, 20) : [];
     return React.createElement("div", { style: { minHeight: "100vh" } },
