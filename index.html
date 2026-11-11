@@ -4948,7 +4948,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, "#" + p.jersey)
           ),
           React.createElement("div", { style: { flex: 1, minWidth: 200 } },
-            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + " · #" + p.jersey + " · " + p.teamFull + " · NHL"),
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + " · #" + p.jersey + " · " + p.teamFull + " · NHL · ID " + (p.id || playerIdRaw)),
             React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1, margin: "0 0 10px" } }, p.name),
             React.createElement("div", { style: { display: "flex", gap: 16, flexWrap: "wrap" } },
               [
@@ -5144,7 +5144,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, p.jersey ? "#" + p.jersey : p.pos)
           ),
           React.createElement("div", { style: { flex: 1, minWidth: 200 } },
-            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + (p.jersey ? " · #" + p.jersey : "") + " · " + p.teamFull + " · NBA"),
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + (p.jersey ? " · #" + p.jersey : "") + " · " + p.teamFull + " · NBA · ID " + (p.id || playerIdRaw)),
             React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1, margin: "0 0 10px" } }, p.name),
             React.createElement("div", { style: { display: "flex", gap: 16, flexWrap: "wrap" } },
               [
@@ -5245,7 +5245,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, p.jersey ? "#" + p.jersey : p.pos)
           ),
           React.createElement("div", { style: { flex: 1, minWidth: 200 } },
-            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + (p.jersey ? " · #" + p.jersey : "") + " · " + p.teamFull + " · NFL"),
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + (p.jersey ? " · #" + p.jersey : "") + " · " + p.teamFull + " · NFL · ID " + (p.id || playerIdRaw)),
             React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1, margin: "0 0 10px" } }, p.name),
             React.createElement("div", { style: { display: "flex", gap: 16, flexWrap: "wrap" } },
               [
@@ -5349,7 +5349,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, p.jersey ? "#" + p.jersey : p.pos)
           ),
           React.createElement("div", { style: { flex: 1, minWidth: 200 } },
-            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + (p.jersey ? " · #" + p.jersey : "") + " · " + p.teamFull + " · MLB"),
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + (p.jersey ? " · #" + p.jersey : "") + " · " + p.teamFull + " · MLB · ID " + (p.id || playerIdRaw)),
             React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1, margin: "0 0 10px" } }, p.name),
             React.createElement("div", { style: { display: "flex", gap: 16, flexWrap: "wrap" } },
               [
