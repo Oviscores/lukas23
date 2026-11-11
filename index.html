@@ -5554,7 +5554,21 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
   }
   // ─── NBA ROSTER ─────────────────────────────────────────
   if (liveRoster && lg === 'NBA') {
-    var nbaAthletes = (liveRoster.athletes || (liveRoster.roster && liveRoster.roster.athletes) || []);
+    // ESPN retourne athletes groupés par position : [{position, items:[...]}]
+    // On aplatit en liste de joueurs avec pos injectée
+    var _rawAthletes = liveRoster.athletes || (liveRoster.roster && liveRoster.roster.athletes) || [];
+    var nbaAthletes = [];
+    if (_rawAthletes.length > 0 && _rawAthletes[0].items) {
+      // Format ESPN groupé par position
+      _rawAthletes.forEach(function(grp) {
+        (grp.items || []).forEach(function(p) {
+          if (!p.position) p.position = grp.position;
+          nbaAthletes.push(p);
+        });
+      });
+    } else {
+      nbaAthletes = _rawAthletes;
+    }
     // Alimenter le cache roster pour goPlayer
     if (!window.__ROSTER_CACHE__) window.__ROSTER_CACHE__ = {};
     nbaAthletes.forEach(function(ath) {
