@@ -4858,6 +4858,16 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
     p = staticP;
   }
 
+  // Merge Sanity player override (bio FR, saisonNote, palmares)
+  if (p) {
+    var _pOverride = window.__SANITY_PLAYER_OVERRIDES__ && window.__SANITY_PLAYER_OVERRIDES__[String(p.id || playerIdRaw)];
+    if (_pOverride) {
+      if (_pOverride.bio) p.bio = _pOverride.bio;
+      if (_pOverride.saisonNote) p.saisonNote = _pOverride.saisonNote;
+      if (_pOverride.palmares) p.palmares = _pOverride.palmares;
+    }
+  }
+
   // Articles liés au joueur — nom complet + nom de famille + équipe
   var pName = p ? p.name.toLowerCase() : '';
   var pLast = p ? (p.name.split(' ').slice(-1)[0] || '').toLowerCase() : '';
@@ -4987,6 +4997,11 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
         p.bio && React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderRadius: 6, padding: "16px 20px", border: "1px solid rgba(0,0,0,0.07)" } },
           React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 13, lineHeight: 1.75, color: "#222", margin: 0, fontWeight: 500 } }, p.bio)
         ),
+        // Note de saison Sanity
+        p.saisonNote && React.createElement("div", { style: { background: lc + "12", borderRadius: 6, padding: "14px 18px", border: "1px solid " + lc + "33" } },
+          React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: lc, letterSpacing: "0.1em", marginBottom: 6 } }, "SAISON EN COURS"),
+          React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 13, lineHeight: 1.7, color: "#222", margin: 0, fontWeight: 500 } }, p.saisonNote)
+        ),
         // Draft + Contrat
         (p.draft || p.contract) && React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap" } },
           p.draft && React.createElement("div", { style: Object.assign({}, bs, { flex: 1, minWidth: 200, padding: "12px 16px" }) },
@@ -4999,8 +5014,8 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#777" } }, p.contract.years + " · " + (p.contract.status || ''))
           )
         ),
-        // Palmarès
-        ((p.staticAwards && p.staticAwards.length > 0) || (p.awards && p.awards.length > 0)) && React.createElement("div", { style: bs },
+        // Palmarès — ESPN awards + Sanity palmares combinés
+        ((p.staticAwards && p.staticAwards.length > 0) || (p.awards && p.awards.length > 0) || p.palmares) && React.createElement("div", { style: bs },
           React.createElement(Hd, { label: "PALMARÈS — " + p.name.toUpperCase() }),
           React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, padding: "12px 14px" } },
             (p.staticAwards || p.awards || []).map(function(a, i) {
@@ -5367,6 +5382,11 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
         // Bio / présentation
         p.bio && React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderRadius: 6, padding: "16px 20px", border: "1px solid rgba(0,0,0,0.07)" } },
           React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 13, lineHeight: 1.75, color: "#222", margin: 0, fontWeight: 500 } }, p.bio)
+        ),
+        // Note de saison Sanity
+        p.saisonNote && React.createElement("div", { style: { background: lc + "12", borderRadius: 6, padding: "14px 18px", border: "1px solid " + lc + "33" } },
+          React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: lc, letterSpacing: "0.1em", marginBottom: 6 } }, "SAISON EN COURS"),
+          React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 13, lineHeight: 1.7, color: "#222", margin: 0, fontWeight: 500 } }, p.saisonNote)
         ),
         // Statistiques année par année
         yearByYear.length > 0 && React.createElement("div", { style: bs },
@@ -6280,7 +6300,25 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
   }, []);
   var _liveInj = (window.__INJURIES__ && window.__INJURIES__[lg] && window.__INJURIES__[lg].length > 0) ? window.__INJURIES__[lg] : (PLAYER_STATUS[lg] || []);
   var allStatus = _liveInj.slice(0, 6);
-  return /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(245,243,240,0.05)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg + " \xB7 " + team.name)), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "16px 20px 30px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(TeamHero, { team, lg, lc, dk, tc }),  /* @__PURE__ */ React.createElement(TeamRoster, { rosterData: liveRoster || rosterData, liveRoster, rosterLoading, lg, lc, tc, team, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamMatchesStats, { upcomingMatches: (lg==='NFL'&&espnSched?espnSched.upcoming:lg==='MLB'&&mlbSched?mlbSched.upcoming:upcomingMatches), recentMatches: (lg==='NFL'&&espnSched?espnSched.recent:lg==='MLB'&&mlbSched?mlbSched.recent:recentMatches), teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamNews, { relatedArts, team, lg, lc, onArticleClick })));
+  // Sanity team override
+  var _teamOverride = window.__SANITY_TEAM_OVERRIDES__ && window.__SANITY_TEAM_OVERRIDES__[teamId + '_' + lg];
+  var teamBio = _teamOverride && _teamOverride.bio ? _teamOverride.bio : null;
+  var teamHistoire = _teamOverride && _teamOverride.histoire ? _teamOverride.histoire : null;
+  var teamSaisonNote = _teamOverride && _teamOverride.saisonNote ? _teamOverride.saisonNote : null;
+  return /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(245,243,240,0.05)" } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "\u2190 Retour"), /* @__PURE__ */ React.createElement(LB, { lg, sz: 18 }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333" } }, lg + " \xB7 " + team.name)), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "16px 20px 30px", display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(TeamHero, { team, lg, lc, dk, tc }),
+    teamBio && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderRadius: 6, padding: "16px 20px", border: "1px solid rgba(0,0,0,0.07)" } },
+      /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", letterSpacing: "0.1em", marginBottom: 8 } }, "PR\u00c9SENTATION"),
+      /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 13, lineHeight: 1.75, color: "#222", margin: 0, fontWeight: 500 } }, teamBio)
+    ),
+    teamHistoire && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderRadius: 6, padding: "16px 20px", border: "1px solid rgba(0,0,0,0.07)" } },
+      /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", letterSpacing: "0.1em", marginBottom: 8 } }, "HISTOIRE"),
+      /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 13, lineHeight: 1.75, color: "#222", margin: 0, fontWeight: 500 } }, teamHistoire)
+    ),
+    teamSaisonNote && /* @__PURE__ */ React.createElement("div", { style: { background: lc + "12", borderRadius: 6, padding: "14px 18px", border: "1px solid " + lc + "33" } },
+      /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: lc, letterSpacing: "0.1em", marginBottom: 6 } }, "SAISON EN COURS"),
+      /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 13, lineHeight: 1.7, color: "#222", margin: 0, fontWeight: 500 } }, teamSaisonNote)
+    ),
+    /* @__PURE__ */ React.createElement(TeamRoster, { rosterData: liveRoster || rosterData, liveRoster, rosterLoading, lg, lc, tc, team, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamMatchesStats, { upcomingMatches: (lg==='NFL'&&espnSched?espnSched.upcoming:lg==='MLB'&&mlbSched?mlbSched.upcoming:upcomingMatches), recentMatches: (lg==='NFL'&&espnSched?espnSched.recent:lg==='MLB'&&mlbSched?mlbSched.recent:recentMatches), teamStats, allStatus, team, teamId, lg, lc, tc, onMatchClick, onPlayerClick }), /* @__PURE__ */ React.createElement(TeamNews, { relatedArts, team, lg, lc, onArticleClick })));
 }
 function LeaguePage({ lg, articles, statsVersion, onBack, onArticleClick, onMatchClick, onTeamClick = () => {
 }, onStandingsClick = () => {
@@ -10967,7 +11005,7 @@ async function fetchSanityMatches() {
 }
 async function fetchSanityArticles() {
   try {
-    var query = encodeURIComponent('*[_type == "article"] | order(publishedAt desc) [0...200] {_id, title, chapo, body, league, tag, franchise, hot, publishedAt, matchId, matchLg, teamId, teamLg, ordre, youtubeId, "imageUrl": image.asset->url}');
+    var query = encodeURIComponent('*[_type == "article"] | order(publishedAt desc) [0...200] {_id, title, chapo, body, league, tag, franchise, hot, publishedAt, matchId, matchLg, teamId, teamLg, ordre, youtubeId, "imageUrl": image.asset->url, players[] {espnId, name, position, team, league}}');
     var resp = await fetch('https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=' + query, { headers: { 'Authorization': 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz' } });
     var data = await resp.json();
     if (!data.result || !data.result.length) return;
@@ -11052,10 +11090,31 @@ window.fetchStandings = async function(lg) {
     } catch(e) { console.log('NFL standings error:', e.message); }
   }
 };
+async function fetchSanityOverrides() {
+  var token = 'Bearer skFwvynfPDriVyENu4nEBzrso1NiEdvyq7GbLrQ8tCYexQyF6bi66B9Hp2JUOU2gpeIV50YCA4RFxtICaJ7SU7MYo1pykeRuGrQR14OM6OXXxd4kbVKL27m38gWCbTYWcyYleHaTlKT0YJ1LDvgwhnijjySfhMmonaM9WcAJoxRZZLeLRyjz';
+  var base = 'https://3p2qmw8s.api.sanity.io/v2021-10-21/data/query/production?query=';
+  try {
+    var pQuery = encodeURIComponent('*[_type == "playerOverride"] { espnId, league, teamId, playerName, bio, saisonNote, palmares }');
+    var pResp = await fetch(base + pQuery, { headers: { 'Authorization': token } });
+    var pData = pResp.ok ? await pResp.json() : {};
+    window.__SANITY_PLAYER_OVERRIDES__ = {};
+    (pData.result || []).forEach(function(o) { if (o.espnId) window.__SANITY_PLAYER_OVERRIDES__[String(o.espnId)] = o; });
+  } catch(e) { console.log('Sanity player overrides error:', e.message); }
+  try {
+    var tQuery = encodeURIComponent('*[_type == "teamOverride"] { teamId, league, teamName, bio, histoire, saisonNote }');
+    var tResp = await fetch(base + tQuery, { headers: { 'Authorization': token } });
+    var tData = tResp.ok ? await tResp.json() : {};
+    window.__SANITY_TEAM_OVERRIDES__ = {};
+    (tData.result || []).forEach(function(o) { if (o.teamId && o.league) window.__SANITY_TEAM_OVERRIDES__[o.teamId + '_' + o.league] = o; });
+  } catch(e) { console.log('Sanity team overrides error:', e.message); }
+}
+
 fetchSanityArticles();
 fetchSanityVideos();
+fetchSanityOverrides();
 setInterval(fetchSanityArticles, 5*60*1000);
 setInterval(fetchSanityVideos, 5*60*1000);
+setInterval(fetchSanityOverrides, 10*60*1000);
 
 // Fetch injuries ESPN pour les 4 ligues
 window.__INJURIES__ = { NHL: [], NFL: [], NBA: [], MLB: [] };
