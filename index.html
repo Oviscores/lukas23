@@ -5635,11 +5635,21 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
   }
   // ─── NBA ROSTER ─────────────────────────────────────────
   if (liveRoster && lg === 'NBA') {
-    // ESPN retourne athletes groupés par position : [{position, items:[...]}]
-    // On aplatit en liste de joueurs avec pos injectée
-    var _rawAthletes = liveRoster.athletes || (liveRoster.roster && liveRoster.roster.athletes) || [];
+    // ESPN v3 retourne positionGroups : [{type, displayName, athletes:[...]}]
+    // On aplatit en liste de joueurs
+    var _rosterData = liveRoster.roster || liveRoster;
+    var _rawAthletes = _rosterData.athletes || [];
+    var _posGroups = _rosterData.positionGroups || [];
     var nbaAthletes = [];
-    if (_rawAthletes.length > 0 && _rawAthletes[0].items) {
+    if (_posGroups.length > 0) {
+      // Format v3 : positionGroups[].athletes[]
+      _posGroups.forEach(function(grp) {
+        (grp.athletes || []).forEach(function(p) {
+          nbaAthletes.push(p);
+        });
+      });
+    } else if (_rawAthletes.length > 0 && _rawAthletes[0].items) {
+      // Format v2 groupé par position
       _rawAthletes.forEach(function(grp) {
         (grp.items || []).forEach(function(p) {
           if (!p.position) p.position = grp.position;
@@ -5650,27 +5660,40 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
       nbaAthletes = _rawAthletes;
     }
 
-    // ── Construire statsMap depuis stats.nba.com commonteamroster ──────────
-    // Structure : liveRoster.stats.resultSets[0] = { headers:[...], rowSet:[[...]] }
-    // Headers incluent: PLAYER, PLAYER_ID, NUM, POSITION, plus stats si dispo
-    // On mappe par prénom+nom normalisé et par PLAYER_ID
-    var nbaStatsMap = {}; // { espnId: {pts, reb, ast, blk, gp}, nameLower: {...} }
-    var _nbaSets = liveRoster.stats && liveRoster.stats.resultSets;
-    if (_nbaSets) {
-      // commonteamroster : juste la liste des joueurs (pas de stats saisonnières)
-      // LeagueDashPlayerStats : stats par joueur si on l'appelle — pour l'instant on utilise STATS_PAGES
-    }
-    // Alimenter depuis window.STATS_PAGES.NBA (déjà chargé à l'init)
+    // ── Construire statsMap depuis ESPN v3 (stats embarquées par joueur) ──────────
+    var nbaStatsMap = {}; // { id: {pts, reb, ast} }
+    nbaAthletes.forEach(function(ath) {
+      if (!ath.id || !ath.statistics) return;
+      var cats = ath.statistics.splits && ath.statistics.splits.categories;
+      if (!cats) return;
+      var entry = {};
+      cats.forEach(function(cat) {
+        (cat.stats || []).forEach(function(sv) {
+          if (sv.name === 'avgPoints') entry.pts = parseFloat(sv.value).toFixed(1);
+          else if (sv.name === 'avgRebounds') entry.reb = parseFloat(sv.value).toFixed(1);
+          else if (sv.name === 'avgAssists') entry.ast = parseFloat(sv.value).toFixed(1);
+          else if (sv.name === 'avgBlocks') entry.blk = parseFloat(sv.value).toFixed(1);
+        });
+      });
+      nbaStatsMap[String(ath.id)] = entry;
+    });
+    // Compléter depuis window.STATS_PAGES.NBA pour joueurs non couverts
     var _sp = window.STATS_PAGES && window.STATS_PAGES.NBA;
     if (_sp && _sp.players) {
       _sp.players.forEach(function(cat) {
         (cat.data || []).forEach(function(row) {
           var nm = (row.name || '').toLowerCase().trim();
-          if (!nbaStatsMap[nm]) nbaStatsMap[nm] = {};
-          if (cat.label && cat.label.match(/point|pts/i)) nbaStatsMap[nm].pts = row.val;
-          else if (cat.label && cat.label.match(/rebond|reb/i)) nbaStatsMap[nm].reb = row.val;
-          else if (cat.label && cat.label.match(/passe|ast|assist/i)) nbaStatsMap[nm].ast = row.val;
-          else if (cat.label && cat.label.match(/contre|blk|block/i)) nbaStatsMap[nm].blk = row.val;
+          nbaAthletes.forEach(function(ath) {
+            var athNm = (ath.displayName || ath.fullName || '').toLowerCase().trim();
+            if (athNm === nm) {
+              var id = String(ath.id);
+              if (!nbaStatsMap[id]) nbaStatsMap[id] = {};
+              if (cat.label && cat.label.match(/point|pts/i) && nbaStatsMap[id].pts === undefined) nbaStatsMap[id].pts = row.val;
+              else if (cat.label && cat.label.match(/rebond|reb/i) && nbaStatsMap[id].reb === undefined) nbaStatsMap[id].reb = row.val;
+              else if (cat.label && cat.label.match(/passe|ast|assist/i) && nbaStatsMap[id].ast === undefined) nbaStatsMap[id].ast = row.val;
+              else if (cat.label && cat.label.match(/contre|blk|block/i) && nbaStatsMap[id].blk === undefined) nbaStatsMap[id].blk = row.val;
+            }
+          });
         });
       });
     }
@@ -5702,19 +5725,13 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
               var num = ath.jersey || '';
               var pos = (ath.position && ath.position.abbreviation) || (typeof ath.position === 'string' ? ath.position : '') || '';
               var bg = i%2===0 ? "transparent" : "rgba(0,0,0,0.025)";
-              // Chercher stats dans STATS_PAGES via nom normalisé
-              var spStats = nbaStatsMap[nomLow] || {};
-              // Fallback : stats ESPN embarquées dans ath.statistics si présentes
-              var espnStats = {};
-              if (ath.statistics && ath.statistics.splits) {
-                var total = ath.statistics.splits.find(function(s){ return s.name === 'All Splits' || s.type === 'total'; });
-                if (total && total.stats) { total.stats.forEach(function(sv){ espnStats[sv.name] = sv.value; }); }
-              }
-              var pts = spStats.pts !== undefined ? spStats.pts : (espnStats['points'] !== undefined ? parseFloat(espnStats['points']).toFixed(1) : '—');
-              var reb = spStats.reb !== undefined ? spStats.reb : (espnStats['rebounds'] !== undefined ? parseFloat(espnStats['rebounds']).toFixed(1) : '—');
-              var ast = spStats.ast !== undefined ? spStats.ast : (espnStats['assists'] !== undefined ? parseFloat(espnStats['assists']).toFixed(1) : '—');
-              var blk = spStats.blk !== undefined ? spStats.blk : (espnStats['blocks'] !== undefined ? parseFloat(espnStats['blocks']).toFixed(1) : '—');
-              var gp = espnStats['gamesPlayed'] || ath.gamesPlayed || '—';
+              // Stats depuis nbaStatsMap (ESPN v3 par joueur)
+              var pStats = nbaStatsMap[String(id)] || {};
+              var pts = pStats.pts !== undefined ? pStats.pts : '—';
+              var reb = pStats.reb !== undefined ? pStats.reb : '—';
+              var ast = pStats.ast !== undefined ? pStats.ast : '—';
+              var blk = pStats.blk !== undefined ? pStats.blk : '—';
+              var gp = ath.gamesPlayed || '—';
               return React.createElement("tr", { key: id || i, onClick: function(){ if(onPlayerClick && id) onPlayerClick(id, 'NBA'); }, style: { borderBottom:"1px solid rgba(0,0,0,0.05)", background: bg, cursor: "pointer" },
                 onMouseEnter: function(e){ e.currentTarget.style.background = lc + "12"; }, onMouseLeave: function(e){ e.currentTarget.style.background = bg; } },
                 React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", color:"#999" } }, num),
