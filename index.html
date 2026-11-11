@@ -4652,7 +4652,21 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
           })
         ]).then(function(results) {
           if (cancelled) return;
-          setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1] });
+          var athleteData = results[0];
+          // Si ESPN bloque (retourne {}), fallback sur cache roster + headshot ESPN direct
+          if (!athleteData || !athleteData.athlete || !athleteData.athlete.id) {
+            var cached = window.__ROSTER_CACHE__ && window.__ROSTER_CACHE__[String(nbaId)];
+            var cachedName = cached && cached.name ? cached.name : '';
+            var cachedTeam = cached && cached.team ? cached.team : {};
+            athleteData = { athlete: {
+              id: nbaId,
+              displayName: cachedName,
+              fullName: cachedName,
+              headshot: { href: 'https://a.espncdn.com/i/headshots/nba/players/full/' + nbaId + '.png' },
+              team: { abbreviation: typeof cachedTeam === 'object' ? (cachedTeam.id || '') : cachedTeam, displayName: typeof cachedTeam === 'object' ? (cachedTeam.name || '') : '' },
+            }};
+          }
+          setLiveData({ type: 'nba', athlete: athleteData, gamelog: results[1] });
           setLoading(false);
         }).catch(function(e) {
           if (!cancelled) { setFetchError(e.message); setLoading(false); }
@@ -9796,7 +9810,9 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     // Fallback: chercher dans le cache roster live (alimenté au rendu)
     var pCache = (!pStatic && window.__ROSTER_CACHE__) ? window.__ROSTER_CACHE__[idStr] : null;
     var pSlug = pStatic ? slugify(pStatic.name) : (pCache && pCache.name ? slugify(pCache.name) : slugify(idStr.replace(/^(nhl|nfl|nba|mlb)-/i,'')));
-    var tSlug = pStatic ? teamSlug(pStatic.team, lg) : (pCache && pCache.team ? teamSlug(pCache.team, lg) : 'equipe');
+    // pCache.team peut être un objet {id, name, ...} ou une string — extraire l'id dans les deux cas
+    var pCacheTeamId = pCache && pCache.team ? (typeof pCache.team === 'object' ? (pCache.team.id || '') : pCache.team) : null;
+    var tSlug = pStatic ? teamSlug(pStatic.team, lg) : (pCacheTeamId ? teamSlug(pCacheTeamId, lg) : 'equipe');
     if (pSlug) history.pushState({}, '', '/' + (lg||'').toLowerCase() + '/' + tSlug + '/' + pSlug);
   }
   function goMatch(m) {
