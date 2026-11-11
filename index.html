@@ -11010,7 +11010,7 @@ async function fetchSanityArticles() {
     var data = await resp.json();
     if (!data.result || !data.result.length) return;
     var sanityArts = data.result.map(function(a, i) {
-      return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null, teamId: a.teamId||null, teamLg: a.teamLg||null, youtubeId: a.youtubeId||null, ordre: (a.ordre != null ? a.ordre : 9999) };
+      return { id: 'sanity_'+(i+1), league: a.league||'NHL', tag: a.tag||'ACTUS', franchise: a.franchise||'', hot: a.hot||false, title: a.title||'', chapo: a.chapo||'', img: a.imageUrl||null, body: a.body ? portableTextToHTML(a.body) : null, publishedAt: a.publishedAt||'', matchId: a.matchId||null, matchLg: a.matchLg||null, teamId: a.teamId||null, teamLg: a.teamLg||null, youtubeId: a.youtubeId||null, ordre: (a.ordre != null ? a.ordre : 9999), players: a.players||[] };
     });
     window.__SANITY_ARTICLES__ = sanityArts;
     mergeAndSetFeed();
