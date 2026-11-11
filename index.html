@@ -4671,7 +4671,21 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
           })
         ]).then(function(results) {
           if (cancelled) return;
-          setLiveData({ type: 'nfl', athlete: results[0], gamelog: results[1] });
+          var athleteData = results[0];
+          // Si ESPN bloque (retourne {}), fallback sur cache roster + headshot ESPN direct
+          if (!athleteData || !athleteData.athlete || !athleteData.athlete.id) {
+            var cached = window.__ROSTER_CACHE__ && window.__ROSTER_CACHE__[String(nflId)];
+            var cachedName = cached && cached.name ? cached.name : '';
+            var cachedTeam = cached && cached.team ? cached.team : {};
+            athleteData = { athlete: {
+              id: nflId,
+              displayName: cachedName,
+              fullName: cachedName,
+              headshot: { href: 'https://a.espncdn.com/i/headshots/nfl/players/full/' + nflId + '.png' },
+              team: { abbreviation: typeof cachedTeam === 'object' ? (cachedTeam.id || '') : cachedTeam, displayName: typeof cachedTeam === 'object' ? (cachedTeam.name || '') : '' },
+            }};
+          }
+          setLiveData({ type: 'nfl', athlete: athleteData, gamelog: results[1] });
           setLoading(false);
         }).catch(function(e) {
           if (!cancelled) { setFetchError(e.message); setLoading(false); }
@@ -6146,7 +6160,7 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
         }
         else if (lg === 'NFL') {
           var nflSlug = NFL_ESPN_TEAMS[teamId];
-          if (nflSlug) endpoint = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + nflSlug + '/roster';
+          if (nflSlug) endpoint = PROXY + '?league=nfl_roster&team=' + nflSlug;
         }
         if (endpoint) {
           var r = await fetch(endpoint);
