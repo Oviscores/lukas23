@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name='impact-site-verification' value='9d6519ec-1bbf-4af0-b572-3fe47cdf098e'>
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
@@ -10802,6 +10802,8 @@ async function fetchSanityArticles() {
     });
     window.__SANITY_ARTICLES__ = sanityArts;
     mergeAndSetFeed();
+    // Mettre à jour og:image si on est sur une page article
+    if (typeof updateCanonical === 'function') updateCanonical();
   } catch(e) { console.log('Sanity error:', e.message); }
 }
 async function fetchSanityVideos() {
@@ -10929,6 +10931,29 @@ function updateCanonical() {
   can.setAttribute('href', href);
   var ogUrl = document.querySelector('meta[property="og:url"]');
   if (ogUrl) ogUrl.setAttribute('content', href);
+
+  // og:image dynamique pour les articles (après chargement Sanity)
+  var artMatch = pn.match(/^\/articles\/([^/]+)\/?$/);
+  if (artMatch && window.__SANITY_ARTICLES__) {
+    var slug = artMatch[1];
+    var art = window.__SANITY_ARTICLES__.find(function(a) {
+      if (!a.title) return false;
+      var s = typeof slugify === 'function'
+        ? slugify(a.title).slice(0, 80)
+        : a.title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0, 80);
+      return s === slug;
+    });
+    if (art && art.img) {
+      // Forcer la résolution 1200px minimum via Sanity image transform
+      var imgUrl = art.img.indexOf('?') === -1
+        ? art.img + '?w=1200&auto=format'
+        : art.img + '&w=1200&auto=format';
+      var ogImg = document.querySelector('meta[property="og:image"]');
+      if (ogImg) ogImg.setAttribute('content', imgUrl);
+      var twImg = document.querySelector('meta[name="twitter:image"]');
+      if (twImg) twImg.setAttribute('content', imgUrl);
+    }
+  }
 }
 updateCanonical();
 window.addEventListener('popstate', updateCanonical);
