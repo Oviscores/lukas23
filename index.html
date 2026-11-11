@@ -1018,6 +1018,56 @@ const PLAYERS_DB = {
       ]
     },
     {
+      id: "nhl-mercer",
+      name: "Dawson Mercer",
+      pos: "C",
+      team: "NJD",
+      jersey: 18,
+      born: "27 oct. 2001",
+      birthplace: "Harbour Grace, NL, Canada",
+      nationality: "Canada",
+      height: "1m83",
+      weight: "84kg",
+      shoots: "Droite",
+      contract: { years: "2022-2029", aav: "$5.75M", status: "Signé" },
+      draft: { year: 2021, round: 1, pick: 18, team: "New Jersey Devils" },
+      nhlId: 8482075,
+      bio: "Dawson Mercer est l'un des meilleurs jeunes centres des Devils du New Jersey. Repêché au 18e rang en 2021, il s'est immédiatement imposé en NHL avec une vitesse de progression remarquable. Buteur efficace et bon deux-sens, il est l'un des piliers offensifs de New Jersey.",
+      awards: ["Calder Trophy candidat 2023"],
+      statsType: ["GP", "G", "A", "PTS", "+/-", "PIM", "PPG"],
+      career: [
+        { season: "2021-22", team: "New Jersey Devils", lg: "NHL", gp: 74, g: 18, a: 22, pts: 40, plusMinus: "-8", pim: 22, ppg: 5 },
+        { season: "2022-23", team: "New Jersey Devils", lg: "NHL", gp: 82, g: 26, a: 33, pts: 59, plusMinus: "+22", pim: 30, ppg: 8 },
+        { season: "2023-24", team: "New Jersey Devils", lg: "NHL", gp: 79, g: 28, a: 29, pts: 57, plusMinus: "+5", pim: 26, ppg: 10 },
+        { season: "2024-25", team: "New Jersey Devils", lg: "NHL", gp: 71, g: 24, a: 31, pts: 55, plusMinus: "+8", pim: 20, ppg: 9 }
+      ],
+      gamelog: []
+    },
+    {
+      id: "nhl-jallen",
+      name: "Jake Allen",
+      pos: "G",
+      team: "NJD",
+      jersey: 34,
+      born: "15 août 1990",
+      birthplace: "Fredericton, NB, Canada",
+      nationality: "Canada",
+      height: "1m88",
+      weight: "90kg",
+      shoots: "Gauche",
+      contract: { years: "2023-2026", aav: "$2.35M", status: "Signé" },
+      draft: { year: 2008, round: 2, pick: 46, team: "St. Louis Blues" },
+      nhlId: 8474886,
+      bio: "Jake Allen est un gardien vétéran de la NHL. Après une longue carrière à St. Louis où il a remporté la Coupe Stanley en 2019, il joue désormais pour les Devils du New Jersey. Gardien expérimenté, il apporte stabilité et profondeur à l'équipe.",
+      awards: ["Coupe Stanley 2019"],
+      statsType: ["GP", "W", "L", "GAA", "SV%", "SO"],
+      career: [
+        { season: "2023-24", team: "New Jersey Devils", lg: "NHL", gp: 38, g: 0, a: 1, pts: 1, plusMinus: "0", pim: 2, ppg: 0 },
+        { season: "2024-25", team: "New Jersey Devils", lg: "NHL", gp: 42, g: 0, a: 0, pts: 0, plusMinus: "0", pim: 0, ppg: 0 }
+      ],
+      gamelog: []
+    },
+    {
       id: "nfl-mahomes",
       name: "Patrick Mahomes",
       pos: "QB",
@@ -4245,7 +4295,8 @@ function linkifyBody(html, lg, onPlayerClick, onTeamClick) {
     var parts = p.name.split(' ');
     var lastName = parts[parts.length - 1];
     entities.push({ text: p.name, type: 'player', id: p.id, slug: p.name });
-    if (lastName.length > 3) {
+    // N'ajouter le nom de famille seul que si > 5 chars (évite "Allen", "Rice", "Cook"... cross-sport)
+    if (lastName.length > 5) {
       entities.push({ text: lastName, type: 'player', id: p.id, slug: p.name });
     }
   });
@@ -4398,7 +4449,11 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick, on
     var parts = p.name.toLowerCase().split(' ');
     var lastName = parts[parts.length - 1];
     var firstName = parts[0];
-    return lastName.length > 3 && (artText.includes(lastName) || artText.includes(firstName + ' ' + lastName));
+    var fullName = firstName + ' ' + lastName;
+    // Noms de famille courts (≤5 chars) ou ambigus : exiger le nom complet pour éviter les faux positifs cross-sport
+    var needFullName = lastName.length <= 5;
+    if (needFullName) return artText.includes(fullName);
+    return artText.includes(lastName) || artText.includes(fullName);
   }).slice(0, 6);
   const lgTeams = TEAMS_DB[lg] || [];
   const linkedTeam = article.franchise ? lgTeams.filter(function(t) {
@@ -4587,9 +4642,14 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       } else if (lg === 'NBA') {
         var nbaId = isNumericId ? playerId : (staticP && staticP.espnId ? staticP.espnId : null);
         if (!nbaId) { setLoading(false); return; }
+        var PROXY_NBA = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
-          fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + nbaId).then(function(r){return r.json();}),
-          fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + nbaId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;})
+          fetch(PROXY_NBA + '?league=nba_player&id=' + nbaId).then(function(r){return r.json();}).catch(function(){
+            return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + nbaId).then(function(r){return r.json();}).catch(function(){return null;});
+          }),
+          fetch(PROXY_NBA + '?league=nba_gamelog&id=' + nbaId).then(function(r){return r.json();}).catch(function(){
+            return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + nbaId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;});
+          })
         ]).then(function(results) {
           if (cancelled) return;
           setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1] });
@@ -4601,9 +4661,14 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       } else if (lg === 'NFL') {
         var nflId = isNumericId ? playerId : (staticP && staticP.espnId ? staticP.espnId : null);
         if (!nflId) { setLoading(false); return; }
+        var PROXY_NFL = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
-          fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/athletes/' + nflId).then(function(r){return r.json();}),
-          fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/athletes/' + nflId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;})
+          fetch(PROXY_NFL + '?league=nfl_player&id=' + nflId).then(function(r){return r.json();}).catch(function(){
+            return fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/athletes/' + nflId).then(function(r){return r.json();}).catch(function(){return null;});
+          }),
+          fetch(PROXY_NFL + '?league=nfl_gamelog&id=' + nflId).then(function(r){return r.json();}).catch(function(){
+            return fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/athletes/' + nflId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;});
+          })
         ]).then(function(results) {
           if (cancelled) return;
           setLiveData({ type: 'nfl', athlete: results[0], gamelog: results[1] });
@@ -5559,7 +5624,6 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
     var _rawAthletes = liveRoster.athletes || (liveRoster.roster && liveRoster.roster.athletes) || [];
     var nbaAthletes = [];
     if (_rawAthletes.length > 0 && _rawAthletes[0].items) {
-      // Format ESPN groupé par position
       _rawAthletes.forEach(function(grp) {
         (grp.items || []).forEach(function(p) {
           if (!p.position) p.position = grp.position;
@@ -5569,6 +5633,32 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
     } else {
       nbaAthletes = _rawAthletes;
     }
+
+    // ── Construire statsMap depuis stats.nba.com commonteamroster ──────────
+    // Structure : liveRoster.stats.resultSets[0] = { headers:[...], rowSet:[[...]] }
+    // Headers incluent: PLAYER, PLAYER_ID, NUM, POSITION, plus stats si dispo
+    // On mappe par prénom+nom normalisé et par PLAYER_ID
+    var nbaStatsMap = {}; // { espnId: {pts, reb, ast, blk, gp}, nameLower: {...} }
+    var _nbaSets = liveRoster.stats && liveRoster.stats.resultSets;
+    if (_nbaSets) {
+      // commonteamroster : juste la liste des joueurs (pas de stats saisonnières)
+      // LeagueDashPlayerStats : stats par joueur si on l'appelle — pour l'instant on utilise STATS_PAGES
+    }
+    // Alimenter depuis window.STATS_PAGES.NBA (déjà chargé à l'init)
+    var _sp = window.STATS_PAGES && window.STATS_PAGES.NBA;
+    if (_sp && _sp.players) {
+      _sp.players.forEach(function(cat) {
+        (cat.data || []).forEach(function(row) {
+          var nm = (row.name || '').toLowerCase().trim();
+          if (!nbaStatsMap[nm]) nbaStatsMap[nm] = {};
+          if (cat.label && cat.label.match(/point|pts/i)) nbaStatsMap[nm].pts = row.val;
+          else if (cat.label && cat.label.match(/rebond|reb/i)) nbaStatsMap[nm].reb = row.val;
+          else if (cat.label && cat.label.match(/passe|ast|assist/i)) nbaStatsMap[nm].ast = row.val;
+          else if (cat.label && cat.label.match(/contre|blk|block/i)) nbaStatsMap[nm].blk = row.val;
+        });
+      });
+    }
+
     // Alimenter le cache roster pour goPlayer
     if (!window.__ROSTER_CACHE__) window.__ROSTER_CACHE__ = {};
     nbaAthletes.forEach(function(ath) {
@@ -5592,25 +5682,33 @@ function TeamRoster({ rosterData, liveRoster, rosterLoading, lg, lc, tc, team, o
             nbaAthletes.map(function(ath, i) {
               var id = ath.id;
               var nom = ath.displayName || ath.fullName || '';
+              var nomLow = nom.toLowerCase().trim();
               var num = ath.jersey || '';
-              var pos = (ath.position && ath.position.abbreviation) || '';
+              var pos = (ath.position && ath.position.abbreviation) || (typeof ath.position === 'string' ? ath.position : '') || '';
               var bg = i%2===0 ? "transparent" : "rgba(0,0,0,0.025)";
-              // stats from athlete.statistics if present
-              var stats = {};
+              // Chercher stats dans STATS_PAGES via nom normalisé
+              var spStats = nbaStatsMap[nomLow] || {};
+              // Fallback : stats ESPN embarquées dans ath.statistics si présentes
+              var espnStats = {};
               if (ath.statistics && ath.statistics.splits) {
                 var total = ath.statistics.splits.find(function(s){ return s.name === 'All Splits' || s.type === 'total'; });
-                if (total && total.stats) { var stArr = total.stats; stArr.forEach(function(sv){ stats[sv.name] = sv.value; }); }
+                if (total && total.stats) { total.stats.forEach(function(sv){ espnStats[sv.name] = sv.value; }); }
               }
+              var pts = spStats.pts !== undefined ? spStats.pts : (espnStats['points'] !== undefined ? parseFloat(espnStats['points']).toFixed(1) : '—');
+              var reb = spStats.reb !== undefined ? spStats.reb : (espnStats['rebounds'] !== undefined ? parseFloat(espnStats['rebounds']).toFixed(1) : '—');
+              var ast = spStats.ast !== undefined ? spStats.ast : (espnStats['assists'] !== undefined ? parseFloat(espnStats['assists']).toFixed(1) : '—');
+              var blk = spStats.blk !== undefined ? spStats.blk : (espnStats['blocks'] !== undefined ? parseFloat(espnStats['blocks']).toFixed(1) : '—');
+              var gp = espnStats['gamesPlayed'] || ath.gamesPlayed || '—';
               return React.createElement("tr", { key: id || i, onClick: function(){ if(onPlayerClick && id) onPlayerClick(id, 'NBA'); }, style: { borderBottom:"1px solid rgba(0,0,0,0.05)", background: bg, cursor: "pointer" },
                 onMouseEnter: function(e){ e.currentTarget.style.background = lc + "12"; }, onMouseLeave: function(e){ e.currentTarget.style.background = bg; } },
                 React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", color:"#999" } }, num),
                 React.createElement("td", { style: { padding:"6px 10px", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800 } }, nom),
                 React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", color:"#666" } }, pos),
-                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, stats['gamesPlayed'] || ath.gamesPlayed || '—'),
-                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, color:lc, fontSize:13 } }, stats['points'] !== undefined ? parseFloat(stats['points']).toFixed(1) : '—'),
-                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, stats['rebounds'] !== undefined ? parseFloat(stats['rebounds']).toFixed(1) : '—'),
-                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, stats['assists'] !== undefined ? parseFloat(stats['assists']).toFixed(1) : '—'),
-                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, stats['blocks'] !== undefined ? parseFloat(stats['blocks']).toFixed(1) : '—')
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, gp),
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, color:lc, fontSize:13 } }, pts),
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, reb),
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, ast),
+                React.createElement("td", { style: { padding:"6px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif" } }, blk)
               );
             })
           )
