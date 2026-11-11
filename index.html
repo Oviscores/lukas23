@@ -4444,17 +4444,24 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick, on
   var related = sameTeam.concat(sameLg).slice(0, 4);
 
   // ── Maillage : joueurs cités dans l'article ──
+  // Priorité 1 : joueurs ajoutés manuellement dans Sanity (article.players)
+  var sanityPlayers = (article.players || []).map(function(p) {
+    return { id: p.espnId, espnId: p.espnId, name: p.name, pos: p.position || '', team: p.team || '', league: p.league || lg, fromSanity: true };
+  });
+  // Priorité 2 : détection auto dans le texte (PLAYERS_DB) — on exclut ceux déjà dans Sanity
+  var sanityIds = new Set(sanityPlayers.map(function(p) { return p.espnId; }));
   var lgPlayers = PLAYERS_DB[lg] || [];
-  var citedPlayers = lgPlayers.filter(function(p) {
+  var autoCited = lgPlayers.filter(function(p) {
+    if (sanityIds.has(p.espnId) || sanityIds.has(p.id)) return false;
     var parts = p.name.toLowerCase().split(' ');
     var lastName = parts[parts.length - 1];
     var firstName = parts[0];
     var fullName = firstName + ' ' + lastName;
-    // Noms de famille courts (≤5 chars) ou ambigus : exiger le nom complet pour éviter les faux positifs cross-sport
     var needFullName = lastName.length <= 5;
     if (needFullName) return artText.includes(fullName);
     return artText.includes(lastName) || artText.includes(fullName);
-  }).slice(0, 6);
+  }).slice(0, Math.max(0, 6 - sanityPlayers.length));
+  var citedPlayers = sanityPlayers.concat(autoCited);
   const lgTeams = TEAMS_DB[lg] || [];
   const linkedTeam = article.franchise ? lgTeams.filter(function(t) {
     return t.id === article.franchise;
@@ -4490,22 +4497,27 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick, on
     ),
     article.teamId && React.createElement(TeamCardInArticle, { teamId: article.teamId, teamLg: article.teamLg || article.league, onTeamClick: onTeamClick }),
     citedPlayers.length > 0 && React.createElement("div", { style: { background: "rgba(255,255,255,0.75)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginTop: 14 } },
-      React.createElement("div", { style: { background: "#111", padding: "4px 16px" } },
-        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "JOUEURS CITÉS")
+      React.createElement("div", { style: { background: "#111", padding: "7px 16px" } },
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "JOUEURS CITÉS")
       ),
-      React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, padding: "12px 16px" } },
+      React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 10, padding: "14px 16px" } },
         citedPlayers.map(function(p, i) {
-          return React.createElement("div", { key: i, onClick: function() { if (onPlayerClick) onPlayerClick(p.id, lg); },
-            style: { display: "flex", alignItems: "center", gap: 8, background: lc + "10", border: "1px solid " + lc + "30", borderRadius: 4, padding: "6px 12px", cursor: "pointer", transition: "background 0.15s" },
-            onMouseEnter: function(e) { e.currentTarget.style.background = lc + "25"; },
-            onMouseLeave: function(e) { e.currentTarget.style.background = lc + "10"; }
+          var pLg = p.league || lg;
+          var espnId = p.espnId || p.nhlId || p.mlbId || p.id || '';
+          var photoSport = pLg === 'NHL' ? 'hockey/nhl' : pLg === 'NFL' ? 'football/nfl' : pLg === 'MLB' ? 'baseball/mlb' : 'basketball/nba';
+          var photoUrl = espnId && /^\d+$/.test(String(espnId)) ? 'https://a.espncdn.com/i/headshots/' + photoSport + '/players/full/' + espnId + '.png' : null;
+          return React.createElement("div", { key: i, onClick: function() { if (onPlayerClick) onPlayerClick(p.id || espnId, pLg); },
+            style: { display: "flex", alignItems: "center", gap: 10, background: lc + "0d", border: "1px solid " + lc + "40", borderRadius: 6, padding: "8px 14px 8px 8px", cursor: "pointer", transition: "background 0.15s", minWidth: 160 },
+            onMouseEnter: function(e) { e.currentTarget.style.background = lc + "22"; },
+            onMouseLeave: function(e) { e.currentTarget.style.background = lc + "0d"; }
           },
-            getTeamLogo(p.team, lg, 16),
+            getTeamLogo(p.team, pLg, 20),
+            photoUrl && React.createElement("img", { src: photoUrl, alt: p.name, style: { width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top", background: "#eee", border: "2px solid " + lc + "44", flexShrink: 0 }, onError: function(e){ e.target.style.display='none'; } }),
             React.createElement("div", null,
-              React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#111" } }, p.name),
-              React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 8, color: "#999" } }, p.pos + " · " + p.team)
+              React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#111" } }, p.name),
+              React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#777" } }, (p.pos ? p.pos + " · " : "") + (p.team || '') )
             ),
-            React.createElement("span", { style: { color: "#ccc", fontSize: 11, marginLeft: 4 } }, "›")
+            React.createElement("span", { style: { color: "#bbb", fontSize: 13, marginLeft: "auto" } }, "›")
           );
         })
       )
