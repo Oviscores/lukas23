@@ -4715,25 +4715,48 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       } else if (lg === 'NBA') {
         var nbaId = isNumericId ? playerId : (staticP && staticP.espnId ? staticP.espnId : null);
         if (!nbaId && !isNumericId) {
-          var playerNameFromSlug = playerId.replace(/-/g, ' ');
-          fetch('https://site.web.api.espn.com/apis/common/v3/search?query=' + encodeURIComponent(playerNameFromSlug) + '&limit=1&type=player&sport=basketball')
+          // Résolution via roster de l'équipe (slug URL → ESPN team ID → cherche joueur par nom)
+          var NBA_SLUG_TO_ESPN = {
+            'atlanta-hawks':'1','brooklyn-nets':'17','boston-celtics':'2','charlotte-hornets':'30',
+            'chicago-bulls':'4','cleveland-cavaliers':'5','dallas-mavericks':'6','denver-nuggets':'7',
+            'detroit-pistons':'8','golden-state-warriors':'9','houston-rockets':'10','indiana-pacers':'11',
+            'los-angeles-clippers':'12','los-angeles-lakers':'13','memphis-grizzlies':'29','miami-heat':'14',
+            'milwaukee-bucks':'15','minnesota-timberwolves':'16','new-orleans-pelicans':'3','new-york-knicks':'18',
+            'oklahoma-city-thunder':'25','orlando-magic':'19','philadelphia-76ers':'20','phoenix-suns':'21',
+            'portland-trail-blazers':'22','sacramento-kings':'23','san-antonio-spurs':'24','toronto-raptors':'28',
+            'utah-jazz':'26','washington-wizards':'27'
+          };
+          // teamSlug vient du path : lg/teamSlug/playerSlug
+          var pathParts = window.location.pathname.split('/').filter(Boolean);
+          var teamSlugFromPath = pathParts[1] || '';
+          var espnTeamId = NBA_SLUG_TO_ESPN[teamSlugFromPath];
+          var playerNameFromSlug = playerId.replace(/-/g, ' ').toLowerCase();
+          var PROXY_NBA_R = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+          if (!espnTeamId) { setLoading(false); return; }
+          fetch(PROXY_NBA_R + '?league=nba_roster&team=' + espnTeamId)
             .then(function(r) { return r.json(); })
             .then(function(d) {
               if (cancelled) return;
-              var hit = (d.items || [])[0];
-              if (!hit || !hit.id) { setLoading(false); return; }
-              var resolvedId = hit.id;
-              var PROXY_NBA2 = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+              var athletes = d.athletes || [];
+              // ESPN roster peut retourner un tableau de groupes
+              var allPlayers = [];
+              athletes.forEach(function(item) {
+                if (item.items) item.items.forEach(function(p) { allPlayers.push(p); });
+                else allPlayers.push(item);
+              });
+              var found = allPlayers.find(function(p) {
+                var nm = (p.displayName || p.fullName || '').toLowerCase();
+                return nm === playerNameFromSlug || nm.replace(/[^a-z ]/g,'') === playerNameFromSlug.replace(/[^a-z ]/g,'');
+              });
+              if (!found || !found.id) { setLoading(false); return; }
+              var resolvedId = found.id;
               Promise.all([
-                fetch(PROXY_NBA2 + '?league=nba_player&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
-                  return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;});
-                }),
-                fetch(PROXY_NBA2 + '?league=nba_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
-                  return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + resolvedId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;});
-                })
+                fetch(PROXY_NBA_R + '?league=nba_player&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}),
+                fetch(PROXY_NBA_R + '?league=nba_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}),
+                fetch(PROXY_NBA_R + '?league=nba_stats&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;})
               ]).then(function(results) {
                 if (cancelled) return;
-                setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1] });
+                setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1], stats: results[2] });
                 setLoading(false);
               }).catch(function() { if (!cancelled) setLoading(false); });
             })
@@ -4743,29 +4766,23 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
         if (!nbaId) { setLoading(false); return; }
         var PROXY_NBA = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
-          fetch(PROXY_NBA + '?league=nba_player&id=' + nbaId).then(function(r){return r.json();}).catch(function(){
-            return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + nbaId).then(function(r){return r.json();}).catch(function(){return null;});
-          }),
-          fetch(PROXY_NBA + '?league=nba_gamelog&id=' + nbaId).then(function(r){return r.json();}).catch(function(){
-            return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + nbaId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;});
-          })
+          fetch(PROXY_NBA + '?league=nba_player&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}),
+          fetch(PROXY_NBA + '?league=nba_gamelog&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}),
+          fetch(PROXY_NBA + '?league=nba_stats&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;})
         ]).then(function(results) {
           if (cancelled) return;
           var athleteData = results[0];
-          // Si ESPN bloque (retourne {}), fallback sur cache roster + headshot ESPN direct
           if (!athleteData || !athleteData.athlete || !athleteData.athlete.id) {
             var cached = window.__ROSTER_CACHE__ && window.__ROSTER_CACHE__[String(nbaId)];
             var cachedName = cached && cached.name ? cached.name : '';
             var cachedTeam = cached && cached.team ? cached.team : {};
             athleteData = { athlete: {
-              id: nbaId,
-              displayName: cachedName,
-              fullName: cachedName,
+              id: nbaId, displayName: cachedName, fullName: cachedName,
               headshot: { href: 'https://a.espncdn.com/i/headshots/nba/players/full/' + nbaId + '.png' },
               team: { abbreviation: typeof cachedTeam === 'object' ? (cachedTeam.id || '') : cachedTeam, displayName: typeof cachedTeam === 'object' ? (cachedTeam.name || '') : '' },
             }};
           }
-          setLiveData({ type: 'nba', athlete: athleteData, gamelog: results[1] });
+          setLiveData({ type: 'nba', athlete: athleteData, gamelog: results[1], stats: results[2] });
           setLoading(false);
         }).catch(function(e) {
           if (!cancelled) { setFetchError(e.message); setLoading(false); }
@@ -5233,16 +5250,29 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
   // ─── Render NBA ──────────────────────────────────
   if (liveData && liveData.type === 'nba') {
     var ath = (liveData.athlete && liveData.athlete.athlete) || {};
-    var statsGroups = (ath.statisticsGroups || ath.statistics || []);
-    // Trouver les stats saison régulière
-    var seasonStats = null;
-    if (ath.statistics && ath.statistics.splits) {
-      var totSplit = ath.statistics.splits.find(function(s){ return s.name === 'All Splits' || s.name === 'Total'; });
-      if (totSplit) seasonStats = totSplit.stats;
-    }
+    // Stats saison : athlete.statsSummary.statistics (PTS, REB, AST, FG%...)
+    var seasonStatCats = (ath.statsSummary && ath.statsSummary.statistics && ath.statsSummary.statistics.length)
+      ? ath.statsSummary.statistics : [];
+    var seasonStatLabel = (ath.statsSummary && ath.statsSummary.displayName) ? ath.statsSummary.displayName.toUpperCase() : 'STATS SAISON EN COURS';
+    // Gamelog match par match
     var glRaw = liveData.gamelog;
     var glEvents = (glRaw && glRaw.events) ? Object.values(glRaw.events).slice(0, 20) : [];
     var glLabels = (glRaw && glRaw.labels) ? glRaw.labels : [];
+    // Carrière par saison depuis nba_stats
+    var statsRaw = liveData.stats || {};
+    // ESPN common/v3 stats retourne splits[] avec type=total et name=season par saison
+    var careerSplits = [];
+    var statsLabels = [];
+    if (statsRaw.splits && statsRaw.splits.length) {
+      // Format: { splits: [{displayName, stats:[], type, ...}], labels:[] }
+      statsLabels = statsRaw.labels || [];
+      careerSplits = statsRaw.splits.filter(function(s){ return s.type === 'total' || s.type === 'season'; }).slice(0, 15);
+    } else if (statsRaw.groups && statsRaw.groups.length) {
+      // Format alternatif statisticslog
+      var grp = statsRaw.groups[0];
+      statsLabels = (grp.statistics || []).map(function(s){ return s.abbreviation || s.name; });
+      careerSplits = (grp.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 15);
+    }
     return React.createElement("div", { style: { minHeight: "100vh" } },
       React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } },
         React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: "#999", cursor: "pointer", fontFamily: "'Barlow',sans-serif", fontSize: 10 } }, "← Retour"),
@@ -5257,7 +5287,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, p.jersey ? "#" + p.jersey : p.pos)
           ),
           React.createElement("div", { style: { flex: 1, minWidth: 200 } },
-            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + (p.jersey ? " · #" + p.jersey : "") + " · " + p.teamFull + " · NBA · ID " + (p.id || playerIdRaw)),
+            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em", marginBottom: 4 } }, p.pos + (p.jersey ? " · #" + p.jersey : "") + " · " + p.teamFull + " · NBA"),
             React.createElement("h1", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1, margin: "0 0 10px" } }, p.name),
             React.createElement("div", { style: { display: "flex", gap: 16, flexWrap: "wrap" } },
               [
@@ -5265,6 +5295,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                 { l: "Lieu", v: p.birthplace },
                 { l: "Taille", v: p.height },
                 { l: "Poids", v: p.weight },
+                { l: "Expérience", v: ath.displayExperience || '' },
               ].filter(function(s){ return s.v; }).map(function(s, i) {
                 return React.createElement("div", { key: i },
                   React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 7, color: "rgba(255,255,255,0.45)" } }, s.l),
@@ -5274,28 +5305,24 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             )
           )
         ),
-        // Stats saison en cours via espn athlete stats
-        (function(){
-          var statsCategories = (ath.statisticsGroups && ath.statisticsGroups[0] && ath.statisticsGroups[0].statistics) ? ath.statisticsGroups[0].statistics : [];
-          if (!statsCategories.length) return null;
-          return React.createElement("div", { style: bs },
-            React.createElement(Hd, { label: "STATS SAISON EN COURS — " + p.name.toUpperCase() }),
-            React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 0 } },
-              statsCategories.slice(0, 12).map(function(stat, i) {
-                return React.createElement("div", { key: i, style: { flex: "1 1 80px", textAlign: "center", padding: "14px 10px", borderRight: "1px solid rgba(0,0,0,0.05)", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
-                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: lc } }, stat.value !== undefined ? (parseFloat(stat.value) === stat.value && !Number.isInteger(stat.value) ? parseFloat(stat.value).toFixed(1) : stat.value) : '—'),
-                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, color: "#aaa", letterSpacing: "0.08em", marginTop: 2 } }, stat.name || stat.abbreviation || '')
-                );
-              })
-            )
-          );
-        })(),
+        // Stats saison en cours (PTS, REB, AST, FG% depuis statsSummary)
+        seasonStatCats.length > 0 && React.createElement("div", { style: bs },
+          React.createElement(Hd, { label: seasonStatLabel + " — " + p.name.toUpperCase() }),
+          React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 0 } },
+            seasonStatCats.map(function(stat, i) {
+              return React.createElement("div", { key: i, style: { flex: "1 1 80px", textAlign: "center", padding: "14px 10px", borderRight: "1px solid rgba(0,0,0,0.05)", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 900, color: lc } }, stat.displayValue || stat.value || '—'),
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, color: "#aaa", letterSpacing: "0.08em", marginTop: 2 } }, stat.abbreviation || stat.shortDisplayName || stat.name || '')
+              );
+            })
+          )
+        ),
         // Draft
         p.draft && React.createElement("div", { style: Object.assign({}, bs, { padding: "12px 16px" }) },
           React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "#aaa", letterSpacing: "0.08em", marginBottom: 6 } }, "REPÊCHAGE"),
-          React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: "#111" } }, p.draft.year + " · Ronde " + p.draft.round + ", " + p.draft.pick + "e choix")
+          React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: "#111" } }, p.draft.year + " · Ronde " + p.draft.round + ", " + p.draft.pick + "e choix · " + (p.draft.team || ''))
         ),
-        // Game log NBA
+        // Gamelog match par match
         glEvents.length > 0 && React.createElement("div", { style: bs },
           React.createElement(Hd, { label: "DERNIERS MATCHS — " + p.name.toUpperCase() }),
           React.createElement("div", { style: { overflowX: "auto" } },
@@ -5313,13 +5340,40 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var opp = ev.opponent && ev.opponent.abbreviation ? ev.opponent.abbreviation : '—';
                   var won = ev.gameResult === 'W';
                   var score = ev.score || '';
-                  var stats = (ev.stats || []).slice(0, 10);
+                  var evStats = (ev.stats || []).slice(0, 10);
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, ev.gameDate || ''),
                     React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700 } }, (home ? 'vs ' : '@ ') + opp),
                     React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: won?"#16a34a":"#ef4444", background: won?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, score)),
-                    stats.map(function(v, vi) {
-                      return React.createElement("td", { key: vi, style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 2 ? 12 : 9, fontWeight: vi === 2 ? 900 : 400, color: vi === 2 && parseInt(v) > 25 ? lc : "#333" } }, v);
+                    evStats.map(function(v, vi) {
+                      return React.createElement("td", { key: vi, style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 0 ? 12 : 9, fontWeight: vi === 0 ? 900 : 400, color: vi === 0 && parseInt(v) > 25 ? lc : "#333" } }, v);
+                    })
+                  );
+                })
+              )
+            )
+          )
+        ),
+        // Carrière par saison
+        careerSplits.length > 0 && React.createElement("div", { style: bs },
+          React.createElement(Hd, { label: "STATISTIQUES CARRIÈRE — " + p.name.toUpperCase() }),
+          React.createElement("div", { style: { overflowX: "auto" } },
+            React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
+              React.createElement("thead", null,
+                React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
+                  ["SAISON","ÉQUIPE"].concat(statsLabels.slice(0, 10)).map(function(h, i) {
+                    return React.createElement("th", { key: i, style: { padding: "5px 8px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
+                  })
+                )
+              ),
+              React.createElement("tbody", null,
+                careerSplits.map(function(sp, i) {
+                  var spStats = (sp.stats || []).slice(0, 10);
+                  return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
+                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, whiteSpace: "nowrap" } }, sp.displayName || sp.season || ''),
+                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555" } }, sp.team || ''),
+                    spStats.map(function(v, vi) {
+                      return React.createElement("td", { key: vi, style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#333" } }, v !== undefined && v !== null ? v : '—');
                     })
                   );
                 })
