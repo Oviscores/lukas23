@@ -5163,7 +5163,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
                   (p.isGoalie ? ["SAISON","ÉQUIPE","PJ","V","D","BL","%ARR","MPB"] : ["SAISON","ÉQUIPE","PJ","B","A","PTS","+/-","PIM","PPB"]).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: i === (p.isGoalie ? 6 : 3) ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i === (p.isGoalie ? 6 : 3) ? lc : (i < 2 ? "#666" : lc + "99"), whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5171,7 +5171,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                 (p.career || []).map(function(s, i) {
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", whiteSpace: "nowrap" } }, s.season),
-                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, s.team),
+                    React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(s.team, 'NHL', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, s.team))),
                     p.isGoalie ?
                     [s.gp, s.g, s.a, s.pim, s.sv, s.gaa].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 4 ? 13 : 11, fontWeight: vi === 4 ? 900 : 400, color: vi === 4 ? lc : "#333" } }, v || "—"); }) :
                     [s.gp, s.g, s.a, s.pts, s.pm !== undefined ? ((s.pm > 0 ? '+' : '') + s.pm) : '—', s.pim, s.ppg].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 3 ? 14 : 11, fontWeight: vi === 3 ? 900 : 400, color: vi === 3 ? lc : "#333" } }, v !== undefined && v !== null ? v : "—"); })
@@ -5196,7 +5196,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
                   (p.isGoalie ? ["DATE","ADV","H/V","DÉC","TIR","MPB","%ARR","BL"] : ["DATE","ADV","H/V","RÉS","B","A","PTS","+/-","TIR","TOI"]).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 3 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 3 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 3 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5211,7 +5211,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   if (p.isGoalie) {
                     return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                       React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, date),
-                      React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp),
+                      React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(opp, 'NHL', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp))),
                       React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888" } }, ha),
                       React.createElement("td", { style: { padding: "7px 10px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: dec==='W'?"#16a34a":"#ef4444", background: dec==='W'?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, dec || score)),
                       React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } }, g.shotsAgainst || '—'),
@@ -5224,7 +5224,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var pm = g.plusMinus || 0;
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, date),
-                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp),
+                    React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(opp, 'NHL', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp))),
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888" } }, ha),
                     React.createElement("td", { style: { padding: "7px 10px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: won?"#16a34a":"#ef4444", background: won?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, score)),
                     React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } }, g.goals || 0),
@@ -5359,7 +5359,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
                   ["DATE","ADV","RÉS"].concat(glLabels.slice(0, 10)).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 3 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5378,7 +5378,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   }
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, dateStr),
-                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, (home ? 'vs ' : '@ ') + opp),
+                    React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(opp, 'NBA', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, (home ? 'vs ' : '@ ') + opp))),
                     React.createElement("td", { style: { padding: "7px 10px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: won?"#16a34a":"#ef4444", background: won?"#16a34a18":"#ef444418", padding:"2px 6px", borderRadius:2 } }, score)),
                     evStats.map(function(v, vi) {
                       return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 0 ? 14 : 11, fontWeight: vi === 0 ? 900 : 400, color: vi === 0 && parseInt(v) > 25 ? lc : "#333" } }, v);
@@ -5397,7 +5397,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
                   ["SAISON","ÉQUIPE"].concat(statsLabels.slice(0, 10)).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: i === 4 ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 2 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5406,7 +5406,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var spStats = (sp.stats || []).slice(0, 10);
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" } }, sp.displayName || sp.season || ''),
-                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, sp.team || ''),
+                    React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(sp.team, 'NBA', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, sp.team || ''))),
                     spStats.map(function(v, vi) {
                       return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 2 ? 14 : 11, fontWeight: vi === 2 ? 900 : 400, color: vi === 2 ? lc : "#333" } }, v !== undefined && v !== null ? v : '—');
                     })
@@ -5536,7 +5536,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
                   ["DATE","ADV","RÉS"].concat(glLabels.slice(0, 12)).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 3 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5553,7 +5553,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   }
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, nflDateStr),
-                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, (ev.atVs === 'vs' ? 'vs ' : '@ ') + opp),
+                    React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(opp, 'NFL', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, (ev.atVs === 'vs' ? 'vs ' : '@ ') + opp))),
                     React.createElement("td", { style: { padding: "7px 10px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: won?"#16a34a":"#ef4444", background: won?"#16a34a18":"#ef444418", padding:"2px 6px", borderRadius:2 } }, score)),
                     stats.map(function(v, vi) {
                       return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 0 ? 14 : 11, fontWeight: vi === 0 ? 900 : 400, color: "#333" } }, v);
@@ -5572,7 +5572,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
                   ["SAISON","ÉQUIPE"].concat(nflStatsLabels.slice(0, 12)).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 2 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5581,7 +5581,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var spStats = (sp.stats || []).slice(0, 12);
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" } }, sp.displayName || sp.season || ''),
-                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, sp.team || ''),
+                    React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(sp.team, 'NFL', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, sp.team || ''))),
                     spStats.map(function(v, vi) {
                       return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 2 ? 14 : 11, fontWeight: vi === 2 ? 900 : 400, color: "#333" } }, v !== undefined && v !== null ? v : '—');
                     })
@@ -5673,7 +5673,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                     ["SAISON","ÉQUIPE","PJ","V","D","K","MPB","WHIP","IP"] :
                     ["SAISON","ÉQUIPE","PJ","AB","AVG","HR","RBI","R","SB","OPS"]
                   ).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: i === (isPitcher ? 5 : 4) ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 2 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5684,7 +5684,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var season = sp.season || '';
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111" } }, season),
-                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, team),
+                    React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(team, 'MLB', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, team))),
                     isPitcher ?
                     [s.gamesPlayed, s.wins, s.losses, s.strikeOuts, s.era, s.whip, s.inningsPitched].map(function(v, vi) {
                       return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 4 ? 13 : 11, fontWeight: vi === 4 ? 900 : 400, color: vi === 4 ? lc : "#333" } }, v || '—');
@@ -5709,7 +5709,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                     ["DATE","ADV","DÉC","IP","H","R","ER","BB","K","MPB"] :
                     ["DATE","ADV","AB","H","HR","RBI","R","BB","K","AVG"]
                   ).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 2 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5721,7 +5721,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var dec = s.note || '';
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, date),
-                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp),
+                    React.createElement("td", { style: { padding: "7px 10px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(opp, 'MLB', 18), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp))),
                     isPitcher ?
                     [dec || (s.wins ? 'V' : s.losses ? 'D' : '—'), s.inningsPitched, s.hits, s.runs, s.earnedRuns, s.baseOnBalls, s.strikeOuts, s.era].map(function(v, vi) {
                       return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 7 ? 13 : 11, fontWeight: vi === 7 ? 900 : 400, color: vi === 7 ? lc : vi === 0 ? (v === 'V' ? "#16a34a" : v === 'D' ? "#ef4444" : "#999") : "#333" } }, v !== undefined ? v : '—');
@@ -5770,16 +5770,16 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
   }))), p.bio && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "PR\xC9SENTATION \u2014 " + p.name.toUpperCase() }), /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px" } }, /* @__PURE__ */ React.createElement("p", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 12, lineHeight: 1.7, color: "#333", margin: 0 } }, p.bio))), p.awards && p.awards.length > 0 && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "PALMAR\xC8S \u2014 " + p.name.toUpperCase() }), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 4, padding: "10px 14px" } }, p.awards.map(function(a, i) {
     return /* @__PURE__ */ React.createElement("span", { key: i, style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 700, color: lc, background: lc + "18", border: "1px solid " + lc + "44", padding: "2px 7px", borderRadius: 2 } }, a);
   }))), /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "STATISTIQUES CARRI\xC8RE \u2014 " + p.name.toUpperCase() }), /* @__PURE__ */ React.createElement("div", { style: { overflowX: "auto" } }, /* @__PURE__ */ React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } }, ["SAISON", "\xC9QUIPE", "LIGUE", "PJ", "B", "A", "PTS", "+/-", "PIM", "PPB", "BEG", "TIR%"].map(function(h, i) {
-    return /* @__PURE__ */ React.createElement("th", { key: i, style: { padding: "6px 10px", textAlign: i < 3 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 800, color: i === 6 ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
+    return /* @__PURE__ */ React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 3 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 3 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
   }))), /* @__PURE__ */ React.createElement("tbody", null, (p.career || []).map(function(s, i) {
-    return /* @__PURE__ */ React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } }, /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "#111", whiteSpace: "nowrap" } }, s.season), /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555" } }, s.team), /* @__PURE__ */ React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "#888" } }, s.lg), [s.gp, s.g, s.a, s.pts, s.pm, s.pim, s.ppg, s.ev, s.sp].map(function(v, vi) {
+    return /* @__PURE__ */ React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } }, /* @__PURE__ */ React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", whiteSpace: "nowrap" } }, s.season), /* @__PURE__ */ React.createElement("td", { style: { padding: "7px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(s.team, s.lg || lg, 18), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, s.team))), /* @__PURE__ */ React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888" } }, s.lg), [s.gp, s.g, s.a, s.pts, s.pm, s.pim, s.ppg, s.ev, s.sp].map(function(v, vi) {
       return /* @__PURE__ */ React.createElement("td", { key: vi, style: { padding: "6px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 3 ? 12 : 9, fontWeight: vi === 3 ? 900 : 400, color: vi === 3 ? lc : "#333" } }, v || "-");
     }));
   }))))), gamelog.length > 0 && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(Hd, { label: "DERNIERS MATCHS \u2014 " + p.name.toUpperCase() }), /* @__PURE__ */ React.createElement("div", { style: { overflowX: "auto" } }, /* @__PURE__ */ React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } }, ["DATE", "ADV", "H/V", "R\xC9S", "B", "A", "PTS", "+/-", "TIR", "TOI"].map(function(h, i) {
-    return /* @__PURE__ */ React.createElement("th", { key: i, style: { padding: "5px 10px", textAlign: i < 3 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 800, color: i === 4 ? lc : i === 5 ? lc : i === 6 ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
+    return /* @__PURE__ */ React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 3 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: i < 3 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
   }))), /* @__PURE__ */ React.createElement("tbody", null, gamelog.map(function(g, i) {
     const won = g.res === "V";
-    return /* @__PURE__ */ React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } }, /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, g.date), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "#111" } }, g.opp), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "#888" } }, g.ha), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: won ? "#16a34a" : "#ef4444", background: won ? "#16a34a18" : "#ef444418", padding: "1px 6px", borderRadius: 2 } }, g.res)), [g.g, g.a, g.pts].map(function(v, vi) {
+    return /* @__PURE__ */ React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } }, /* @__PURE__ */ React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, g.date), /* @__PURE__ */ React.createElement("td", { style: { padding: "7px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(g.opp, lg, 18), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111" } }, g.opp))), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "#888" } }, g.ha), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: won ? "#16a34a" : "#ef4444", background: won ? "#16a34a18" : "#ef444418", padding: "1px 6px", borderRadius: 2 } }, g.res)), [g.g, g.a, g.pts].map(function(v, vi) {
       return /* @__PURE__ */ React.createElement("td", { key: vi, style: { padding: "5px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 2 ? 13 : 10, fontWeight: vi === 2 ? 900 : vi > 0 && v > 0 ? 700 : 400, color: vi === 2 && g.pts > 2 ? lc : vi === 2 ? "#333" : "#555" } }, v);
     }), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: g.pm.startsWith("+") ? lc : "#ef4444" } }, g.pm), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555" } }, g.sog), /* @__PURE__ */ React.createElement("td", { style: { padding: "5px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#888" } }, g.toi));
   }))))),
