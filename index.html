@@ -4752,10 +4752,11 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               var resolvedId = found.id;
               Promise.all([
                 fetch(PROXY_NBA_R + '?league=nba_player&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}),
-                fetch(PROXY_NBA_R + '?league=nba_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;})
+                fetch(PROXY_NBA_R + '?league=nba_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}),
+                fetch(PROXY_NBA_R + '?league=nba_stats&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;})
               ]).then(function(results) {
                 if (cancelled) return;
-                setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1], stats: null });
+                setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1], stats: results[2] });
                 setLoading(false);
               }).catch(function() { if (!cancelled) setLoading(false); });
             })
@@ -4766,7 +4767,8 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
         var PROXY_NBA = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
           fetch(PROXY_NBA + '?league=nba_player&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}),
-          fetch(PROXY_NBA + '?league=nba_gamelog&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;})
+          fetch(PROXY_NBA + '?league=nba_gamelog&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}),
+          fetch(PROXY_NBA + '?league=nba_stats&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;})
         ]).then(function(results) {
           if (cancelled) return;
           var athleteData = results[0];
@@ -4780,7 +4782,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               team: { abbreviation: typeof cachedTeam === 'object' ? (cachedTeam.id || '') : cachedTeam, displayName: typeof cachedTeam === 'object' ? (cachedTeam.name || '') : '' },
             }};
           }
-          setLiveData({ type: 'nba', athlete: athleteData, gamelog: results[1], stats: null });
+          setLiveData({ type: 'nba', athlete: athleteData, gamelog: results[1], stats: results[2] });
           setLoading(false);
         }).catch(function(e) {
           if (!cancelled) { setFetchError(e.message); setLoading(false); }
@@ -5271,10 +5273,24 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
     } else if (glRaw && glRaw.events) {
       glEvents = Object.values(glRaw.events).slice(0, 20);
     }
-    // Carrière par saison — extrait directement depuis glRaw.seasonTypes (déjà chargé, pas d'appel supplémentaire)
+    // Carrière par saison NBA
     var careerSplits = [];
-    var statsLabels = glLabels; // réutilise les labels du gamelog
-    if (glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
+    var statsLabels = glLabels;
+    var statsRaw = liveData.stats || {};
+    // Priorité 1 : liveData.stats (depuis statisticslog ESPN — multi-saisons)
+    if (statsRaw.seasons && statsRaw.seasons.length) {
+      statsLabels = statsRaw.labels || glLabels;
+      careerSplits = statsRaw.seasons.slice(0, 20);
+    } else if (statsRaw.splits && statsRaw.splits.length) {
+      statsLabels = statsRaw.labels || glLabels;
+      careerSplits = statsRaw.splits.filter(function(s){ return s.type === 'total' || s.type === 'season' || !s.type; }).slice(0, 20);
+    } else if (statsRaw.groups && statsRaw.groups.length) {
+      var grp0 = statsRaw.groups[0];
+      statsLabels = (grp0.statistics || []).map(function(s){ return s.abbreviation || s.name; });
+      careerSplits = (grp0.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 20);
+    }
+    // Priorité 2 (fallback) : gamelog seasonTypes summary (ne contient que la saison courante)
+    if (careerSplits.length === 0 && glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
       glRaw.seasonTypes
         .filter(function(st){ return st.displayName && st.displayName.indexOf('Regular Season') !== -1; })
         .forEach(function(st) {
@@ -5288,17 +5304,6 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             });
           }
         });
-    }
-    // Fallback : liveData.stats si présent et non vide
-    if (careerSplits.length === 0) {
-      var statsRaw = liveData.stats || {};
-      if (statsRaw.seasons && statsRaw.seasons.length) {
-        statsLabels = statsRaw.labels || glLabels;
-        careerSplits = statsRaw.seasons.slice(0, 20);
-      } else if (statsRaw.splits && statsRaw.splits.length) {
-        statsLabels = statsRaw.labels || glLabels;
-        careerSplits = statsRaw.splits.filter(function(s){ return s.type === 'total' || s.type === 'season' || !s.type; }).slice(0, 20);
-      }
     }
     return React.createElement("div", { style: { minHeight: "100vh" } },
       React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } },
@@ -5442,10 +5447,24 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       glEvents = Object.values(glRaw.events).slice(0, 20);
     }
     var statsCategories = (ath.statisticsGroups && ath.statisticsGroups[0] && ath.statisticsGroups[0].statistics) ? ath.statisticsGroups[0].statistics : [];
-    // Carrière par saison NFL — extrait depuis glRaw.seasonTypes (déjà chargé)
+    // Carrière par saison NFL
     var nflCareerSplits = [];
     var nflStatsLabels = glLabels;
-    if (glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
+    var nflStatsRaw = liveData.stats || {};
+    // Priorité 1 : liveData.stats (depuis statisticslog ESPN — multi-saisons)
+    if (nflStatsRaw.seasons && nflStatsRaw.seasons.length) {
+      nflStatsLabels = nflStatsRaw.labels || glLabels;
+      nflCareerSplits = nflStatsRaw.seasons.slice(0, 20);
+    } else if (nflStatsRaw.splits && nflStatsRaw.splits.length) {
+      nflStatsLabels = nflStatsRaw.labels || glLabels;
+      nflCareerSplits = nflStatsRaw.splits.filter(function(s){ return !s.type || s.type === 'total' || s.type === 'season'; }).slice(0, 20);
+    } else if (nflStatsRaw.groups && nflStatsRaw.groups.length) {
+      var nflGrp0 = nflStatsRaw.groups[0];
+      nflStatsLabels = (nflGrp0.statistics || []).map(function(s){ return s.abbreviation || s.name; });
+      nflCareerSplits = (nflGrp0.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 20);
+    }
+    // Priorité 2 (fallback) : gamelog seasonTypes summary (saison courante seulement)
+    if (nflCareerSplits.length === 0 && glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
       glRaw.seasonTypes
         .filter(function(st){ return st.displayName && st.displayName.indexOf('Regular Season') !== -1; })
         .forEach(function(st) {
@@ -5459,31 +5478,6 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             });
           }
         });
-    }
-    // Fallback : liveData.stats (depuis nfl_stats endpoint)
-    if (nflCareerSplits.length === 0) {
-      var nflStatsRaw = liveData.stats || {};
-      if (nflStatsRaw.seasons && nflStatsRaw.seasons.length) {
-        nflStatsLabels = nflStatsRaw.labels || glLabels;
-        nflCareerSplits = nflStatsRaw.seasons.slice(0, 20);
-      } else if (nflStatsRaw.splits && nflStatsRaw.splits.length) {
-        nflStatsLabels = nflStatsRaw.labels || glLabels;
-        nflCareerSplits = nflStatsRaw.splits.filter(function(s){ return !s.type || s.type === 'total' || s.type === 'season'; }).slice(0, 20);
-      } else if (nflStatsRaw.entries && nflStatsRaw.entries.length) {
-        // Format ESPN statisticslog : { entries: [{ season: { year }, statistics: [{ labels:[], stats:[] }] }] }
-        nflStatsRaw.entries.forEach(function(entry) {
-          var yr = entry.season && entry.season.year ? String(entry.season.year) : '';
-          var statsArr = entry.statistics && entry.statistics[0];
-          if (statsArr) {
-            if (!nflStatsLabels.length) nflStatsLabels = statsArr.labels || glLabels;
-            nflCareerSplits.push({
-              displayName: yr,
-              team: '',
-              stats: (statsArr.stats || []).map(function(v){ return String(v); })
-            });
-          }
-        });
-      }
     }
     return React.createElement("div", { style: { minHeight: "100vh" } },
       React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } },
