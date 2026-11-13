@@ -5257,9 +5257,22 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       ? ath.statsSummary.statistics : [];
     var seasonStatLabel = (ath.statsSummary && ath.statsSummary.displayName) ? ath.statsSummary.displayName.toUpperCase() : 'STATS SAISON EN COURS';
     // Gamelog match par match
+    // ESPN common/v3 : structure seasonTypes[n].categories[n].events[] (array avec .stats[])
     var glRaw = liveData.gamelog;
-    var glEvents = (glRaw && glRaw.events) ? Object.values(glRaw.events).slice(0, 20) : [];
     var glLabels = (glRaw && glRaw.labels) ? glRaw.labels : [];
+    var glEvents = [];
+    if (glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
+      // Prend la première saison Regular Season, concatène tous les events de toutes les catégories (mois)
+      var glST = glRaw.seasonTypes.find(function(st){ return st.displayName && st.displayName.indexOf('Regular') !== -1; }) || glRaw.seasonTypes[0];
+      if (glST && glST.categories) {
+        glST.categories.forEach(function(cat) {
+          (cat.events || []).forEach(function(ev) { glEvents.push(ev); });
+        });
+      }
+      glEvents = glEvents.slice(0, 20);
+    } else if (glRaw && glRaw.events) {
+      glEvents = Object.values(glRaw.events).slice(0, 20);
+    }
     // Carrière par saison depuis nba_stats
     var statsRaw = liveData.stats || {};
     var careerSplits = [];
@@ -5402,8 +5415,19 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
   if (liveData && liveData.type === 'nfl') {
     var ath = (liveData.athlete && liveData.athlete.athlete) || {};
     var glRaw = liveData.gamelog;
-    var glEvents = (glRaw && glRaw.events) ? Object.values(glRaw.events).slice(0, 20) : [];
     var glLabels = (glRaw && glRaw.labels) ? glRaw.labels : [];
+    var glEvents = [];
+    if (glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
+      var glST = glRaw.seasonTypes.find(function(st){ return st.displayName && st.displayName.indexOf('Regular') !== -1; }) || glRaw.seasonTypes[0];
+      if (glST && glST.categories) {
+        glST.categories.forEach(function(cat) {
+          (cat.events || []).forEach(function(ev) { glEvents.push(ev); });
+        });
+      }
+      glEvents = glEvents.slice(0, 20);
+    } else if (glRaw && glRaw.events) {
+      glEvents = Object.values(glRaw.events).slice(0, 20);
+    }
     var statsCategories = (ath.statisticsGroups && ath.statisticsGroups[0] && ath.statisticsGroups[0].statistics) ? ath.statisticsGroups[0].statistics : [];
     // Carrière par saison NFL
     var nflStatsRaw = liveData.stats || {};
