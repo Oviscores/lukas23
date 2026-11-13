@@ -5163,26 +5163,26 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
                   (p.isGoalie ? ["SAISON","ÉQUIPE","PJ","V","D","BL","%ARR","MPB"] : ["SAISON","ÉQUIPE","PJ","B","A","PTS","+/-","PIM","PPB"]).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "6px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 800, color: i === (p.isGoalie ? 6 : 3) ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: i === (p.isGoalie ? 6 : 3) ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
               React.createElement("tbody", null,
                 (p.career || []).map(function(s, i) {
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(0,0,0,0.02)" } },
-                    React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "#111", whiteSpace: "nowrap" } }, s.season),
-                    React.createElement("td", { style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555" } }, s.team),
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", whiteSpace: "nowrap" } }, s.season),
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, s.team),
                     p.isGoalie ?
-                    [s.gp, s.g, s.a, s.pim, s.sv, s.gaa].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "6px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 4 ? 11 : 9, fontWeight: vi === 4 ? 900 : 400, color: vi === 4 ? lc : "#333" } }, v || "—"); }) :
-                    [s.gp, s.g, s.a, s.pts, s.pm !== undefined ? ((s.pm > 0 ? '+' : '') + s.pm) : '—', s.pim, s.ppg].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "6px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 3 ? 12 : 9, fontWeight: vi === 3 ? 900 : 400, color: vi === 3 ? lc : "#333" } }, v !== undefined && v !== null ? v : "—"); })
+                    [s.gp, s.g, s.a, s.pim, s.sv, s.gaa].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 4 ? 13 : 11, fontWeight: vi === 4 ? 900 : 400, color: vi === 4 ? lc : "#333" } }, v || "—"); }) :
+                    [s.gp, s.g, s.a, s.pts, s.pm !== undefined ? ((s.pm > 0 ? '+' : '') + s.pm) : '—', s.pim, s.ppg].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 3 ? 14 : 11, fontWeight: vi === 3 ? 900 : 400, color: vi === 3 ? lc : "#333" } }, v !== undefined && v !== null ? v : "—"); })
                   );
                 }),
                 // Totaux carrière
                 React.createElement("tr", { style: { borderTop: "2px solid " + lc + "44", background: lc + "08" } },
-                  React.createElement("td", { colSpan: 2, style: { padding: "6px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: lc } }, "TOTAL NHL"),
+                  React.createElement("td", { colSpan: 2, style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: lc } }, "TOTAL NHL"),
                   p.isGoalie ?
-                  [ct.gamesPlayed, ct.wins, ct.losses, ct.shutouts, ct.savePctg ? '.' + Math.round(ct.savePctg * 1000) : '—', ct.goalsAgainstAvg ? ct.goalsAgainstAvg.toFixed(2) : '—'].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "6px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 4 ? 11 : 9, fontWeight: 900, color: vi === 4 ? lc : "#333" } }, v || 0); }) :
-                  [ct.gamesPlayed, ct.goals, ct.assists, ct.points, ct.plusMinus !== undefined ? ((ct.plusMinus > 0 ? '+' : '') + ct.plusMinus) : '—', ct.pimPlusA || ct.pim, ct.powerPlayGoals].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "6px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 3 ? 12 : 9, fontWeight: 900, color: vi === 3 ? lc : "#333" } }, v !== undefined && v !== null ? v : 0); })
+                  [ct.gamesPlayed, ct.wins, ct.losses, ct.shutouts, ct.savePctg ? '.' + Math.round(ct.savePctg * 1000) : '—', ct.goalsAgainstAvg ? ct.goalsAgainstAvg.toFixed(2) : '—'].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 4 ? 13 : 11, fontWeight: 900, color: vi === 4 ? lc : "#333" } }, v || 0); }) :
+                  [ct.gamesPlayed, ct.goals, ct.assists, ct.points, ct.plusMinus !== undefined ? ((ct.plusMinus > 0 ? '+' : '') + ct.plusMinus) : '—', ct.pimPlusA || ct.pim, ct.powerPlayGoals].map(function(v, vi) { return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 3 ? 14 : 11, fontWeight: 900, color: vi === 3 ? lc : "#333" } }, v !== undefined && v !== null ? v : 0); })
                 )
               )
             )
@@ -5196,7 +5196,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
                   (p.isGoalie ? ["DATE","ADV","H/V","DÉC","TIR","MPB","%ARR","BL"] : ["DATE","ADV","H/V","RÉS","B","A","PTS","+/-","TIR","TOI"]).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "5px 8px", textAlign: i < 3 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 3 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5210,29 +5210,29 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var date = g.gameDate || '';
                   if (p.isGoalie) {
                     return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
-                      React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, date),
-                      React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700 } }, opp),
-                      React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "#888" } }, ha),
-                      React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: dec==='W'?"#16a34a":"#ef4444", background: dec==='W'?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, dec || score)),
-                      React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9 } }, g.shotsAgainst || '—'),
-                      React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9 } }, g.goalsAgainst !== undefined ? g.goalsAgainst : '—'),
-                      React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: lc, fontWeight: 800 } }, g.savePctg ? '.' + Math.round(g.savePctg * 1000) : '—'),
-                      React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9 } }, g.shutouts || 0)
+                      React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, date),
+                      React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp),
+                      React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888" } }, ha),
+                      React.createElement("td", { style: { padding: "7px 10px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: dec==='W'?"#16a34a":"#ef4444", background: dec==='W'?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, dec || score)),
+                      React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } }, g.shotsAgainst || '—'),
+                      React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } }, g.goalsAgainst !== undefined ? g.goalsAgainst : '—'),
+                      React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, color: lc, fontWeight: 800 } }, g.savePctg ? '.' + Math.round(g.savePctg * 1000) : '—'),
+                      React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } }, g.shutouts || 0)
                     );
                   }
                   var pts = (g.goals||0) + (g.assists||0);
                   var pm = g.plusMinus || 0;
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
-                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, date),
-                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700 } }, opp),
-                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, color: "#888" } }, ha),
-                    React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: won?"#16a34a":"#ef4444", background: won?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, score)),
-                    React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10 } }, g.goals || 0),
-                    React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10 } }, g.assists || 0),
-                    React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: pts > 2 ? lc : "#333" } }, pts),
-                    React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: pm > 0 ? "#16a34a" : pm < 0 ? "#ef4444" : "#999" } }, (pm > 0 ? '+' : '') + pm),
-                    React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555" } }, g.shots || 0),
-                    React.createElement("td", { style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#888" } }, g.toi || '—')
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, date),
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp),
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888" } }, ha),
+                    React.createElement("td", { style: { padding: "7px 10px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: won?"#16a34a":"#ef4444", background: won?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, score)),
+                    React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } }, g.goals || 0),
+                    React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11 } }, g.assists || 0),
+                    React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: pts > 2 ? lc : "#333" } }, pts),
+                    React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: pm > 0 ? "#16a34a" : pm < 0 ? "#ef4444" : "#999" } }, (pm > 0 ? '+' : '') + pm),
+                    React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, g.shots || 0),
+                    React.createElement("td", { style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#888" } }, g.toi || '—')
                   );
                 })
               )
@@ -5673,7 +5673,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                     ["SAISON","ÉQUIPE","PJ","V","D","K","MPB","WHIP","IP"] :
                     ["SAISON","ÉQUIPE","PJ","AB","AVG","HR","RBI","R","SB","OPS"]
                   ).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "6px 8px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 800, color: i === (isPitcher ? 5 : 4) ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: i === (isPitcher ? 5 : 4) ? lc : "#aaa", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5683,14 +5683,14 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var team = sp.team && sp.team.abbreviation ? sp.team.abbreviation : (sp.team && sp.team.name ? sp.team.name : '');
                   var season = sp.season || '';
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
-                    React.createElement("td", { style: { padding: "6px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: "#111" } }, season),
-                    React.createElement("td", { style: { padding: "6px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555" } }, team),
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111" } }, season),
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555" } }, team),
                     isPitcher ?
                     [s.gamesPlayed, s.wins, s.losses, s.strikeOuts, s.era, s.whip, s.inningsPitched].map(function(v, vi) {
-                      return React.createElement("td", { key: vi, style: { padding: "6px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 4 ? 11 : 9, fontWeight: vi === 4 ? 900 : 400, color: vi === 4 ? lc : "#333" } }, v || '—');
+                      return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 4 ? 13 : 11, fontWeight: vi === 4 ? 900 : 400, color: vi === 4 ? lc : "#333" } }, v || '—');
                     }) :
                     [s.gamesPlayed, s.atBats, s.avg, s.homeRuns, s.rbi, s.runs, s.stolenBases, s.ops].map(function(v, vi) {
-                      return React.createElement("td", { key: vi, style: { padding: "6px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 2 ? 11 : 9, fontWeight: vi === 2 ? 900 : 400, color: vi === 2 ? lc : "#333" } }, v || '—');
+                      return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 2 ? 13 : 11, fontWeight: vi === 2 ? 900 : 400, color: vi === 2 ? lc : "#333" } }, v || '—');
                     })
                   );
                 })
@@ -5709,7 +5709,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                     ["DATE","ADV","DÉC","IP","H","R","ER","BB","K","MPB"] :
                     ["DATE","ADV","AB","H","HR","RBI","R","BB","K","AVG"]
                   ).map(function(h, i) {
-                    return React.createElement("th", { key: i, style: { padding: "5px 8px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 7, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
+                    return React.createElement("th", { key: i, style: { padding: "7px 10px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 800, color: "#aaa", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
@@ -5720,14 +5720,14 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var date = sp.date || '';
                   var dec = s.note || '';
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
-                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, date),
-                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700 } }, opp),
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#555", whiteSpace: "nowrap" } }, date),
+                    React.createElement("td", { style: { padding: "7px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700 } }, opp),
                     isPitcher ?
                     [dec || (s.wins ? 'V' : s.losses ? 'D' : '—'), s.inningsPitched, s.hits, s.runs, s.earnedRuns, s.baseOnBalls, s.strikeOuts, s.era].map(function(v, vi) {
-                      return React.createElement("td", { key: vi, style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 7 ? 11 : 9, fontWeight: vi === 7 ? 900 : 400, color: vi === 7 ? lc : vi === 0 ? (v === 'V' ? "#16a34a" : v === 'D' ? "#ef4444" : "#999") : "#333" } }, v !== undefined ? v : '—');
+                      return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 7 ? 13 : 11, fontWeight: vi === 7 ? 900 : 400, color: vi === 7 ? lc : vi === 0 ? (v === 'V' ? "#16a34a" : v === 'D' ? "#ef4444" : "#999") : "#333" } }, v !== undefined ? v : '—');
                     }) :
                     [s.atBats, s.hits, s.homeRuns, s.rbi, s.runs, s.baseOnBalls, s.strikeOuts, s.avg].map(function(v, vi) {
-                      return React.createElement("td", { key: vi, style: { padding: "5px 8px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 7 ? 11 : 9, fontWeight: vi === 7 ? 900 : 400, color: vi === 7 ? lc : "#333" } }, v !== undefined ? v : '—');
+                      return React.createElement("td", { key: vi, style: { padding: "7px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 7 ? 13 : 11, fontWeight: vi === 7 ? 900 : 400, color: vi === 7 ? lc : "#333" } }, v !== undefined ? v : '—');
                     })
                   );
                 })
