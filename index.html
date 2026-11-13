@@ -248,10 +248,10 @@ function getTeamLogo(abbr, lg, sz) {
   var nhlMap = { TBL: 'tb', NJD: 'nj', SJS: 'sj', LAK: 'la', UTA: 'utah' };
   if (lg === 'NHL' && nhlMap[abbr]) abbr = nhlMap[abbr];
   var src;
-  if (lg==='NFL') src='https://a.espncdn.com/i/teamlogos/nfl/50/'+abbr.toLowerCase()+'.png';
-  else if (lg==='NHL') src='https://a.espncdn.com/i/teamlogos/nhl/50/'+abbr.toLowerCase()+'.png';
-  else if (lg==='NBA') src='https://a.espncdn.com/i/teamlogos/nba/50/'+abbr.toLowerCase()+'.png';
-  else if (lg==='MLB') src='https://a.espncdn.com/i/teamlogos/mlb/50/'+abbr.toLowerCase()+'.png';
+  if (lg==='NFL') src='https://a.espncdn.com/i/teamlogos/nfl/500/'+abbr.toLowerCase()+'.png';
+  else if (lg==='NHL') src='https://a.espncdn.com/i/teamlogos/nhl/500/'+abbr.toLowerCase()+'.png';
+  else if (lg==='NBA') src='https://a.espncdn.com/i/teamlogos/nba/500/'+abbr.toLowerCase()+'.png';
+  else if (lg==='MLB') src='https://a.espncdn.com/i/teamlogos/mlb/500/'+abbr.toLowerCase()+'.png';
   else src='https://zoneus-proxy.vivienfrappier.workers.dev?logo='+abbr+'&lg='+lg;
   var actualSz = lg === 'NHL' ? Math.round(sz * 1.35) : sz;
   var s = { width: actualSz, height: actualSz, objectFit: 'contain', flexShrink: 0, display: 'block' };
@@ -2749,8 +2749,8 @@ async function fetchLiveScores() {
         awayScore: isLive || isFinal ? parseInt(away.score || 0) : null,
         time: g.date ? new Date(g.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '',
         startUTC: g.date ? new Date(g.date).getTime() : 0,
-        homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nba/50/' + home.team.abbreviation.toLowerCase() + '.png' : '',
-        awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nba/50/' + away.team.abbreviation.toLowerCase() + '.png' : ''
+        homeLogo: home.team ? 'https://a.espncdn.com/i/teamlogos/nba/500/' + home.team.abbreviation.toLowerCase() + '.png' : '',
+        awayLogo: away.team ? 'https://a.espncdn.com/i/teamlogos/nba/500/' + away.team.abbreviation.toLowerCase() + '.png' : ''
       });
     }
   } catch(e) { console.log('NBA API error:', e.message); }
@@ -3630,7 +3630,7 @@ const STATS_FULL = {
   }
 };
 function LB({ lg, sz = 18 }) {
-  const logos = { NHL: 'https://a.espncdn.com/i/teamlogos/leagues/50/nhl.png', NFL: 'https://a.espncdn.com/i/teamlogos/leagues/50/nfl.png', NBA: 'https://a.espncdn.com/i/teamlogos/leagues/50/nba.png', MLB: 'https://a.espncdn.com/i/teamlogos/leagues/50/mlb.png' };
+  const logos = { NHL: 'https://a.espncdn.com/i/teamlogos/leagues/500/nhl.png', NFL: 'https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png', NBA: 'https://a.espncdn.com/i/teamlogos/leagues/500/nba.png', MLB: 'https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png' };
   const cfg = { NHL:{bg:"#000"}, NFL:{bg:"#013369"}, NBA:{bg:"#1D428A"}, MLB:{bg:"#041E42"} }[lg] || {bg:"#333"};
   return React.createElement("div", { style: { width: sz, height: sz, borderRadius: "50%", background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" } },
     logos[lg] ? React.createElement("img", { src: logos[lg], alt: lg, style: { width: sz*0.85, height: sz*0.85, objectFit: "contain" }, onError: function(e){e.target.style.display="none";} }) : null
@@ -3674,7 +3674,7 @@ function MatchInner({ a, hov, h }) {
   const aWin = isFinal && a._mHs != null && a._mAs != null && a._mAs > a._mHs;
   const bgImg = lg === 'NFL' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/32adbd87-image.jpg' : lg === 'MLB' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/d517eae8-image.jpg' : lg === 'NBA' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/6d51a2c9-image.jpg' : 'https://raw.githubusercontent.com/Oviscores/lukas23/main/977b26b0-image.jpg';
   const bgGrad = lg === 'NFL' ? 'linear-gradient(135deg,#1a1a2e,#0f3460)' : lg === 'MLB' ? 'linear-gradient(135deg,#1a0a0a,#6b0f0f)' : lg === 'NBA' ? 'linear-gradient(135deg,#0a0a1a,#2d1b8e)' : 'linear-gradient(135deg,#001a2e,#005fa3)';
-  const logoUrl = function(ab) { return 'https://a.espncdn.com/i/teamlogos/' + sport + '/50/' + (ab||'').toLowerCase() + '.png'; };
+  const logoUrl = function(ab) { return 'https://a.espncdn.com/i/teamlogos/' + sport + '/500/' + (ab||'').toLowerCase() + '.png'; };
   var timeStr = ''; var dateStr = '';
   if (a._mDate) { var _dd = new Date(a._mDate); if (!isNaN(_dd)) { timeStr = _dd.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); dateStr = _dd.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); } }
   const logoSz = h >= 280 ? 80 : 56;
@@ -3851,7 +3851,7 @@ function SanityMatchCard({ m, onClick }) {
   }
   const bgImg = lg === 'NFL' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/32adbd87-image.jpg' : lg === 'MLB' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/d517eae8-image.jpg' : lg === 'NBA' ? 'https://raw.githubusercontent.com/Oviscores/lukas23/main/6d51a2c9-image.jpg' : 'https://raw.githubusercontent.com/Oviscores/lukas23/main/977b26b0-image.jpg';
   const bgGrad = lg === 'NFL' ? 'linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%)' : lg === 'MLB' ? 'linear-gradient(135deg,#1a0a0a 0%,#3d1515 40%,#6b0f0f 100%)' : lg === 'NBA' ? 'linear-gradient(135deg,#0a0a1a 0%,#1a1060 40%,#2d1b8e 100%)' : 'linear-gradient(135deg,#001a2e 0%,#003d6b 40%,#005fa3 100%)';
-  const logoUrl = function(ab) { return 'https://a.espncdn.com/i/teamlogos/' + sport + '/50/' + ab.toLowerCase() + '.png'; };
+  const logoUrl = function(ab) { return 'https://a.espncdn.com/i/teamlogos/' + sport + '/500/' + ab.toLowerCase() + '.png'; };
   const handleClick = function() { if (onClick) onClick(m); };
   var timeStr = '';
   if (m.gameDate) { var _d = new Date(m.gameDate); if (!isNaN(_d)) timeStr = _d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }); }
@@ -4247,11 +4247,11 @@ function MatchScoreInArticle({ matchId, matchLg }) {
     ),
     home && away && React.createElement("div", { style: { display: "flex", justifyContent: "space-around", padding: "16px", background: "#111" } },
       React.createElement("div", { style: { textAlign: "center" } },
-        React.createElement("img", { src: 'https://a.espncdn.com/i/teamlogos/' + matchLg.toLowerCase() + '/50/' + (away.team&&away.team.abbreviation||'').toLowerCase() + '.png', style: { width: 56, height: 56, objectFit: "contain" } }),
+        React.createElement("img", { src: 'https://a.espncdn.com/i/teamlogos/' + matchLg.toLowerCase() + '/500/' + (away.team&&away.team.abbreviation||'').toLowerCase() + '.png', style: { width: 56, height: 56, objectFit: "contain" } }),
         React.createElement("div", { style: { color: "#fff", fontWeight: 900, fontSize: 36 } }, away.score || '0')
       ),
       React.createElement("div", { style: { textAlign: "center" } },
-        React.createElement("img", { src: 'https://a.espncdn.com/i/teamlogos/' + matchLg.toLowerCase() + '/50/' + (home.team&&home.team.abbreviation||'').toLowerCase() + '.png', style: { width: 56, height: 56, objectFit: "contain" } }),
+        React.createElement("img", { src: 'https://a.espncdn.com/i/teamlogos/' + matchLg.toLowerCase() + '/500/' + (home.team&&home.team.abbreviation||'').toLowerCase() + '.png', style: { width: 56, height: 56, objectFit: "contain" } }),
         React.createElement("div", { style: { color: "#fff", fontWeight: 900, fontSize: 36 } }, home.score || '0')
       )
     ),
