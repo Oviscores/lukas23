@@ -4665,24 +4665,36 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
         // NHL: proxy → api-web.nhle.com (fetch direct souvent bloqué par CORS/WAF)
         var nhlId = isNumericId ? playerId : (staticP && staticP.nhlId ? staticP.nhlId : null);
         if (!nhlId && !isNumericId) {
-          // Résolution via proxy nhl_search (suggest.svc.nhl.com)
           var playerNameFromSlug = playerId.replace(/-/g, ' ');
           var PROXY_NHL_S = 'https://zoneus-proxy.vivienfrappier.workers.dev';
           fetch(PROXY_NHL_S + '?league=nhl_search&q=' + encodeURIComponent(playerNameFromSlug))
             .then(function(r) { return r.json(); })
             .then(function(d) {
+              if (cancelled) return;
               var hit = (Array.isArray(d) ? d : (d.players || []))[0];
-              if (hit && hit.playerId) { nhlId = hit.playerId; fetchData(); }
-              else { setLoading(false); }
+              if (!hit || !hit.playerId) { setLoading(false); return; }
+              var resolvedId = hit.playerId;
+              var PROXY_NHL2 = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+              Promise.all([
+                fetch(PROXY_NHL2 + '?league=nhl_player&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
+                  return fetch('https://api-web.nhle.com/v1/player/' + resolvedId + '/landing').then(function(r){return r.json();}).catch(function(){return null;});
+                }),
+                fetch(PROXY_NHL2 + '?league=nhl_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
+                  return fetch('https://api-web.nhle.com/v1/player/' + resolvedId + '/game-log/now').then(function(r){return r.json();}).catch(function(){return null;});
+                })
+              ]).then(function(results) {
+                if (cancelled) return;
+                setLiveData({ type: 'nhl', player: results[0], gamelog: results[1] });
+                setLoading(false);
+              }).catch(function() { if (!cancelled) setLoading(false); });
             })
-            .catch(function() { setLoading(false); });
+            .catch(function() { if (!cancelled) setLoading(false); });
           return;
         }
         if (!nhlId) { setLoading(false); return; }
         var PROXY_NHL = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
           fetch(PROXY_NHL + '?league=nhl_player&id=' + nhlId).then(function(r){return r.json();}).catch(function(){
-            // fallback direct si le proxy ne supporte pas encore nhl_player
             return fetch('https://api-web.nhle.com/v1/player/' + nhlId + '/landing').then(function(r){return r.json();}).catch(function(){return null;});
           }),
           fetch(PROXY_NHL + '?league=nhl_gamelog&id=' + nhlId).then(function(r){return r.json();}).catch(function(){
@@ -4694,7 +4706,6 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
           setLoading(false);
         }).catch(function(e) {
           if (!cancelled) {
-            // Si le fetch échoue et qu'on a des données statiques, les utiliser
             if (staticP) { setLiveData({ type: 'nhl_static', player: staticP }); }
             else { setFetchError(e.message); }
             setLoading(false);
@@ -4704,16 +4715,29 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       } else if (lg === 'NBA') {
         var nbaId = isNumericId ? playerId : (staticP && staticP.espnId ? staticP.espnId : null);
         if (!nbaId && !isNumericId) {
-          // Résolution ESPN par nom depuis le slug (joueurs hors PLAYERS_DB)
           var playerNameFromSlug = playerId.replace(/-/g, ' ');
           fetch('https://site.web.api.espn.com/apis/common/v3/search?query=' + encodeURIComponent(playerNameFromSlug) + '&limit=1&type=player&sport=basketball')
             .then(function(r) { return r.json(); })
             .then(function(d) {
+              if (cancelled) return;
               var hit = (d.items || [])[0];
-              if (hit && hit.id) { nbaId = hit.id; fetchData(); }
-              else { setLoading(false); }
+              if (!hit || !hit.id) { setLoading(false); return; }
+              var resolvedId = hit.id;
+              var PROXY_NBA2 = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+              Promise.all([
+                fetch(PROXY_NBA2 + '?league=nba_player&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
+                  return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;});
+                }),
+                fetch(PROXY_NBA2 + '?league=nba_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
+                  return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/athletes/' + resolvedId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;});
+                })
+              ]).then(function(results) {
+                if (cancelled) return;
+                setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1] });
+                setLoading(false);
+              }).catch(function() { if (!cancelled) setLoading(false); });
             })
-            .catch(function() { setLoading(false); });
+            .catch(function() { if (!cancelled) setLoading(false); });
           return;
         }
         if (!nbaId) { setLoading(false); return; }
@@ -4754,11 +4778,25 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
           fetch('https://site.web.api.espn.com/apis/common/v3/search?query=' + encodeURIComponent(playerNameFromSlug) + '&limit=1&type=player&sport=football')
             .then(function(r) { return r.json(); })
             .then(function(d) {
+              if (cancelled) return;
               var hit = (d.items || [])[0];
-              if (hit && hit.id) { nflId = hit.id; fetchData(); }
-              else { setLoading(false); }
+              if (!hit || !hit.id) { setLoading(false); return; }
+              var resolvedId = hit.id;
+              var PROXY_NFL2 = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+              Promise.all([
+                fetch(PROXY_NFL2 + '?league=nfl_player&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
+                  return fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/athletes/' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;});
+                }),
+                fetch(PROXY_NFL2 + '?league=nfl_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
+                  return fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/athletes/' + resolvedId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;});
+                })
+              ]).then(function(results) {
+                if (cancelled) return;
+                setLiveData({ type: 'nfl', athlete: results[0], gamelog: results[1] });
+                setLoading(false);
+              }).catch(function() { if (!cancelled) setLoading(false); });
             })
-            .catch(function() { setLoading(false); });
+            .catch(function() { if (!cancelled) setLoading(false); });
           return;
         }
         if (!nflId) { setLoading(false); return; }
