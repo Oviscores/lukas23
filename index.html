@@ -5260,18 +5260,56 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
     var glLabels = (glRaw && glRaw.labels) ? glRaw.labels : [];
     // Carrière par saison depuis nba_stats
     var statsRaw = liveData.stats || {};
-    // ESPN common/v3 stats retourne splits[] avec type=total et name=season par saison
     var careerSplits = [];
     var statsLabels = [];
+    // Format A : { splits: [...], labels: [...] }  (common/v3/stats)
     if (statsRaw.splits && statsRaw.splits.length) {
-      // Format: { splits: [{displayName, stats:[], type, ...}], labels:[] }
       statsLabels = statsRaw.labels || [];
-      careerSplits = statsRaw.splits.filter(function(s){ return s.type === 'total' || s.type === 'season'; }).slice(0, 15);
-    } else if (statsRaw.groups && statsRaw.groups.length) {
-      // Format alternatif statisticslog
+      careerSplits = statsRaw.splits.filter(function(s){ return s.type === 'total' || s.type === 'season' || !s.type; }).slice(0, 20);
+    }
+    // Format B : { groups: [{ splits: [...], statistics: [...] }] }  (statisticslog)
+    else if (statsRaw.groups && statsRaw.groups.length) {
       var grp = statsRaw.groups[0];
       statsLabels = (grp.statistics || []).map(function(s){ return s.abbreviation || s.name; });
-      careerSplits = (grp.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 15);
+      careerSplits = (grp.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 20);
+    }
+    // Format C : { categories: [...] }  (ESPN statistics endpoint)
+    else if (statsRaw.categories && statsRaw.categories.length) {
+      var cat0 = statsRaw.categories[0];
+      statsLabels = (statsRaw.categories || []).map(function(c){ return c.abbreviation || c.name || ''; });
+      // reconstruct rows from each category's splits aligned by index
+      var allCatSplits = statsRaw.categories.map(function(c){ return c.splits || []; });
+      var rowCount = allCatSplits[0] ? allCatSplits[0].length : 0;
+      for (var ri = 0; ri < Math.min(rowCount, 20); ri++) {
+        var firstSplit = allCatSplits[0][ri] || {};
+        careerSplits.push({
+          displayName: firstSplit.displayName || firstSplit.season || '',
+          team: firstSplit.team ? (firstSplit.team.abbreviation || '') : '',
+          stats: allCatSplits.map(function(catSplits){ return (catSplits[ri] && catSplits[ri].value !== undefined) ? catSplits[ri].displayValue || String(catSplits[ri].value) : '—'; })
+        });
+      }
+    }
+    // Format D : { entries: [...] }  (statisticslog v2)
+    else if (statsRaw.entries && statsRaw.entries.length) {
+      var firstEntry = statsRaw.entries[0] || {};
+      var firstStats = (firstEntry.statistics && firstEntry.statistics.splits && firstEntry.statistics.splits[0]) ? firstEntry.statistics.splits[0] : null;
+      if (firstStats) {
+        statsLabels = (firstStats.stats || []).map(function(s){ return s.abbreviation || s.name || ''; });
+      }
+      careerSplits = statsRaw.entries.map(function(e){
+        var seasonSplit = (e.statistics && e.statistics.splits) ? e.statistics.splits.find(function(s){ return s.type === 'total' || s.type === 'season'; }) : null;
+        return {
+          displayName: e.season ? String(e.season.year || e.season.displayName || '') : '',
+          team: '',
+          stats: (seasonSplit && seasonSplit.stats) ? seasonSplit.stats.map(function(s){ return s.displayValue || String(s.value || '—'); }) : []
+        };
+      }).filter(function(r){ return r.stats.length > 0; }).slice(0, 20);
+    }
+    // Format E : fromGamelog — seasonStats array
+    else if (statsRaw.fromGamelog && statsRaw.seasonStats && statsRaw.seasonStats.length) {
+      var ss = statsRaw.seasonStats;
+      statsLabels = statsRaw.labels || (ss[0] ? (ss[0].stats || []).map(function(s){ return s.abbreviation || s.name || ''; }) : []);
+      careerSplits = ss.map(function(s){ return { displayName: s.displayName || s.season || '', team: s.team || '', stats: (s.stats || []).map(function(v){ return v.displayValue || String(v.value || '—'); }) }; });
     }
     return React.createElement("div", { style: { minHeight: "100vh" } },
       React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } },
