@@ -4752,11 +4752,10 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               var resolvedId = found.id;
               Promise.all([
                 fetch(PROXY_NBA_R + '?league=nba_player&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}),
-                fetch(PROXY_NBA_R + '?league=nba_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}),
-                fetch(PROXY_NBA_R + '?league=nba_stats&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;})
+                fetch(PROXY_NBA_R + '?league=nba_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;})
               ]).then(function(results) {
                 if (cancelled) return;
-                setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1], stats: results[2] });
+                setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1], stats: null });
                 setLoading(false);
               }).catch(function() { if (!cancelled) setLoading(false); });
             })
@@ -4767,8 +4766,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
         var PROXY_NBA = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
           fetch(PROXY_NBA + '?league=nba_player&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}),
-          fetch(PROXY_NBA + '?league=nba_gamelog&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}),
-          fetch(PROXY_NBA + '?league=nba_stats&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;})
+          fetch(PROXY_NBA + '?league=nba_gamelog&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;})
         ]).then(function(results) {
           if (cancelled) return;
           var athleteData = results[0];
@@ -4782,7 +4780,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               team: { abbreviation: typeof cachedTeam === 'object' ? (cachedTeam.id || '') : cachedTeam, displayName: typeof cachedTeam === 'object' ? (cachedTeam.name || '') : '' },
             }};
           }
-          setLiveData({ type: 'nba', athlete: athleteData, gamelog: results[1], stats: results[2] });
+          setLiveData({ type: 'nba', athlete: athleteData, gamelog: results[1], stats: null });
           setLoading(false);
         }).catch(function(e) {
           if (!cancelled) { setFetchError(e.message); setLoading(false); }
@@ -5273,25 +5271,34 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
     } else if (glRaw && glRaw.events) {
       glEvents = Object.values(glRaw.events).slice(0, 20);
     }
-    // Carrière par saison depuis nba_stats
-    var statsRaw = liveData.stats || {};
+    // Carrière par saison — extrait directement depuis glRaw.seasonTypes (déjà chargé, pas d'appel supplémentaire)
     var careerSplits = [];
-    var statsLabels = [];
-    // Format principal : { seasons: [...], labels: [...] }  (depuis gamelog seasonTypes)
-    if (statsRaw.seasons && statsRaw.seasons.length) {
-      statsLabels = statsRaw.labels || [];
-      careerSplits = statsRaw.seasons.slice(0, 20);
+    var statsLabels = glLabels; // réutilise les labels du gamelog
+    if (glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
+      glRaw.seasonTypes
+        .filter(function(st){ return st.displayName && st.displayName.indexOf('Regular Season') !== -1; })
+        .forEach(function(st) {
+          var sumStats = (st.summary && st.summary.stats) ? st.summary.stats : [];
+          var avgEntry = sumStats.find(function(s){ return s.type === 'avg'; }) || sumStats[0];
+          if (avgEntry && avgEntry.stats && avgEntry.stats.length) {
+            careerSplits.push({
+              displayName: st.displayName || '',
+              team: (st.displayTeam && st.displayTeam.abbreviation) || '',
+              stats: avgEntry.stats.map(function(v){ return String(v); })
+            });
+          }
+        });
     }
-    // Format B : { splits: [...], labels: [...] }
-    else if (statsRaw.splits && statsRaw.splits.length) {
-      statsLabels = statsRaw.labels || [];
-      careerSplits = statsRaw.splits.filter(function(s){ return s.type === 'total' || s.type === 'season' || !s.type; }).slice(0, 20);
-    }
-    // Format C : { groups: [{ splits: [...], statistics: [...] }] }
-    else if (statsRaw.groups && statsRaw.groups.length) {
-      var grp = statsRaw.groups[0];
-      statsLabels = (grp.statistics || []).map(function(s){ return s.abbreviation || s.name; });
-      careerSplits = (grp.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 20);
+    // Fallback : liveData.stats si présent et non vide
+    if (careerSplits.length === 0) {
+      var statsRaw = liveData.stats || {};
+      if (statsRaw.seasons && statsRaw.seasons.length) {
+        statsLabels = statsRaw.labels || glLabels;
+        careerSplits = statsRaw.seasons.slice(0, 20);
+      } else if (statsRaw.splits && statsRaw.splits.length) {
+        statsLabels = statsRaw.labels || glLabels;
+        careerSplits = statsRaw.splits.filter(function(s){ return s.type === 'total' || s.type === 'season' || !s.type; }).slice(0, 20);
+      }
     }
     return React.createElement("div", { style: { minHeight: "100vh" } },
       React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } },
@@ -5361,8 +5368,14 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var won = ev.gameResult === 'W';
                   var score = ev.score || '';
                   var evStats = (ev.stats || []).slice(0, 10);
+                  // Formater la date ISO en JJ/MM
+                  var dateStr = ev.gameDate || '';
+                  if (dateStr && dateStr.length >= 10) {
+                    var dp = dateStr.substring(0, 10).split('-');
+                    if (dp.length === 3) dateStr = dp[2] + '/' + dp[1];
+                  }
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
-                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, ev.gameDate || ''),
+                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, dateStr),
                     React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700 } }, (home ? 'vs ' : '@ ') + opp),
                     React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: won?"#16a34a":"#ef4444", background: won?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, score)),
                     evStats.map(function(v, vi) {
@@ -5429,20 +5442,48 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       glEvents = Object.values(glRaw.events).slice(0, 20);
     }
     var statsCategories = (ath.statisticsGroups && ath.statisticsGroups[0] && ath.statisticsGroups[0].statistics) ? ath.statisticsGroups[0].statistics : [];
-    // Carrière par saison NFL
-    var nflStatsRaw = liveData.stats || {};
+    // Carrière par saison NFL — extrait depuis glRaw.seasonTypes (déjà chargé)
     var nflCareerSplits = [];
-    var nflStatsLabels = [];
-    if (nflStatsRaw.seasons && nflStatsRaw.seasons.length) {
-      nflStatsLabels = nflStatsRaw.labels || [];
-      nflCareerSplits = nflStatsRaw.seasons.slice(0, 20);
-    } else if (nflStatsRaw.splits && nflStatsRaw.splits.length) {
-      nflStatsLabels = nflStatsRaw.labels || [];
-      nflCareerSplits = nflStatsRaw.splits.filter(function(s){ return !s.type || s.type === 'total' || s.type === 'season'; }).slice(0, 20);
-    } else if (nflStatsRaw.groups && nflStatsRaw.groups.length) {
-      var nflGrp = nflStatsRaw.groups[0];
-      nflStatsLabels = (nflGrp.statistics || []).map(function(s){ return s.abbreviation || s.name; });
-      nflCareerSplits = (nflGrp.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 20);
+    var nflStatsLabels = glLabels;
+    if (glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
+      glRaw.seasonTypes
+        .filter(function(st){ return st.displayName && st.displayName.indexOf('Regular Season') !== -1; })
+        .forEach(function(st) {
+          var sumStats = (st.summary && st.summary.stats) ? st.summary.stats : [];
+          var totEntry = sumStats.find(function(s){ return s.type === 'total'; }) || sumStats.find(function(s){ return s.type === 'avg'; }) || sumStats[0];
+          if (totEntry && totEntry.stats && totEntry.stats.length) {
+            nflCareerSplits.push({
+              displayName: st.displayName || '',
+              team: (st.displayTeam && st.displayTeam.abbreviation) || '',
+              stats: totEntry.stats.map(function(v){ return String(v); })
+            });
+          }
+        });
+    }
+    // Fallback : liveData.stats (depuis nfl_stats endpoint)
+    if (nflCareerSplits.length === 0) {
+      var nflStatsRaw = liveData.stats || {};
+      if (nflStatsRaw.seasons && nflStatsRaw.seasons.length) {
+        nflStatsLabels = nflStatsRaw.labels || glLabels;
+        nflCareerSplits = nflStatsRaw.seasons.slice(0, 20);
+      } else if (nflStatsRaw.splits && nflStatsRaw.splits.length) {
+        nflStatsLabels = nflStatsRaw.labels || glLabels;
+        nflCareerSplits = nflStatsRaw.splits.filter(function(s){ return !s.type || s.type === 'total' || s.type === 'season'; }).slice(0, 20);
+      } else if (nflStatsRaw.entries && nflStatsRaw.entries.length) {
+        // Format ESPN statisticslog : { entries: [{ season: { year }, statistics: [{ labels:[], stats:[] }] }] }
+        nflStatsRaw.entries.forEach(function(entry) {
+          var yr = entry.season && entry.season.year ? String(entry.season.year) : '';
+          var statsArr = entry.statistics && entry.statistics[0];
+          if (statsArr) {
+            if (!nflStatsLabels.length) nflStatsLabels = statsArr.labels || glLabels;
+            nflCareerSplits.push({
+              displayName: yr,
+              team: '',
+              stats: (statsArr.stats || []).map(function(v){ return String(v); })
+            });
+          }
+        });
+      }
     }
     return React.createElement("div", { style: { minHeight: "100vh" } },
       React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } },
@@ -5517,8 +5558,13 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                   var won = ev.gameResult === 'W';
                   var score = ev.score || '';
                   var stats = (ev.stats || []).slice(0, 12);
+                  var nflDateStr = ev.gameDate || '';
+                  if (nflDateStr && nflDateStr.length >= 10) {
+                    var ndp = nflDateStr.substring(0, 10).split('-');
+                    if (ndp.length === 3) nflDateStr = ndp[2] + '/' + ndp[1];
+                  }
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
-                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, ev.gameDate || ''),
+                    React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#555", whiteSpace: "nowrap" } }, nflDateStr),
                     React.createElement("td", { style: { padding: "5px 8px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700 } }, (ev.atVs === 'vs' ? 'vs ' : '@ ') + opp),
                     React.createElement("td", { style: { padding: "5px 8px", textAlign: "center" } }, React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: won?"#16a34a":"#ef4444", background: won?"#16a34a18":"#ef444418", padding:"1px 5px", borderRadius:2 } }, score)),
                     stats.map(function(v, vi) {
