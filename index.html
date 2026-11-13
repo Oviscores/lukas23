@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name='impact-site-verification' value='9d6519ec-1bbf-4af0-b572-3fe47cdf098e'>
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="sitemap" type="application/xml" href="/sitemap-index.xml">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
@@ -4664,6 +4664,20 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       if (lg === 'NHL') {
         // NHL: proxy → api-web.nhle.com (fetch direct souvent bloqué par CORS/WAF)
         var nhlId = isNumericId ? playerId : (staticP && staticP.nhlId ? staticP.nhlId : null);
+        if (!nhlId && !isNumericId) {
+          // Résolution via proxy nhl_search (suggest.svc.nhl.com)
+          var playerNameFromSlug = playerId.replace(/-/g, ' ');
+          var PROXY_NHL_S = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+          fetch(PROXY_NHL_S + '?league=nhl_search&q=' + encodeURIComponent(playerNameFromSlug))
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              var hit = (Array.isArray(d) ? d : (d.players || []))[0];
+              if (hit && hit.playerId) { nhlId = hit.playerId; fetchData(); }
+              else { setLoading(false); }
+            })
+            .catch(function() { setLoading(false); });
+          return;
+        }
         if (!nhlId) { setLoading(false); return; }
         var PROXY_NHL = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
@@ -4689,6 +4703,19 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
 
       } else if (lg === 'NBA') {
         var nbaId = isNumericId ? playerId : (staticP && staticP.espnId ? staticP.espnId : null);
+        if (!nbaId && !isNumericId) {
+          // Résolution ESPN par nom depuis le slug (joueurs hors PLAYERS_DB)
+          var playerNameFromSlug = playerId.replace(/-/g, ' ');
+          fetch('https://site.web.api.espn.com/apis/common/v3/search?query=' + encodeURIComponent(playerNameFromSlug) + '&limit=1&type=player&sport=basketball')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              var hit = (d.items || [])[0];
+              if (hit && hit.id) { nbaId = hit.id; fetchData(); }
+              else { setLoading(false); }
+            })
+            .catch(function() { setLoading(false); });
+          return;
+        }
         if (!nbaId) { setLoading(false); return; }
         var PROXY_NBA = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
@@ -4722,6 +4749,18 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
 
       } else if (lg === 'NFL') {
         var nflId = isNumericId ? playerId : (staticP && staticP.espnId ? staticP.espnId : null);
+        if (!nflId && !isNumericId) {
+          var playerNameFromSlug = playerId.replace(/-/g, ' ');
+          fetch('https://site.web.api.espn.com/apis/common/v3/search?query=' + encodeURIComponent(playerNameFromSlug) + '&limit=1&type=player&sport=football')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              var hit = (d.items || [])[0];
+              if (hit && hit.id) { nflId = hit.id; fetchData(); }
+              else { setLoading(false); }
+            })
+            .catch(function() { setLoading(false); });
+          return;
+        }
         if (!nflId) { setLoading(false); return; }
         var PROXY_NFL = 'https://zoneus-proxy.vivienfrappier.workers.dev';
         Promise.all([
