@@ -3674,7 +3674,11 @@ function Logo({ w = 90, onClick }) {
 function PBg({ lg, h, seed = 1, img }) {
   const kws = UNSPLASH[lg] || ["sport"];
   const kw = kws[seed % kws.length];
-  const url = img || "https://source.unsplash.com/featured/1200x800/?" + kw + "&sig=" + seed;
+  // Pour les images Sanity (cdn.sanity.io), on ajoute q=90&auto=format pour garder la qualité
+  const sanityImg = img && img.includes('cdn.sanity.io')
+    ? (img.indexOf('?') === -1 ? img + '?w=1600&q=90&auto=format' : img + '&w=1600&q=90&auto=format')
+    : img;
+  const url = sanityImg || "https://source.unsplash.com/featured/1200x800/?" + kw + "&sig=" + seed;
   const lc = LG[lg] && LG[lg].color || "#333";
   const dk = LG[lg] && LG[lg].dark || "#111";
   const em = LG[lg] && LG[lg].emoji || "\u2605";
