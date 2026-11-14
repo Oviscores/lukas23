@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name='impact-site-verification' value='9d6519ec-1bbf-4af0-b572-3fe47cdf098e'>
+  <meta name="description" content="Zone US, le media sportif francophone spécialisé NHL, NFL, NBA et MLB. Scores en direct, résultats, feuilles de match et actualités.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -5256,6 +5257,26 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
     var seasonStatCats = (ath.statsSummary && ath.statsSummary.statistics && ath.statsSummary.statistics.length)
       ? ath.statsSummary.statistics : [];
     var seasonStatLabel = (ath.statsSummary && ath.statsSummary.displayName) ? ath.statsSummary.displayName.toUpperCase() : 'STATS SAISON EN COURS';
+    // Fallback PPG/RPG/APG depuis gamelog summary si statsSummary est vide
+    if (seasonStatCats.length === 0 && liveData.gamelog) {
+      var glSummary = liveData.gamelog;
+      var stTypes = glSummary.seasonTypes || [];
+      var regSeason = stTypes.find(function(st){ return st.displayName && st.displayName.indexOf('Regular') !== -1; }) || stTypes[0];
+      if (regSeason && regSeason.summary && regSeason.summary.stats) {
+        var avgEntry = regSeason.summary.stats.find(function(s){ return s.type === 'avg'; }) || regSeason.summary.stats[0];
+        if (avgEntry && avgEntry.stats) {
+          // labels match les positions
+          var glL = glSummary.labels || [];
+          var statVals = avgEntry.stats;
+          ['PTS','REB','AST','BLK','STL'].forEach(function(abbr) {
+            var idx = glL.indexOf(abbr);
+            if (idx !== -1 && statVals[idx] !== undefined) {
+              seasonStatCats.push({ abbreviation: abbr, displayValue: String(parseFloat(statVals[idx]).toFixed(1)) });
+            }
+          });
+        }
+      }
+    }
     // Gamelog match par match
     // ESPN common/v3 : structure seasonTypes[n].categories[n].events[] (array avec .stats[])
     var glRaw = liveData.gamelog;
@@ -5304,6 +5325,30 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             });
           }
         });
+    }
+    // Fallback tuiles NBA depuis careerSplits si statsSummary vide
+    if (seasonStatCats.length === 0 && careerSplits.length > 0 && statsLabels.length > 0) {
+      var curSeason = careerSplits[0];
+      var sVals = curSeason.stats || curSeason.values || [];
+      var gpIdx = statsLabels.indexOf('GP');
+      var ptsIdx = statsLabels.indexOf('PTS');
+      var rebIdx = statsLabels.indexOf('REB');
+      var astIdx = statsLabels.indexOf('AST');
+      var blkIdx = statsLabels.indexOf('BLK');
+      var stlIdx = statsLabels.indexOf('STL');
+      var gp = gpIdx !== -1 ? (parseFloat(sVals[gpIdx]) || 1) : 1;
+      [
+        { abbr: 'PPM', idx: ptsIdx },
+        { abbr: 'RPM', idx: rebIdx },
+        { abbr: 'APM', idx: astIdx },
+        { abbr: 'BPM', idx: blkIdx },
+        { abbr: 'SPM', idx: stlIdx },
+      ].forEach(function(x) {
+        if (x.idx !== -1 && sVals[x.idx] !== undefined) {
+          var total = parseFloat(sVals[x.idx]) || 0;
+          seasonStatCats.push({ abbreviation: x.abbr, displayValue: (total / gp).toFixed(1) });
+        }
+      });
     }
     return React.createElement("div", { style: { minHeight: "100vh" } },
       React.createElement("div", { style: { background: "rgba(255,255,255,0.97)", borderBottom: "3px solid " + lc, padding: "8px 20px", display: "flex", alignItems: "center", gap: 14, position: "sticky", top: 0, zIndex: 50, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" } },
@@ -10160,9 +10205,12 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   }
   function goScore(g, lg) {
     var _eid = g.eventId || (lg === 'NFL' ? (g.id||'').replace('nfl_','') : null) || null;
+    // Pour NHL depuis LeftCol, g.id est null donc fallback "TOR-BOS" cassait l'API.
+    // On utilise g.eventId (= NHL gameId numérique) comme id quand g.id manque.
+    var _mid = (lg === 'NHL' && !g.id && g.eventId) ? g.eventId : (g.id || (g.away + "-" + g.home));
     goMatch({
       eventId: _eid,
-      id: g.id || (g.away + "-" + g.home),
+      id: _mid,
       lg,
       status: g.st === "Final" ? "FINAL" : g.st === "Live" ? "LIVE" : (g.hs === null || g.hs === undefined || g.as === null || g.as === undefined) ? "UPCOMING" : (g.st || "FINAL"),
       period: g.st || "",
@@ -10728,17 +10776,31 @@ async function fetchStandings(lg) {
       if (Object.keys(divs).length > 0) { CONF_STANDINGS.MLB = divs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
     }
     if (lg === 'NBA') {
-      var r = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=2025');
+      // La saison NBA 2025-26 = season=2026 dans l'API ESPN (l'année de fin de saison)
+      var r = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=2026');
       var d = await r.json();
       if (!d || !d.children) return;
       var confs = {};
       d.children.forEach(function(conf) {
         var rows = [];
-        (conf.standings && conf.standings.entries || []).forEach(function(e, i) {
+        // ESPN peut retourner soit conf.standings.entries soit conf.children[n].standings.entries
+        var entries = (conf.standings && conf.standings.entries) || [];
+        if (entries.length === 0 && conf.children) {
+          // Structure divisionnaire : conf.children[n] = division, chaque division a standings.entries
+          conf.children.forEach(function(div) {
+            (div.standings && div.standings.entries || []).forEach(function(e, i) {
+              entries.push(e);
+            });
+          });
+        }
+        entries.forEach(function(e, i) {
           var stats = {}; (e.stats || []).forEach(function(s){stats[s.name]=s.value;});
           rows.push({ r: i+1, ab: e.team && e.team.abbreviation || '', w: stats.wins || 0, l: stats.losses || 0, pct: e.stats && e.stats.find(function(s){return s.name==='winPercent';}) ? e.stats.find(function(s){return s.name==='winPercent';}).displayValue : '.000' });
         });
-        confs[conf.name || 'Conference'] = rows;
+        // Trier par wins desc
+        rows.sort(function(a,b){return b.w-a.w;});
+        rows.forEach(function(r,i){r.r=i+1;});
+        if (rows.length > 0) confs[conf.name || 'Conference'] = rows;
       });
       if (Object.keys(confs).length > 0) { CONF_STANDINGS.NBA = confs; if (window.__zoneus_refresh__) window.__zoneus_refresh__(); }
     }
