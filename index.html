@@ -5403,18 +5403,32 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
-                  ["DATE","ADV","RÉS"].concat(glLabels.slice(0, 10)).map(function(h, i) {
+                  (function(){
+                    // Priorité PTS, REB, AST, puis le reste — ESPN met MIN avant PTS
+                    var priority = ['PTS','REB','AST','STL','BLK','MIN','FG','FG%','3PT','3P%'];
+                    var ordered = [];
+                    priority.forEach(function(k){ if(glLabels.indexOf(k)!==-1) ordered.push(k); });
+                    glLabels.forEach(function(k){ if(ordered.indexOf(k)===-1) ordered.push(k); });
+                    return ["DATE","ADV","RÉS"].concat(ordered.slice(0,10));
+                  })().map(function(h, i) {
                     return React.createElement("th", { key: i, style: { padding: "10px 14px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: i < 3 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
               React.createElement("tbody", null,
-                glEvents.map(function(ev, i) {
+                (function(){
+                  // Même ordre pour les données
+                  var priority = ['PTS','REB','AST','STL','BLK','MIN','FG','FG%','3PT','3P%'];
+                  var ordered = [];
+                  priority.forEach(function(k){ if(glLabels.indexOf(k)!==-1) ordered.push(glLabels.indexOf(k)); });
+                  glLabels.forEach(function(k,ki){ if(priority.indexOf(k)===-1) ordered.push(ki); });
+                  var colIdx = ordered.slice(0,10);
+                  return glEvents.map(function(ev, i) {
                   var home = ev.atVs === 'vs';
                   var opp = ev.opponent && ev.opponent.abbreviation ? ev.opponent.abbreviation : '—';
                   var won = ev.gameResult === 'W';
                   var score = ev.score || '';
-                  var evStats = (ev.stats || []).slice(0, 10);
+                  var evStats = colIdx.map(function(ci){ return (ev.stats||[])[ci] !== undefined ? (ev.stats||[])[ci] : '—'; });
                   // Formater la date ISO en JJ/MM
                   var dateStr = ev.gameDate || '';
                   if (dateStr && dateStr.length >= 10) {
@@ -5429,7 +5443,8 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                       return React.createElement("td", { key: vi, style: { padding: "10px 14px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 0 ? 14 : 11, fontWeight: vi === 0 ? 900 : 400, color: vi === 0 && parseInt(v) > 25 ? lc : "#333" } }, v);
                     })
                   );
-                })
+                });
+                })()
               )
             )
           )
@@ -5441,22 +5456,35 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
             React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
               React.createElement("thead", null,
                 React.createElement("tr", { style: { background: "rgba(0,0,0,0.04)" } },
-                  ["SAISON","ÉQUIPE"].concat(statsLabels.slice(0, 10)).map(function(h, i) {
+                  (function(){
+                    var priority = ['PTS','REB','AST','STL','BLK','GP','MIN','FG%','3P%'];
+                    var ordered = [];
+                    priority.forEach(function(k){ if(statsLabels.indexOf(k)!==-1) ordered.push(k); });
+                    statsLabels.forEach(function(k){ if(ordered.indexOf(k)===-1) ordered.push(k); });
+                    return ["SAISON","ÉQUIPE"].concat(ordered.slice(0,10));
+                  })().map(function(h, i) {
                     return React.createElement("th", { key: i, style: { padding: "10px 14px", textAlign: i < 2 ? "left" : "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: i < 2 ? "#666" : lc + "99", whiteSpace: "nowrap" } }, h);
                   })
                 )
               ),
               React.createElement("tbody", null,
-                careerSplits.map(function(sp, i) {
-                  var spStats = (sp.stats || []).slice(0, 10);
+                (function(){
+                  var priority = ['PTS','REB','AST','STL','BLK','GP','MIN','FG%','3P%'];
+                  var ordIdx = [];
+                  priority.forEach(function(k){ if(statsLabels.indexOf(k)!==-1) ordIdx.push(statsLabels.indexOf(k)); });
+                  statsLabels.forEach(function(k,ki){ if(priority.indexOf(k)===-1) ordIdx.push(ki); });
+                  var colIdx = ordIdx.slice(0,10);
+                  return careerSplits.map(function(sp, i) {
+                  var spStats = colIdx.map(function(ci){ return (sp.stats||[])[ci] !== undefined ? (sp.stats||[])[ci] : '—'; });
                   return React.createElement("tr", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.04)", background: i%2===0?"transparent":"rgba(0,0,0,0.02)" } },
                     React.createElement("td", { style: { padding: "10px 14px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 700, whiteSpace: "nowrap" } }, sp.displayName || sp.season || ''),
                     React.createElement("td", { style: { padding: "10px 14px" } }, React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, getTeamLogo(sp.team, 'NBA', 22), React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, color: "#555" } }, sp.team || ''))),
                     spStats.map(function(v, vi) {
-                      return React.createElement("td", { key: vi, style: { padding: "10px 14px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 2 ? 14 : 11, fontWeight: vi === 2 ? 900 : 400, color: vi === 2 ? lc : "#333" } }, v !== undefined && v !== null ? v : '—');
+                      return React.createElement("td", { key: vi, style: { padding: "10px 14px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: vi === 0 ? 14 : 11, fontWeight: vi === 0 ? 900 : 400, color: vi === 0 ? lc : "#333" } }, v !== undefined && v !== null ? v : '—');
                     })
                   );
-                })
+                  });
+                })()
               )
             )
           )
