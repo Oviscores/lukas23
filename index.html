@@ -7680,19 +7680,21 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
     var lgLower = (matchData.lg||"").toLowerCase();
     var nameLower = name.toLowerCase();
     /* 1. Articles spécifiques à l'équipe (franchise ou mention dans le titre) */
-    var filtered = (articles||[]).filter(function(a){
+    var teamArts = (articles||[]).filter(function(a){
       if ((a.league||"").toLowerCase() !== lgLower) return false;
       return (a.franchise && a.franchise === ab) ||
              (a.title && a.title.toLowerCase().indexOf(nameLower) >= 0) ||
              (a.chapo && a.chapo.toLowerCase().indexOf(nameLower) >= 0);
     }).slice(0,3);
     /* 2. Fallback : derniers articles de la ligue si pas assez d'articles équipe */
-    if (filtered.length < 2) {
-      var lgArts = (articles||[]).filter(function(a){
-        return (a.league||"").toLowerCase()===lgLower && filtered.indexOf(a)<0;
-      }).slice(0, 3 - filtered.length);
-      filtered = filtered.concat(lgArts);
+    var fallbackArts = [];
+    if (teamArts.length < 2) {
+      fallbackArts = (articles||[]).filter(function(a){
+        return (a.league||"").toLowerCase()===lgLower && teamArts.indexOf(a)<0;
+      }).slice(0, 3 - teamArts.length);
     }
+    var filtered = teamArts.concat(fallbackArts);
+    var fallbackSet = new Set(fallbackArts.map(function(a){return a.id;}));
     if(!filtered.length) return React.createElement("div",{style:{background:"rgba(255,255,255,0.88)",borderRadius:6,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",marginBottom:8}},
       React.createElement("div",{style:{background:"#111",padding:"5px 10px",display:"flex",alignItems:"center",gap:6}},
         React.createElement("div",{style:{width:2,height:10,background:lc,borderRadius:1}}),
@@ -7710,7 +7712,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
           onMouseEnter:function(e){e.currentTarget.style.background=col.bg+"0a";},
           onMouseLeave:function(e){e.currentTarget.style.background="transparent";}
         },
-          a.franchise && a.franchise!==ab && React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,fontWeight:800,color:col.bg,background:col.bg+"18",borderRadius:3,padding:"1px 4px",display:"inline-block",marginBottom:2}},(matchData.lg||"")),
+          fallbackSet.has(a.id) && React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,fontWeight:800,color:col.bg,background:col.bg+"18",borderRadius:3,padding:"1px 4px",display:"inline-block",marginBottom:2}},(matchData.lg||"")),
           React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:800,color:"#111",lineHeight:1.2,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}, a.title)
         );
       })
