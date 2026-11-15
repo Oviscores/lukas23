@@ -4329,6 +4329,8 @@ function TeamCardInArticle({ teamId, teamLg, onTeamClick }) {
 // Basé sur la ligue de l'article → zéro homonyme cross-ligue.
 function linkifyBody(html, lg, onPlayerClick, onTeamClick) {
   if (!html) return null;
+  // Détection automatique des joueurs désactivée — les liens sont gérés manuellement dans Sanity
+  return React.createElement('div', { dangerouslySetInnerHTML: { __html: html }, style: { fontFamily: "'Barlow',sans-serif", fontSize: 16, color: '#111', lineHeight: 1.9, fontWeight: 500 } });
   var players = PLAYERS_DB[lg] || [];
   var lc = LG[lg] ? LG[lg].color : '#D50A0A';
 
