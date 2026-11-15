@@ -7426,115 +7426,104 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
       },
       style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: copied ? "#16a34a" : "#555", background: copied ? "#dcfce7" : "rgba(0,0,0,0.06)", border: "none", borderRadius: 4, padding: "5px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5, transition: "all 0.2s" }
     }, copied ? "\u2713 COPI\xC9" : "\uD83D\uDD17 PARTAGER");
-  })())),
-  /* ===== LAYOUT 3 COLONNES ===== */
-  (function() {
-    /* --- Sidebar joueurs (top 3) --- */
-    function renderSidebarPlayers(players, col, teamAb, teamName) {
-      var top3 = players.slice(0, 3);
-      if (!top3.length) return null;
-      return top3.map(function(p, i) {
-        return React.createElement("div", {
-          key: p.id,
-          onClick: function() { if (onPlayerClick) onPlayerClick(p.id, matchData.lg); },
-          style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, boxShadow: "0 1px 6px rgba(0,0,0,0.07)", marginBottom: 8, padding: "10px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, backdropFilter: "blur(8px)" },
-          onMouseEnter: function(e) { e.currentTarget.style.background = col.bg + "12"; },
-          onMouseLeave: function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.85)"; }
-        },
-          React.createElement("div", { style: { width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg," + col.bg + "30," + col.bg + "10)", border: "2px solid " + col.bg + "55", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } },
-            React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: col.bg } }, "#", p.jersey)
-          ),
-          React.createElement("div", { style: { flex: 1, minWidth: 0 } },
-            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: "#111", lineHeight: 1.1 } }, p.name),
-            React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#aaa", marginTop: 2 } },
-              React.createElement("span", { style: { background: col.bg + "20", color: col.bg, borderRadius: 3, padding: "1px 5px", fontWeight: 700, marginRight: 4 } }, p.pos),
-              p.contract && p.contract.aav ? p.contract.aav : ""
-            )
-          ),
-          React.createElement("span", { style: { color: "#ddd", fontSize: 14 } }, "›")
-        );
-      });
-    }
-    /* --- Sidebar classement division --- */
-    function renderSidebarStandings(teamAb) {
-      var allConf = (window.__CONF_STANDINGS__ || CONF_STANDINGS)[matchData.lg] || {};
-      var divName = null, divTeams = null;
-      Object.entries(allConf).forEach(function(entry) {
-        var d = entry[0], teams = entry[1];
-        if (teams.some(function(t) { return t.ab === teamAb; })) { divName = d; divTeams = teams; }
-      });
-      if (!divTeams) return null;
-      return React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.07)", marginBottom: 8, backdropFilter: "blur(8px)" } },
-        React.createElement("div", { style: { background: "#111", padding: "7px 12px", display: "flex", alignItems: "center", gap: 6 } },
-          React.createElement("div", { style: { width: 3, height: 12, background: lc, borderRadius: 2 } }),
-          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, divName)
-        ),
-        divTeams.map(function(s, i) {
-          var isThis = s.ab === teamAb;
-          var isHome = s.ab === _homeAb;
-          var isAway = s.ab === _awayAb;
-          var highlight = isHome ? hc : isAway ? ac : null;
-          return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 7, padding: "6px 12px", borderBottom: "1px solid #f8f8f8", background: isThis ? (highlight ? highlight.bg + "12" : lc + "10") : "transparent" } },
-            React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: i === 0 ? lc : "#ccc", width: 12 } }, s.r),
-            getTeamLogo(s.ab, matchData.lg, 18),
-            React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: isThis ? 900 : 600, color: isThis ? "#111" : "#666", flex: 1 } }, TEAM_NAMES[s.ab + "_" + matchData.lg] || s.ab),
-            React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 800, color: i === 0 ? lc : "#555" } },
-              matchData.lg === "NHL" ? (s.pts || "") : matchData.lg === "NBA" || matchData.lg === "MLB" ? (s.pct || "") : (s.w + "-" + s.l)
-            )
-          );
-        })
-      );
-    }
-    /* --- Sidebar articles --- */
-    function renderSidebarArticles(teamAb, teamName, col) {
-      var nameLast = (teamName.split(" ").pop() || "").toLowerCase();
-      var arts = (articles || []).filter(function(a) {
-        return a.league === matchData.lg && (a.franchise === teamAb || (a.title || "").toLowerCase().includes(nameLast) || (a.chapo || "").toLowerCase().includes(nameLast));
-      }).slice(0, 4);
-      if (!arts.length) return null;
-      return React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.07)", backdropFilter: "blur(8px)" } },
-        React.createElement("div", { style: { background: "#111", padding: "7px 12px", display: "flex", alignItems: "center", gap: 6 } },
-          React.createElement("div", { style: { width: 3, height: 12, background: col.bg, borderRadius: 2 } }),
-          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: "#fff" } }, "ARTICLES")
-        ),
-        arts.map(function(a, i) {
-          return React.createElement("div", { key: i,
-            onClick: function() { if (onArticleClick) onArticleClick(a); },
-            style: { padding: "9px 12px", borderBottom: i < arts.length - 1 ? "1px solid #f5f5f5" : "none", cursor: "pointer" },
-            onMouseEnter: function(e) { e.currentTarget.style.background = col.bg + "10"; },
-            onMouseLeave: function(e) { e.currentTarget.style.background = "transparent"; }
-          },
-            React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111", lineHeight: 1.3, textTransform: "uppercase" } }, a.title),
-            React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#aaa", marginTop: 3, lineHeight: 1.4 } }, (a.chapo || "").slice(0, 80) + (a.chapo && a.chapo.length > 80 ? "…" : ""))
-          );
-        })
-      );
-    }
-    /* --- Sidebar header équipe --- */
-    function renderSidebarTeamHeader(teamAb, teamName, col, isHome) {
-      return React.createElement("div", {
-        onClick: function() { if (onTeamClick) onTeamClick(teamAb, matchData.lg); },
-        style: { background: "linear-gradient(135deg," + col.bg + " 0%," + col.bg + "cc 100%)", borderRadius: 6, padding: "12px 14px", marginBottom: 8, display: "flex", alignItems: "center", gap: 10, cursor: "pointer", boxShadow: "0 2px 8px " + col.bg + "44" }
-      },
-        getTeamLogo(teamAb, matchData.lg, 32),
-        React.createElement("div", null,
-          React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.6)", letterSpacing: "0.1em" } }, isHome ? "DOMICILE" : "VISITEUR"),
-          React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 900, color: "#fff" } }, teamName)
-        ),
-        React.createElement("span", { style: { marginLeft: "auto", color: "rgba(255,255,255,0.5)", fontSize: 14 } }, "›")
-      );
-    }
-    return React.createElement("div", { style: { display: "grid", gridTemplateColumns: "260px 1fr 260px", gap: 16, padding: "16px 16px 60px", alignItems: "flex-start" } },
-      /* ===== COLONNE GAUCHE — DOMICILE ===== */
-      React.createElement("div", { style: { display: "flex", flexDirection: "column" } },
-        renderSidebarTeamHeader(_homeAb, hName, hc, true),
-        renderSidebarPlayers(hPlayers, hc, _homeAb, hName),
-        renderSidebarStandings(_homeAb),
-        renderSidebarArticles(_homeAb, hName, hc)
+  })())), (function(){
+  /* ===== HELPERS SIDEBAR ===== */
+  function sidebarHeader(ab, name, col, isHome) {
+    return React.createElement("div", {
+      onClick: function(){ if(onTeamClick) onTeamClick(ab, matchData.lg); },
+      style:{ background:"linear-gradient(135deg,"+col.bg+" 0%,"+col.bg+"cc 100%)", borderRadius:6, padding:"10px 14px", marginBottom:8, cursor:"pointer", display:"flex", alignItems:"center", gap:8, boxShadow:"0 2px 8px rgba(0,0,0,0.12)" }
+    },
+      getTeamLogo(ab, matchData.lg, 28),
+      React.createElement("div",{style:{flex:1,minWidth:0}},
+        React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,fontWeight:700,color:"rgba(255,255,255,0.65)",letterSpacing:"0.1em"}}, isHome?"DOMICILE":"VISITEUR"),
+        React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:16,fontWeight:900,color:"#fff",lineHeight:1.1}}, name)
       ),
-      /* ===== COLONNE CENTRALE ===== */
-      React.createElement("div", null,
-      /* @__PURE__ */ React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 8, padding: "28px 24px", marginBottom: 16, boxShadow: "0 6px 24px rgba(0,0,0,0.2)" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, letterSpacing: "0.16em", color: "rgba(255,255,255,0.55)" } }, isLive ? "\u{1F534} LIVE \u2014 " + (matchData.period || '') : isFinal ? "FINAL" : "\xC0 VENIR \u2014 " + matchData.time)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 24 } },
+      React.createElement("span",{style:{color:"rgba(255,255,255,0.5)",fontSize:12}},"›")
+    );
+  }
+  function sidebarPlayers(players, col) {
+    var top3 = players.slice(0,3);
+    if(!top3.length) return null;
+    return top3.map(function(p,i){
+      return React.createElement("div",{
+        key:p.id, onClick:function(){ if(onPlayerClick) onPlayerClick(p.id, matchData.lg); },
+        style:{ background:"rgba(255,255,255,0.88)", borderRadius:6, boxShadow:"0 1px 4px rgba(0,0,0,0.07)", marginBottom:6, padding:"9px 11px", cursor:"pointer", display:"flex", alignItems:"center", gap:9, backdropFilter:"blur(8px)" },
+        onMouseEnter:function(e){e.currentTarget.style.background=col.bg+"14";},
+        onMouseLeave:function(e){e.currentTarget.style.background="rgba(255,255,255,0.88)";}
+      },
+        React.createElement("div",{style:{width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg,"+col.bg+"30,"+col.bg+"10)",border:"2px solid "+col.bg+"55",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,color:col.bg}},"#",p.jersey)
+        ),
+        React.createElement("div",{style:{flex:1,minWidth:0}},
+          React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:900,color:"#111",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}, p.name),
+          React.createElement("div",{style:{fontFamily:"'Barlow',sans-serif",fontSize:9,color:"#aaa",marginTop:1}},
+            React.createElement("span",{style:{background:col.bg+"20",color:col.bg,borderRadius:3,padding:"1px 4px",fontWeight:700,marginRight:3}}, p.pos),
+            p.contract&&p.contract.aav?p.contract.aav:""
+          )
+        ),
+        React.createElement("span",{style:{color:"#ddd",fontSize:12}},"›")
+      );
+    });
+  }
+  function sidebarStandings(ab) {
+    var lgStands = CONF_STANDINGS[matchData.lg] || {};
+    var divName = null, divTeams = null;
+    Object.entries(lgStands).forEach(function(e){ if(e[1].some(function(t){return t.ab===ab;})){divName=e[0];divTeams=e[1];} });
+    if(!divTeams) return null;
+    return React.createElement("div",{style:{background:"rgba(255,255,255,0.88)",borderRadius:6,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",marginBottom:8}},
+      React.createElement("div",{style:{background:"#111",padding:"5px 10px",display:"flex",alignItems:"center",gap:6}},
+        React.createElement("div",{style:{width:2,height:10,background:lc,borderRadius:1}}),
+        React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,letterSpacing:"0.08em",color:"#fff"}}, divName)
+      ),
+      divTeams.map(function(s,i){
+        var isPlaying = s.ab===_homeAb||s.ab===_awayAb;
+        var isH = s.ab===_homeAb;
+        return React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",padding:"5px 10px",gap:6,borderBottom:i<divTeams.length-1?"1px solid #f8f8f8":"none",background:isPlaying?(isH?hc.bg+"14":ac.bg+"14"):"transparent"}},
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:900,color:i===0?lc:"#ccc",width:12,textAlign:"center"}}, s.r),
+          getTeamLogo(s.ab, matchData.lg, 16),
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:isPlaying?900:600,color:isPlaying?"#111":"#555",flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}, TEAM_NAMES[s.ab+"_"+matchData.lg]||s.ab),
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:800,color:i===0?lc:"#333"}},
+            matchData.lg==="NFL"?s.w+"-"+s.l:matchData.lg==="NBA"||matchData.lg==="MLB"?s.pct:s.pts
+          )
+        );
+      })
+    );
+  }
+  function sidebarArticles(ab, name, col) {
+    var lgLower = (matchData.lg||"").toLowerCase();
+    var filtered = (articles||[]).filter(function(a){
+      return (a.league||"").toLowerCase()===lgLower && (
+        (a.franchise&&a.franchise===ab) ||
+        (a.title&&a.title.toLowerCase().indexOf(name.toLowerCase())>=0)
+      );
+    }).slice(0,4);
+    if(!filtered.length) return null;
+    return React.createElement("div",{style:{background:"rgba(255,255,255,0.88)",borderRadius:6,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",marginBottom:8}},
+      React.createElement("div",{style:{background:"#111",padding:"5px 10px",display:"flex",alignItems:"center",gap:6}},
+        React.createElement("div",{style:{width:2,height:10,background:lc,borderRadius:1}}),
+        React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,letterSpacing:"0.08em",color:"#fff"}}, "ARTICLES")
+      ),
+      filtered.map(function(a,i){
+        return React.createElement("div",{key:a.id||i,onClick:function(){if(onArticleClick)onArticleClick(a);},style:{padding:"7px 10px",borderBottom:i<filtered.length-1?"1px solid #f8f8f8":"none",cursor:"pointer"},
+          onMouseEnter:function(e){e.currentTarget.style.background=col.bg+"0a";},
+          onMouseLeave:function(e){e.currentTarget.style.background="transparent";}
+        },
+          React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:800,color:"#111",lineHeight:1.2,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}, a.title)
+        );
+      })
+    );
+  }
+  /* ===== GRID 3 COLONNES ===== */
+  return React.createElement("div",{style:{display:"grid",gridTemplateColumns:"240px 1fr 240px",gap:14,padding:"16px 16px 60px",alignItems:"flex-start"}},
+    /* COLONNE GAUCHE — DOMICILE */
+    React.createElement("div",{style:{display:"flex",flexDirection:"column"}},
+      sidebarHeader(_homeAb, hName, hc, true),
+      sidebarPlayers(hPlayers, hc),
+      sidebarStandings(_homeAb),
+      sidebarArticles(_homeAb, hName, hc)
+    ),
+    /* COLONNE CENTRALE */
+    React.createElement("div",{style:{minWidth:0}}, /* @__PURE__ */ React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 8, padding: "28px 24px", marginBottom: 16, boxShadow: "0 6px 24px rgba(0,0,0,0.2)" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, letterSpacing: "0.16em", color: "rgba(255,255,255,0.55)" } }, isLive ? "\u{1F534} LIVE \u2014 " + (matchData.period || '') : isFinal ? "FINAL" : "\xC0 VENIR \u2014 " + matchData.time)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 24 } },
     /* DOMICILE */
     /* @__PURE__ */ React.createElement("div", { style: { flex: 1, textAlign: "right" } },
       /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10, marginBottom: 2 } },
@@ -7566,7 +7555,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
       ),
       /* @__PURE__ */ renderStandMini(aStand, ac)
     )
-  ), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 14 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 17, color: "rgba(255,255,255,0.5)" } }, "\u{1F4CD} ", matchData.arena, " \xB7 ", matchData.city)))),
+  ), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 14 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 17, color: "rgba(255,255,255,0.5)" } }, "\u{1F4CD} ", matchData.arena, " \xB7 ", matchData.city))),
       /* ===== RÉSUMÉ VIDÉO YOUTUBE ===== */
       React.createElement(YouTubeHighlight, { matchData: matchData, isFinal: isFinal || ['FINAL','OFF','Final','STATUS_FINAL'].indexOf(matchData.status) !== -1, isLive: isLive || ['LIVE','CRIT','Live','STATUS_IN_PROGRESS'].indexOf(matchData.status) !== -1, lc: lc, homeAb: _homeAb, awayAb: _awayAb }),
       (bxLoading || boxscore) && /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", backdropFilter: "blur(10px)", marginBottom: 14 } },
@@ -8644,16 +8633,16 @@ Object.entries(CONF_STANDINGS[matchData.lg] || {}).map(([div, teams]) => {
       )
     )
   )
-      ), /* fin colonne centrale createElement("div") */
-      /* ===== COLONNE DROITE — VISITEUR ===== */
-      React.createElement("div", { style: { display: "flex", flexDirection: "column" } },
-        renderSidebarTeamHeader(_awayAb, aName, ac, false),
-        renderSidebarPlayers(aPlayers, ac, _awayAb, aName),
-        renderSidebarStandings(_awayAb),
-        renderSidebarArticles(_awayAb, aName, ac)
-      )
-  })()
-)
+  ), /* fin colonne centrale */
+  /* COLONNE DROITE — VISITEUR */
+  React.createElement("div",{style:{display:"flex",flexDirection:"column"}},
+    sidebarHeader(_awayAb, aName, ac, false),
+    sidebarPlayers(aPlayers, ac),
+    sidebarStandings(_awayAb),
+    sidebarArticles(_awayAb, aName, ac)
+  )
+  ); })() /* fin grid 3 colonnes */
+  )
 
 }
 function MatchCard({ m, lc, lg, onMatchClick }) {
