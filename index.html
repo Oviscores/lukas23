@@ -7444,14 +7444,33 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
   function sidebarPlayers(players, col) {
     var top3 = players.slice(0,3);
     if(!top3.length) return null;
+    var lgLower = (matchData.lg||"").toLowerCase();
+    var photoSport = lgLower === "nfl" ? "nfl" : lgLower === "nba" ? "nba" : lgLower === "mlb" ? "mlb" : "hockey";
+    function _slug(str){ return (str||'').toLowerCase().replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i').replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ç]/g,'c').replace(/[ñ]/g,'n').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+    function _teamSlug(ab){ var key=ab+'_'+matchData.lg; var full=TEAM_NAMES[key]||ab; return _slug(full); }
     return top3.map(function(p,i){
-      return React.createElement("div",{
-        key:p.id, onClick:function(){ if(onPlayerClick) onPlayerClick(p.id, matchData.lg); },
-        style:{ background:"rgba(255,255,255,0.88)", borderRadius:6, boxShadow:"0 1px 4px rgba(0,0,0,0.07)", marginBottom:6, padding:"9px 11px", cursor:"pointer", display:"flex", alignItems:"center", gap:9, backdropFilter:"blur(8px)" },
+      var photoId = p.espnId || p.nhlId || null;
+      var photoUrl = photoId ? ("https://a.espncdn.com/i/headshots/"+photoSport+"/players/full/"+photoId+".png") : null;
+      var pSlug = _slug(p.name);
+      var tSlug = _teamSlug(p.team);
+      var playerUrl = "https://zoneus.fr/"+lgLower+"/"+tSlug+"/"+pSlug;
+      return React.createElement("a",{
+        key:p.id,
+        href: playerUrl,
+        onClick:function(e){
+          e.preventDefault();
+          if(onPlayerClick) onPlayerClick(p.id, matchData.lg);
+        },
+        style:{ background:"rgba(255,255,255,0.88)", borderRadius:6, boxShadow:"0 1px 4px rgba(0,0,0,0.07)", marginBottom:6, padding:"9px 11px", cursor:"pointer", display:"flex", alignItems:"center", gap:9, backdropFilter:"blur(8px)", textDecoration:"none" },
         onMouseEnter:function(e){e.currentTarget.style.background=col.bg+"14";},
         onMouseLeave:function(e){e.currentTarget.style.background="rgba(255,255,255,0.88)";}
       },
-        React.createElement("div",{style:{width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg,"+col.bg+"30,"+col.bg+"10)",border:"2px solid "+col.bg+"55",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
+        photoUrl
+          ? React.createElement("img",{src:photoUrl, alt:p.name, style:{width:42,height:42,borderRadius:"50%",objectFit:"cover",border:"2px solid "+col.bg+"55",flexShrink:0,background:"#f0f0f0"},
+              onError:function(e){e.target.style.display="none";e.target.nextSibling&&(e.target.nextSibling.style.display="flex");}
+            })
+          : null,
+        React.createElement("div",{style:{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,"+col.bg+"30,"+col.bg+"10)",border:"2px solid "+col.bg+"55",display: photoUrl ? "none" : "flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
           React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,color:col.bg}},"#",p.jersey)
         ),
         React.createElement("div",{style:{flex:1,minWidth:0}},
