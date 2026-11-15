@@ -7631,47 +7631,86 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
   }
   function sidebarStandings(ab) {
     var lgStands = CONF_STANDINGS[matchData.lg] || {};
-    var divName = null, divTeams = null;
-    Object.entries(lgStands).forEach(function(e){ if(e[1].some(function(t){return t.ab===ab;})){divName=e[0];divTeams=e[1];} });
-    if(!divTeams) return null;
+    /* Trouver la conférence (ou division) qui contient l'équipe */
+    var confName = null, confTeams = null;
+    Object.entries(lgStands).forEach(function(entry){
+      var teams = entry[1];
+      if (teams.some(function(t){return t.ab===ab;})) { confName=entry[0]; confTeams=teams; }
+    });
+    if (!confTeams) return React.createElement("div",{style:{background:"rgba(255,255,255,0.88)",borderRadius:6,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",marginBottom:8}},
+      React.createElement("div",{style:{background:"#111",padding:"5px 10px",display:"flex",alignItems:"center",gap:6}},
+        React.createElement("div",{style:{width:2,height:10,background:lc,borderRadius:1}}),
+        React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,letterSpacing:"0.08em",color:"#fff"}}, "CLASSEMENT")
+      ),
+      React.createElement("div",{style:{padding:"10px",textAlign:"center",fontFamily:"'Barlow',sans-serif",fontSize:11,color:"#bbb"}},"Chargement…")
+    );
+    /* Afficher max 8 équipes, l'équipe courante toujours visible */
+    var maxShow = 8;
+    var teams = confTeams;
+    var teamIdx = teams.findIndex(function(t){return t.ab===ab;});
+    var display = teams;
+    if (teams.length > maxShow) {
+      var start = Math.max(0, Math.min(teamIdx - 3, teams.length - maxShow));
+      display = teams.slice(start, start + maxShow);
+    }
+    var statLabel = function(s) {
+      if (matchData.lg==="NFL") return s.w+"-"+s.l;
+      if (matchData.lg==="NBA"||matchData.lg==="MLB") return s.pct||".000";
+      return (s.pts||0)+" pts";
+    };
     return React.createElement("div",{style:{background:"rgba(255,255,255,0.88)",borderRadius:6,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",marginBottom:8}},
       React.createElement("div",{style:{background:"#111",padding:"5px 10px",display:"flex",alignItems:"center",gap:6}},
         React.createElement("div",{style:{width:2,height:10,background:lc,borderRadius:1}}),
-        React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,letterSpacing:"0.08em",color:"#fff"}}, divName)
+        React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,letterSpacing:"0.08em",color:"#fff"}}, confName||"CLASSEMENT")
       ),
-      divTeams.map(function(s,i){
-        var isPlaying = s.ab===_homeAb||s.ab===_awayAb;
-        var isH = s.ab===_homeAb;
-        return React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",padding:"5px 10px",gap:6,borderBottom:i<divTeams.length-1?"1px solid #f8f8f8":"none",background:isPlaying?(isH?hc.bg+"14":ac.bg+"14"):"transparent"}},
-          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:900,color:i===0?lc:"#ccc",width:12,textAlign:"center"}}, s.r),
-          getTeamLogo(s.ab, matchData.lg, 16),
-          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:isPlaying?900:600,color:isPlaying?"#111":"#555",flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}, TEAM_NAMES[s.ab+"_"+matchData.lg]||s.ab),
-          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:800,color:i===0?lc:"#333"}},
-            matchData.lg==="NFL"?s.w+"-"+s.l:matchData.lg==="NBA"||matchData.lg==="MLB"?s.pct:s.pts
-          )
+      display.map(function(s,i){
+        var isCur = s.ab===ab;
+        var isOther = (s.ab===_homeAb||s.ab===_awayAb) && !isCur;
+        var bg = isCur ? (ab===_homeAb?hc.bg+"22":ac.bg+"22") : isOther ? "rgba(0,0,0,0.04)" : "transparent";
+        return React.createElement("div",{key:s.ab||i,style:{display:"flex",alignItems:"center",padding:"5px 10px",gap:6,borderBottom:i<display.length-1?"1px solid #f4f4f4":"none",background:bg}},
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:isCur?900:600,color:s.r===1?lc:"#aaa",width:14,textAlign:"center",flexShrink:0}}, s.r),
+          getTeamLogo(s.ab, matchData.lg, 15),
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:isCur?900:600,color:isCur?"#111":"#555",flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}, TEAM_NAMES[s.ab+"_"+matchData.lg]||s.ab),
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:isCur?900:700,color:isCur?"#111":"#999",flexShrink:0}}, statLabel(s))
         );
       })
     );
   }
   function sidebarArticles(ab, name, col) {
     var lgLower = (matchData.lg||"").toLowerCase();
+    var nameLower = name.toLowerCase();
+    /* 1. Articles spécifiques à l'équipe (franchise ou mention dans le titre) */
     var filtered = (articles||[]).filter(function(a){
-      return (a.league||"").toLowerCase()===lgLower && (
-        (a.franchise&&a.franchise===ab) ||
-        (a.title&&a.title.toLowerCase().indexOf(name.toLowerCase())>=0)
-      );
-    }).slice(0,4);
-    if(!filtered.length) return null;
+      if ((a.league||"").toLowerCase() !== lgLower) return false;
+      return (a.franchise && a.franchise === ab) ||
+             (a.title && a.title.toLowerCase().indexOf(nameLower) >= 0) ||
+             (a.chapo && a.chapo.toLowerCase().indexOf(nameLower) >= 0);
+    }).slice(0,3);
+    /* 2. Fallback : derniers articles de la ligue si pas assez d'articles équipe */
+    if (filtered.length < 2) {
+      var lgArts = (articles||[]).filter(function(a){
+        return (a.league||"").toLowerCase()===lgLower && filtered.indexOf(a)<0;
+      }).slice(0, 3 - filtered.length);
+      filtered = filtered.concat(lgArts);
+    }
+    if(!filtered.length) return React.createElement("div",{style:{background:"rgba(255,255,255,0.88)",borderRadius:6,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",marginBottom:8}},
+      React.createElement("div",{style:{background:"#111",padding:"5px 10px",display:"flex",alignItems:"center",gap:6}},
+        React.createElement("div",{style:{width:2,height:10,background:lc,borderRadius:1}}),
+        React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,letterSpacing:"0.08em",color:"#fff"}}, "ARTICLES")
+      ),
+      React.createElement("div",{style:{padding:"12px 10px",textAlign:"center",fontFamily:"'Barlow',sans-serif",fontSize:11,color:"#bbb"}},"Aucun article")
+    );
     return React.createElement("div",{style:{background:"rgba(255,255,255,0.88)",borderRadius:6,overflow:"hidden",boxShadow:"0 1px 4px rgba(0,0,0,0.07)",marginBottom:8}},
       React.createElement("div",{style:{background:"#111",padding:"5px 10px",display:"flex",alignItems:"center",gap:6}},
         React.createElement("div",{style:{width:2,height:10,background:lc,borderRadius:1}}),
         React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,letterSpacing:"0.08em",color:"#fff"}}, "ARTICLES")
       ),
       filtered.map(function(a,i){
-        return React.createElement("div",{key:a.id||i,onClick:function(){if(onArticleClick)onArticleClick(a);},style:{padding:"7px 10px",borderBottom:i<filtered.length-1?"1px solid #f8f8f8":"none",cursor:"pointer"},
+        return React.createElement("a",{key:a.id||i,href:"#",onClick:function(e){e.preventDefault();if(onArticleClick)onArticleClick(a);},style:{display:"block",padding:"7px 10px",borderBottom:i<filtered.length-1?"1px solid #f8f8f8":"none",cursor:"pointer",textDecoration:"none"},
           onMouseEnter:function(e){e.currentTarget.style.background=col.bg+"0a";},
           onMouseLeave:function(e){e.currentTarget.style.background="transparent";}
         },
+          a.franchise && a.franchise!==ab && React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,fontWeight:800,color:col.bg,background:col.bg+"18",borderRadius:3,padding:"1px 4px",display:"inline-block",marginBottom:2}},(matchData.lg||"")),
           React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:800,color:"#111",lineHeight:1.2,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}, a.title)
         );
       })
@@ -11710,6 +11749,52 @@ function mergeAndSetFeed() {
 }
 var NFL_DIV = {'BUF':'AFC Est','MIA':'AFC Est','NE':'AFC Est','NYJ':'AFC Est','BAL':'AFC Nord','CIN':'AFC Nord','CLE':'AFC Nord','PIT':'AFC Nord','HOU':'AFC Sud','IND':'AFC Sud','JAX':'AFC Sud','TEN':'AFC Sud','DEN':'AFC Ouest','KC':'AFC Ouest','LV':'AFC Ouest','LAC':'AFC Ouest','DAL':'NFC Est','NYG':'NFC Est','PHI':'NFC Est','WSH':'NFC Est','CHI':'NFC Nord','DET':'NFC Nord','GB':'NFC Nord','MIN':'NFC Nord','ATL':'NFC Sud','CAR':'NFC Sud','NO':'NFC Sud','TB':'NFC Sud','ARI':'NFC Ouest','LAR':'NFC Ouest','SF':'NFC Ouest','SEA':'NFC Ouest'};
 window.fetchStandings = async function(lg) {
+  if (lg === 'NHL') {
+    try {
+      var resp = await fetch('https://api-web.nhle.com/v1/standings/now');
+      var data = await resp.json();
+      if (!data || !data.standings) throw new Error('no data');
+      var confEst = [], confOuest = [];
+      data.standings.forEach(function(t) {
+        var ab = (t.teamAbbrev && t.teamAbbrev.default) || '';
+        var row = { ab: ab, w: t.wins||0, l: t.losses||0, pts: t.points||0 };
+        if (t.conferenceAbbrev === 'E') confEst.push(row);
+        else confOuest.push(row);
+      });
+      confEst.sort(function(a,b){return b.pts-a.pts;}); confEst.forEach(function(r,i){r.r=i+1;});
+      confOuest.sort(function(a,b){return b.pts-a.pts;}); confOuest.forEach(function(r,i){r.r=i+1;});
+      var confs = { 'Conf. Est': confEst, 'Conf. Ouest': confOuest };
+      CONF_STANDINGS.NHL = confs; window.__CONF_STANDINGS__.NHL = confs;
+      if (window.__setStandings__) window.__setStandings__('NHL', confs);
+      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+    } catch(e) { console.log('NHL standings error:', e.message); }
+  }
+  if (lg === 'NBA') {
+    try {
+      var resp = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=2026');
+      var data = await resp.json();
+      if (!data || !data.children) throw new Error('no data');
+      var confs = {};
+      data.children.forEach(function(conf) {
+        var entries = (conf.standings && conf.standings.entries) || [];
+        if (entries.length === 0 && conf.children) {
+          conf.children.forEach(function(div) { (div.standings&&div.standings.entries||[]).forEach(function(e){entries.push(e);}); });
+        }
+        var rows = entries.map(function(e,i) {
+          var stats = {}; (e.stats||[]).forEach(function(s){stats[s.name]=s.value;});
+          var pctDisp = e.stats&&e.stats.find(function(s){return s.name==='winPercent';});
+          return { r:i+1, ab:e.team&&e.team.abbreviation||'', w:stats.wins||0, l:stats.losses||0, pct:pctDisp?pctDisp.displayValue:'.000' };
+        });
+        rows.sort(function(a,b){return b.w-a.w;}); rows.forEach(function(r,i){r.r=i+1;});
+        if (rows.length > 0) confs[conf.name||'Conference'] = rows;
+      });
+      if (Object.keys(confs).length > 0) {
+        CONF_STANDINGS.NBA = confs; window.__CONF_STANDINGS__.NBA = confs;
+        if (window.__setStandings__) window.__setStandings__('NBA', confs);
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
+    } catch(e) { console.log('NBA standings error:', e.message); }
+  }
   if (lg === 'MLB') {
     try {
       var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_standings');
@@ -11719,6 +11804,7 @@ window.fetchStandings = async function(lg) {
       (data.records||[]).forEach(function(div) { result[divMap[div.division.id]||'Div'+div.division.id] = div.teamRecords.map(function(t,i) { return { r:i+1, ab:t.team.abbreviation==='AZ'?'ARI':t.team.abbreviation, w:t.wins, l:t.losses, pct:t.winningPercentage, gb:t.gamesBack==='-'?'-':t.gamesBack }; }); });
       window.__CONF_STANDINGS__.MLB = result; CONF_STANDINGS.MLB = result;
       if (window.__setStandings__) window.__setStandings__('MLB', result);
+      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
     } catch(e) { console.log('MLB standings error:', e.message); }
   }
   if (lg === 'NFL') {
@@ -11730,6 +11816,7 @@ window.fetchStandings = async function(lg) {
       Object.keys(result2).forEach(function(div) { result2[div].sort(function(a,b){return b.w-a.w;}); result2[div].forEach(function(t,i){t.r=i+1;}); });
       window.__CONF_STANDINGS__.NFL = result2; CONF_STANDINGS.NFL = result2;
       if (window.__setStandings__) window.__setStandings__('NFL', result2);
+      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
     } catch(e) { console.log('NFL standings error:', e.message); }
   }
 };
