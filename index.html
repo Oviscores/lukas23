@@ -11751,22 +11751,29 @@ var NFL_DIV = {'BUF':'AFC Est','MIA':'AFC Est','NE':'AFC Est','NYJ':'AFC Est','B
 window.fetchStandings = async function(lg) {
   if (lg === 'NHL') {
     try {
-      var resp = await fetch('https://api-web.nhle.com/v1/standings/now');
+      /* ESPN standings NHL — API publique, pas de CORS */
+      var resp = await fetch('https://site.api.espn.com/apis/v2/sports/hockey/nhl/standings?season=2025');
       var data = await resp.json();
-      if (!data || !data.standings) throw new Error('no data');
-      var confEst = [], confOuest = [];
-      data.standings.forEach(function(t) {
-        var ab = (t.teamAbbrev && t.teamAbbrev.default) || '';
-        var row = { ab: ab, w: t.wins||0, l: t.losses||0, pts: t.points||0 };
-        if (t.conferenceAbbrev === 'E') confEst.push(row);
-        else confOuest.push(row);
+      if (!data || !data.children) throw new Error('no data');
+      var confs = {};
+      data.children.forEach(function(conf) {
+        var entries = (conf.standings && conf.standings.entries) || [];
+        if (entries.length === 0 && conf.children) {
+          conf.children.forEach(function(div) { (div.standings&&div.standings.entries||[]).forEach(function(e){entries.push(e);}); });
+        }
+        var rows = entries.map(function(e,i) {
+          var stats = {}; (e.stats||[]).forEach(function(s){stats[s.name]=s.value;});
+          var pts = stats.points || 0;
+          return { r:i+1, ab:e.team&&e.team.abbreviation||'', w:stats.wins||0, l:stats.losses||0, pts:pts };
+        });
+        rows.sort(function(a,b){return b.pts-a.pts;}); rows.forEach(function(r,i){r.r=i+1;});
+        if (rows.length > 0) confs[conf.name||'Conference'] = rows;
       });
-      confEst.sort(function(a,b){return b.pts-a.pts;}); confEst.forEach(function(r,i){r.r=i+1;});
-      confOuest.sort(function(a,b){return b.pts-a.pts;}); confOuest.forEach(function(r,i){r.r=i+1;});
-      var confs = { 'Conf. Est': confEst, 'Conf. Ouest': confOuest };
-      CONF_STANDINGS.NHL = confs; window.__CONF_STANDINGS__.NHL = confs;
-      if (window.__setStandings__) window.__setStandings__('NHL', confs);
-      if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      if (Object.keys(confs).length > 0) {
+        CONF_STANDINGS.NHL = confs; window.__CONF_STANDINGS__.NHL = confs;
+        if (window.__setStandings__) window.__setStandings__('NHL', confs);
+        if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+      }
     } catch(e) { console.log('NHL standings error:', e.message); }
   }
   if (lg === 'NBA') {
