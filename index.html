@@ -888,6 +888,12 @@ const UNSPLASH = {
   MLB: ["baseball", "baseball-stadium", "baseball-pitcher", "home-run"]
 };
 const PLAYERS_DB = {
+  NHL: [],
+  NFL: [],
+  NBA: [],
+  MLB: []
+};
+const _PLAYERS_DB_UNUSED = {
   NHL: [
     {
       id: "nhl-matthews",
@@ -1104,6 +1110,81 @@ const PLAYERS_DB = {
       career: [
         { season: "2023-24", team: "New Jersey Devils", lg: "NHL", gp: 38, g: 0, a: 1, pts: 1, plusMinus: "0", pim: 2, ppg: 0 },
         { season: "2024-25", team: "New Jersey Devils", lg: "NHL", gp: 42, g: 0, a: 0, pts: 0, plusMinus: "0", pim: 0, ppg: 0 }
+      ],
+      gamelog: []
+    },
+    {
+      id: "nhl-konecny",
+      name: "Travis Konecny",
+      pos: "RW",
+      team: "PHI",
+      jersey: 11,
+      born: "11 mars 1997",
+      birthplace: "Port Elgin, ON, Canada",
+      nationality: "Canada",
+      height: "1m80",
+      weight: "85kg",
+      shoots: "Droite",
+      contract: { years: "2024-2032", aav: "$7.8M", status: "Sign\xE9" },
+      draft: { year: 2015, round: 1, pick: 24, team: "Philadelphia Flyers" },
+      nhlId: 8479525,
+      bio: "Travis Konecny est le moteur offensif des Philadelphia Flyers. Meilleur pointeur de l'\xE9quipe depuis plusieurs saisons, le centre explosif est devenu la figure de proue d'une jeune franchise en reconstruction. Son jeu intense et son engagement total en font l'un des attaquants les plus complets de sa g\xE9n\xE9ration.",
+      awards: [],
+      statsType: ["GP", "G", "A", "PTS", "+/-", "PIM", "PPG"],
+      career: [
+        { season: "2022-23", team: "Philadelphia Flyers", lg: "NHL", gp: 82, g: 31, a: 42, pts: 73, plusMinus: "-14", pim: 46, ppg: 10 },
+        { season: "2023-24", team: "Philadelphia Flyers", lg: "NHL", gp: 76, g: 42, a: 50, pts: 92, plusMinus: "-6", pim: 36, ppg: 14 },
+        { season: "2024-25", team: "Philadelphia Flyers", lg: "NHL", gp: 71, g: 37, a: 44, pts: 81, plusMinus: "+3", pim: 38, ppg: 12 }
+      ],
+      gamelog: []
+    },
+    {
+      id: "nhl-couturier",
+      name: "Sean Couturier",
+      pos: "C",
+      team: "PHI",
+      jersey: 14,
+      born: "7 d\xE9c. 1992",
+      birthplace: "Bathurst, NB, Canada",
+      nationality: "Canada",
+      height: "1m91",
+      weight: "97kg",
+      shoots: "Gauche",
+      contract: { years: "2022-2031", aav: "$7.75M", status: "Sign\xE9" },
+      draft: { year: 2011, round: 1, pick: 8, team: "Philadelphia Flyers" },
+      nhlId: 8476461,
+      bio: "Sean Couturier est le capitaine et pilier des Philadelphia Flyers depuis plus d'une d\xE9cennie. Vainqueur du Selke Trophy en 2022 (meilleur attaquant d\xE9fensif de la NHL), ce centre complet allie excellence d\xE9fensive et production offensive. Apr\xE8s plusieurs blessures, Couturier est de retour au meilleur de sa forme.",
+      awards: ["Selke Trophy 2022"],
+      statsType: ["GP", "G", "A", "PTS", "+/-", "PIM", "PPG"],
+      career: [
+        { season: "2022-23", team: "Philadelphia Flyers", lg: "NHL", gp: 78, g: 22, a: 39, pts: 61, plusMinus: "-9", pim: 20, ppg: 8 },
+        { season: "2023-24", team: "Philadelphia Flyers", lg: "NHL", gp: 79, g: 26, a: 36, pts: 62, plusMinus: "+5", pim: 16, ppg: 9 },
+        { season: "2024-25", team: "Philadelphia Flyers", lg: "NHL", gp: 74, g: 23, a: 38, pts: 61, plusMinus: "+8", pim: 18, ppg: 7 }
+      ],
+      gamelog: []
+    },
+    {
+      id: "nhl-tippett",
+      name: "Owen Tippett",
+      pos: "RW",
+      team: "PHI",
+      jersey: 74,
+      born: "16 f\xE9vr. 1999",
+      birthplace: "Peterborough, ON, Canada",
+      nationality: "Canada",
+      height: "1m88",
+      weight: "95kg",
+      shoots: "Droite",
+      contract: { years: "2023-2026", aav: "$2.4M", status: "Sign\xE9" },
+      draft: { year: 2017, round: 1, pick: 10, team: "Florida Panthers" },
+      nhlId: 8481560,
+      bio: "Owen Tippett est l'une des jeunes promesses des Philadelphia Flyers. Ailier puissant avec un excellent lancer, il a connu une progression r\xE9guli\xE8re depuis son arriv\xE9e \xE0 Philadelphie et s'est impos\xE9 comme l'un des marqueurs de but fiables de l'\xE9quipe.",
+      awards: [],
+      statsType: ["GP", "G", "A", "PTS", "+/-", "PIM", "PPG"],
+      career: [
+        { season: "2022-23", team: "Philadelphia Flyers", lg: "NHL", gp: 71, g: 20, a: 20, pts: 40, plusMinus: "-14", pim: 24, ppg: 7 },
+        { season: "2023-24", team: "Philadelphia Flyers", lg: "NHL", gp: 68, g: 22, a: 25, pts: 47, plusMinus: "+2", pim: 20, ppg: 8 },
+        { season: "2024-25", team: "Philadelphia Flyers", lg: "NHL", gp: 68, g: 24, a: 22, pts: 46, plusMinus: "+5", pim: 22, ppg: 9 }
       ],
       gamelog: []
     },
@@ -7385,8 +7466,68 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
   const h2h = H2H[h2hKey] || H2H[h2hKeyAlt] || { wins: [0, 0], last5: [], avgGoals: 0 };
   const hStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === _homeAb);
   const aStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === _awayAb);
-  const hPlayers = (PLAYERS_DB[matchData.lg] || []).filter((p) => p.team === _homeAb);
-  const aPlayers = (PLAYERS_DB[matchData.lg] || []).filter((p) => p.team === _awayAb);
+  /* ── TOP SCOREURS SIDEBAR (live via proxy) ── */
+  var _hTop = React.useState([]); var hPlayers = _hTop[0], setHPlayers = _hTop[1];
+  var _aTop = React.useState([]); var aPlayers = _aTop[0], setAPlayers = _aTop[1];
+  React.useEffect(function() {
+    var lg = matchData.lg;
+    var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+    function normalizeNHL(d) {
+      var all = [].concat(d.roster&&d.roster.forwards||[], d.roster&&d.roster.defensemen||[]);
+      var statsMap = {};
+      (d.stats&&d.stats.skaters||[]).forEach(function(s){ statsMap[s.playerId]=s; });
+      return all.map(function(p){
+        var pid = p.id||p.playerId; var s = statsMap[pid]||{};
+        return { id: String(pid), name: (p.firstName&&p.lastName)?((p.firstName.default||p.firstName)+' '+(p.lastName.default||p.lastName)):(p.fullName||''), pos: p.positionCode||p.position||'', jersey: p.sweaterNumber||'', headshot: p.headshot||('https://assets.nhle.com/mugs/nhl/408x408/'+(pid)+'.png'), stat: (s.points||0), statLabel: (s.points||0)+' PTS' };
+      }).sort(function(a,b){return b.stat-a.stat;}).slice(0,3);
+    }
+    function normalizeNBA(d) {
+      var athletes = [];
+      var src = d.roster||d;
+      if (src.positionGroups) src.positionGroups.forEach(function(g){(g.athletes||[]).forEach(function(p){athletes.push(p);});});
+      else if (src.athletes&&src.athletes[0]&&src.athletes[0].items) src.athletes.forEach(function(g){(g.items||[]).forEach(function(p){athletes.push(p);});});
+      else athletes = src.athletes||src;
+      return athletes.filter(function(p){return p&&p.id;}).map(function(p){
+        var cats = p.statistics&&p.statistics.splits&&p.statistics.splits.categories||[];
+        var pts=0; cats.forEach(function(c){(c.stats||[]).forEach(function(sv){if(sv.name==='avgPoints')pts=parseFloat(sv.value)||0;});});
+        var hs = (p.headshot&&p.headshot.href)||('https://a.espncdn.com/i/headshots/nba/players/full/'+p.id+'.png');
+        return { id: String(p.id), name: p.displayName||p.fullName||'', pos: p.position&&p.position.abbreviation||'', jersey: p.jersey||'', headshot: hs, stat: pts, statLabel: pts.toFixed(1)+' PPG' };
+      }).sort(function(a,b){return b.stat-a.stat;}).slice(0,3);
+    }
+    function normalizeNFL(d) {
+      var athletes = [];
+      (d.athletes||[]).forEach(function(g){(g.items||[]).forEach(function(p){athletes.push(p);});});
+      return athletes.filter(function(p){return p&&p.id&&['QB','RB','WR','TE'].indexOf(p.position&&p.position.abbreviation)>=0;}).map(function(p){
+        var hs = p.headshot&&p.headshot.href ? p.headshot.href : ('https://a.espncdn.com/i/headshots/nfl/players/full/'+p.id+'.png');
+        return { id: String(p.id), name: p.displayName||'', pos: p.position&&p.position.abbreviation||'', jersey: p.jersey||'', headshot: hs, stat: 0, statLabel: '' };
+      }).slice(0,3);
+    }
+    function normalizeMLB(d) {
+      var roster = d.roster&&d.roster.roster||[];
+      return roster.filter(function(p){return p&&p.person;}).map(function(p){
+        var pid = p.person.id;
+        return { id: String(pid), name: p.person.fullName||'', pos: p.position&&p.position.abbreviation||'', jersey: p.jerseyNumber||'', headshot: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/'+pid+'/headshot/67/current', stat: 0, statLabel: '' };
+      }).slice(0,3);
+    }
+    function fetchRoster(ab, setter) {
+      var endpoint = null;
+      if (lg==='NHL') endpoint = PROXY+'?league=nhl_roster&team='+ab;
+      else if (lg==='NBA') { var nbaId=NBA_OFFICIAL_IDS&&(NBA_OFFICIAL_IDS[ab]||NBA_TEAM_IDS[ab]); if(nbaId) endpoint=PROXY+'?league=nba_roster&team='+nbaId; }
+      else if (lg==='NFL') { var nflSlug=NFL_ESPN_TEAMS&&NFL_ESPN_TEAMS[ab]; if(nflSlug) endpoint=PROXY+'?league=nfl_roster&team='+nflSlug; }
+      else if (lg==='MLB') { var mlbId=MLB_TEAM_IDS&&MLB_TEAM_IDS[ab]; if(mlbId) endpoint=PROXY+'?league=mlb_roster&team='+mlbId; }
+      if (!endpoint) return;
+      fetch(endpoint).then(function(r){return r.json();}).then(function(d){
+        var players = [];
+        if (lg==='NHL') players = normalizeNHL(d);
+        else if (lg==='NBA') players = normalizeNBA(d);
+        else if (lg==='NFL') players = normalizeNFL(d);
+        else if (lg==='MLB') players = normalizeMLB(d);
+        setter(players);
+      }).catch(function(){});
+    }
+    fetchRoster(_homeAb, setHPlayers);
+    fetchRoster(_awayAb, setAPlayers);
+  }, [matchData.lg, _homeAb, _awayAb]);
   const isLive = matchData.status === "LIVE";
   const isFinal = matchData.status === "FINAL";
   const StatBar = ({ label, home, away, unit = "" }) => {
@@ -7441,47 +7582,51 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
       React.createElement("span",{style:{color:"rgba(255,255,255,0.5)",fontSize:12}},"›")
     );
   }
-  function sidebarPlayers(players, col) {
-    var top3 = players.slice(0,3);
-    if(!top3.length) return null;
+  /* PlayerCard: small sub-component so hooks are called at component level, not inside .map() */
+  function PlayerCard(props) {
+    var p = props.player, col = props.col, playerUrl = props.playerUrl, onPlayerClick = props.onPlayerClick, matchLg = props.matchLg;
+    var _imgState = React.useState(!!p.headshot); var imgOk = _imgState[0], setImgOk = _imgState[1];
+    return React.createElement("a",{
+      href: playerUrl,
+      onClick:function(e){ e.preventDefault(); if(onPlayerClick) onPlayerClick(p.id, matchLg); },
+      style:{ background:"rgba(255,255,255,0.88)", borderRadius:6, boxShadow:"0 1px 4px rgba(0,0,0,0.07)", marginBottom:6, padding:"8px 11px", cursor:"pointer", display:"flex", alignItems:"center", gap:9, backdropFilter:"blur(8px)", textDecoration:"none" },
+      onMouseEnter:function(e){e.currentTarget.style.background=col.bg+"14";},
+      onMouseLeave:function(e){e.currentTarget.style.background="rgba(255,255,255,0.88)";}
+    },
+      imgOk && p.headshot
+        ? React.createElement("img",{src:p.headshot, alt:p.name, style:{width:44,height:44,borderRadius:"50%",objectFit:"cover",objectPosition:"top center",border:"2px solid "+col.bg+"66",flexShrink:0,background:"#f0f0f0"},
+            onError:function(){ setImgOk(false); }
+          })
+        : React.createElement("div",{style:{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg,"+col.bg+"30,"+col.bg+"10)",border:"2px solid "+col.bg+"55",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
+            React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:900,color:col.bg}}, p.jersey?"#"+p.jersey:p.pos)
+          ),
+      React.createElement("div",{style:{flex:1,minWidth:0}},
+        React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:900,color:"#111",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}, p.name),
+        React.createElement("div",{style:{fontFamily:"'Barlow',sans-serif",fontSize:9,color:"#aaa",marginTop:2,display:"flex",alignItems:"center",gap:4}},
+          p.pos && React.createElement("span",{style:{background:col.bg+"20",color:col.bg,borderRadius:3,padding:"1px 4px",fontWeight:700}}, p.pos),
+          p.statLabel && React.createElement("span",{style:{color:"#888",fontWeight:600}}, p.statLabel)
+        )
+      ),
+      React.createElement("span",{style:{color:"#ddd",fontSize:12}},"›")
+    );
+  }
+  function sidebarPlayers(players, col, teamAb) {
+    if(!players||!players.length) return React.createElement("div",{style:{padding:"12px 10px",textAlign:"center",fontFamily:"'Barlow',sans-serif",fontSize:11,color:"#bbb"}},"Chargement…");
     var lgLower = (matchData.lg||"").toLowerCase();
-    var photoSport = lgLower === "nfl" ? "nfl" : lgLower === "nba" ? "nba" : lgLower === "mlb" ? "mlb" : "hockey";
     function _slug(str){ return (str||'').toLowerCase().replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i').replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ç]/g,'c').replace(/[ñ]/g,'n').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
     function _teamSlug(ab){ var key=ab+'_'+matchData.lg; var full=TEAM_NAMES[key]||ab; return _slug(full); }
-    return top3.map(function(p,i){
-      var photoId = p.espnId || p.nhlId || null;
-      var photoUrl = photoId ? ("https://a.espncdn.com/i/headshots/"+photoSport+"/players/full/"+photoId+".png") : null;
+    var tSlugVal = _teamSlug(teamAb);
+    return players.slice(0,3).map(function(p,i){
       var pSlug = _slug(p.name);
-      var tSlug = _teamSlug(p.team);
-      var playerUrl = "https://zoneus.fr/"+lgLower+"/"+tSlug+"/"+pSlug;
-      return React.createElement("a",{
-        key:p.id,
-        href: playerUrl,
-        onClick:function(e){
-          e.preventDefault();
-          if(onPlayerClick) onPlayerClick(p.id, matchData.lg);
-        },
-        style:{ background:"rgba(255,255,255,0.88)", borderRadius:6, boxShadow:"0 1px 4px rgba(0,0,0,0.07)", marginBottom:6, padding:"9px 11px", cursor:"pointer", display:"flex", alignItems:"center", gap:9, backdropFilter:"blur(8px)", textDecoration:"none" },
-        onMouseEnter:function(e){e.currentTarget.style.background=col.bg+"14";},
-        onMouseLeave:function(e){e.currentTarget.style.background="rgba(255,255,255,0.88)";}
-      },
-        photoUrl
-          ? React.createElement("img",{src:photoUrl, alt:p.name, style:{width:42,height:42,borderRadius:"50%",objectFit:"cover",border:"2px solid "+col.bg+"55",flexShrink:0,background:"#f0f0f0"},
-              onError:function(e){e.target.style.display="none";e.target.nextSibling&&(e.target.nextSibling.style.display="flex");}
-            })
-          : null,
-        React.createElement("div",{style:{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,"+col.bg+"30,"+col.bg+"10)",border:"2px solid "+col.bg+"55",display: photoUrl ? "none" : "flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
-          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:900,color:col.bg}},"#",p.jersey)
-        ),
-        React.createElement("div",{style:{flex:1,minWidth:0}},
-          React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:900,color:"#111",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}, p.name),
-          React.createElement("div",{style:{fontFamily:"'Barlow',sans-serif",fontSize:9,color:"#aaa",marginTop:1}},
-            React.createElement("span",{style:{background:col.bg+"20",color:col.bg,borderRadius:3,padding:"1px 4px",fontWeight:700,marginRight:3}}, p.pos),
-            p.contract&&p.contract.aav?p.contract.aav:""
-          )
-        ),
-        React.createElement("span",{style:{color:"#ddd",fontSize:12}},"›")
-      );
+      var playerUrl = "https://zoneus.fr/"+lgLower+"/"+tSlugVal+"/"+pSlug;
+      return React.createElement(PlayerCard, {
+        key: p.id||i,
+        player: p,
+        col: col,
+        playerUrl: playerUrl,
+        onPlayerClick: onPlayerClick,
+        matchLg: matchData.lg
+      });
     });
   }
   function sidebarStandings(ab) {
@@ -7537,7 +7682,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
     /* COLONNE GAUCHE — DOMICILE */
     React.createElement("div",{style:{display:"flex",flexDirection:"column"}},
       sidebarHeader(_homeAb, hName, hc, true),
-      sidebarPlayers(hPlayers, hc),
+      sidebarPlayers(hPlayers, hc, _homeAb),
       sidebarStandings(_homeAb),
       sidebarArticles(_homeAb, hName, hc)
     ),
@@ -8656,7 +8801,7 @@ Object.entries(CONF_STANDINGS[matchData.lg] || {}).map(([div, teams]) => {
   /* COLONNE DROITE — VISITEUR */
   React.createElement("div",{style:{display:"flex",flexDirection:"column"}},
     sidebarHeader(_awayAb, aName, ac, false),
-    sidebarPlayers(aPlayers, ac),
+    sidebarPlayers(aPlayers, ac, _awayAb),
     sidebarStandings(_awayAb),
     sidebarArticles(_awayAb, aName, ac)
   )
