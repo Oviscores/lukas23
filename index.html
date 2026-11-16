@@ -8233,21 +8233,21 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
           )
         ),
         /* NFL Scoring Plays */
-        !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data.scoringPlays && boxscore.data.scoringPlays.length > 0 && React.createElement("div", { style: { marginBottom: 14, background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden" } },
-          React.createElement("div", { style: { background: "#111", padding: "8px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "ACTIONS MARQUANTES"),
+        !bxLoading && boxscore && boxscore.type === 'NFL' && boxscore.data.scoringPlays && boxscore.data.scoringPlays.length > 0 && React.createElement("div", { style: { marginBottom: 10, background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden" } },
+          React.createElement("div", { style: { background: "#111", padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.08em" } }, "ACTIONS MARQUANTES"),
           boxscore.data.scoringPlays.map(function(play, i) {
             var abbr = play.type && play.type.abbreviation || '';
             var badgeBg = (abbr==='TD'||abbr==='RSTD'||abbr==='RCTD') ? '#e30613' : abbr==='FG' ? '#2563eb' : '#555';
-            return React.createElement("div", { key: i, style: { display: "flex", gap: 10, padding: "8px 12px", borderBottom: "1px solid rgba(0,0,0,0.05)", alignItems: "flex-start", background: i%2===0?"#fff":"#f8f8f8" } },
-              React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", minWidth: 40, gap: 3 } },
-                React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 900, color: "#fff", background: badgeBg, borderRadius: 4, padding: "2px 6px" } }, abbr||'?'),
-                React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, color: "#aaa" } }, "Q"+(play.period&&play.period.number||''))
+            return React.createElement("div", { key: i, style: { display: "flex", gap: 8, padding: "5px 10px", borderBottom: "1px solid rgba(0,0,0,0.05)", alignItems: "flex-start", background: i%2===0?"#fff":"#f8f8f8" } },
+              React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", minWidth: 34, gap: 1 } },
+                React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", background: badgeBg, borderRadius: 3, padding: "1px 4px" } }, abbr||'?'),
+                React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#aaa" } }, "Q"+(play.period&&play.period.number||''))
               ),
               React.createElement("div", { style: { flex: 1 } },
-                React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 18, color: "#111", lineHeight: 1.5, marginBottom: 4 } }, play.text||''),
-                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
-                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, color: "#333", background: "#f0f0f0", borderRadius: 3, padding: "1px 6px" } }, (play.awayScore||0)+" - "+(play.homeScore||0)),
-                  play.team && play.team.abbreviation ? getTeamLogo(play.team.abbreviation, 'NFL', 22) : null
+                React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#111", lineHeight: 1.4, marginBottom: 2 } }, play.text||''),
+                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
+                  React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#333", background: "#f0f0f0", borderRadius: 3, padding: "1px 5px" } }, (play.awayScore||0)+" - "+(play.homeScore||0)),
+                  play.team && play.team.abbreviation ? getTeamLogo(play.team.abbreviation, 'NFL', 18) : null
                 )
               )
             );
@@ -8532,29 +8532,29 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
           var lastPlay = drive && drive.plays && drive.plays[drive.plays.length-1];
           var lastPlayText = lastPlay && lastPlay.text;
           return React.createElement("div", { style: { marginBottom: 14, background: "rgba(255,255,255,0.85)", borderRadius: 6, overflow: "hidden" } },
-            React.createElement("div", { style: { background: "#1a3a6a", padding: "8px 12px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: 10 } },
+            React.createElement("div", { style: { background: "#1a3a6a", padding: "5px 10px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: 10 } },
               "DRIVE EN COURS",
-              posTeam ? React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: "#fff", background: "rgba(255,255,255,0.18)", borderRadius: 3, padding: "1px 7px", letterSpacing: "0.1em" } }, posTeam) : null
+              posTeam ? React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", background: "rgba(255,255,255,0.18)", borderRadius: 3, padding: "1px 6px", letterSpacing: "0.1em" } }, posTeam) : null
             ),
-            React.createElement("div", { style: { padding: "10px 14px", display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" } },
+            React.createElement("div", { style: { padding: "7px 12px", display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" } },
               downFr ? React.createElement("div", { style: { textAlign: "center" } },
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, fontWeight: 900, color: "#1a3a6a", lineHeight: 1 } }, downFr),
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.12em", marginTop: 2 } }, "SITUATION")
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#1a3a6a", lineHeight: 1 } }, downFr),
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.12em", marginTop: 1 } }, "SITUATION")
               ) : null,
               yardLine ? React.createElement("div", { style: { textAlign: "center" } },
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, fontWeight: 900, color: "#333", lineHeight: 1 } }, yardLine),
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.12em", marginTop: 2 } }, "LIGNE DE YARDS")
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#333", lineHeight: 1 } }, yardLine),
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.12em", marginTop: 1 } }, "LIGNE DE YARDS")
               ) : null,
               driveYards != null ? React.createElement("div", { style: { textAlign: "center" } },
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, fontWeight: 900, color: "#333", lineHeight: 1 } }, driveYards+'y'),
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.12em", marginTop: 2 } }, "CE DRIVE")
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#333", lineHeight: 1 } }, driveYards+'y'),
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.12em", marginTop: 1 } }, "CE DRIVE")
               ) : null,
               drivePlays != null ? React.createElement("div", { style: { textAlign: "center" } },
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, fontWeight: 900, color: "#333", lineHeight: 1 } }, drivePlays),
-                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.12em", marginTop: 2 } }, "JEUX")
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#333", lineHeight: 1 } }, drivePlays),
+                React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.12em", marginTop: 1 } }, "JEUX")
               ) : null
             ),
-            lastPlayText ? React.createElement("div", { style: { padding: "6px 14px 12px", fontFamily: "'Barlow',sans-serif", fontSize: 14, color: "#555", borderTop: "1px solid #f0f0f0" } },
+            lastPlayText ? React.createElement("div", { style: { padding: "4px 12px 8px", fontFamily: "'Barlow',sans-serif", fontSize: 11, color: "#555", borderTop: "1px solid #f0f0f0" } },
               React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#aaa", letterSpacing: "0.1em", marginRight: 6 } }, "DERNIER JEU"),
               lastPlayText
             ) : null
@@ -8573,14 +8573,14 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
                 var labelFr = statName==='passing'?'PASSEURS':statName==='rushing'?'COUREURS':'RECEVEURS';
                 var cols = statGroup.labels||[];
                 return React.createElement("div", { key: statName },
-                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, color: "#fff", background: teamColor, padding: "10px 14px", letterSpacing: "0.08em", marginTop: 10 } }, teamAb+" - "+labelFr),
+                  React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", background: teamColor, padding: "5px 10px", letterSpacing: "0.08em", marginTop: 6 } }, teamAb+" - "+labelFr),
                   statGroup.athletes.map(function(a, i) {
                     var name = a.athlete&&a.athlete.displayName||'';
                     var stats = a.stats||[];
                     var summary = cols.slice(0,4).map(function(c,ci){return c+': '+(stats[ci]||'-');}).join('  ');
-                    return React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 10px", background: i%2===0?"#fff":"#f5f5f5", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
-                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, color: "#111" } }, name),
-                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, color: "#444", fontWeight: 700, background: "#f0f0f0", borderRadius: 3, padding: "1px 8px" } }, summary)
+                    return React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 10px", background: i%2===0?"#fff":"#f5f5f5", borderBottom: "1px solid rgba(0,0,0,0.05)" } },
+                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 800, color: "#111" } }, name),
+                      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#444", fontWeight: 700, background: "#f0f0f0", borderRadius: 3, padding: "1px 6px" } }, summary)
                     );
                   })
                 );
