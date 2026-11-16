@@ -5080,7 +5080,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
         shoots: person.batSide && person.batSide.code ? 'Bat: ' + person.batSide.code + ' / Lancer: ' + (person.pitchHand && person.pitchHand.code ? person.pitchHand.code : '?') : '',
         headshot: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/' + (person.id || '') + '/headshot/67/current',
         careerStat: careerStat,
-        yearByYear: (yearByYear && yearByYear.splits ? yearByYear.splits.slice().reverse() : []).slice(0, 15),
+        yearByYear: (yearByYear && yearByYear.splits ? yearByYear.splits.filter(function(s){ return s.sport && s.sport.id === 1; }).slice().reverse() : []).slice(0, 20),
         gamelogRaw: liveData.gamelog,
         contract: staticP && staticP.contract ? staticP.contract : null,
         bio: staticP && staticP.bio ? staticP.bio : null,
