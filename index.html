@@ -4855,7 +4855,10 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
               Promise.all([
                 fetch(PROXY_NBA_R + '?league=nba_player&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}),
                 fetch(PROXY_NBA_R + '?league=nba_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}),
-                fetch(PROXY_NBA_R + '?league=nba_stats&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;})
+                fetch(PROXY_NBA_R + '?league=nba_stats&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}).then(function(d){
+                  if (d && (d.seasons || d.splits || d.groups)) return d;
+                  return fetch('https://site.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/' + resolvedId + '/statisticslog').then(function(r){return r.json();}).catch(function(){return null;});
+                })
               ]).then(function(results) {
                 if (cancelled) return;
                 setLiveData({ type: 'nba', athlete: results[0], gamelog: results[1], stats: results[2] });
@@ -4870,7 +4873,10 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
         Promise.all([
           fetch(PROXY_NBA + '?league=nba_player&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}),
           fetch(PROXY_NBA + '?league=nba_gamelog&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}),
-          fetch(PROXY_NBA + '?league=nba_stats&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;})
+          fetch(PROXY_NBA + '?league=nba_stats&id=' + nbaId).then(function(r){return r.json();}).catch(function(){return null;}).then(function(d){
+            if (d && (d.seasons || d.splits || d.groups)) return d;
+            return fetch('https://site.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/' + nbaId + '/statisticslog').then(function(r){return r.json();}).catch(function(){return null;});
+          })
         ]).then(function(results) {
           if (cancelled) return;
           var athleteData = results[0];
@@ -4909,7 +4915,10 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
                 fetch(PROXY_NFL2 + '?league=nfl_gamelog&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){
                   return fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/athletes/' + resolvedId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;});
                 }),
-                fetch(PROXY_NFL2 + '?league=nfl_stats&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;})
+                fetch(PROXY_NFL2 + '?league=nfl_stats&id=' + resolvedId).then(function(r){return r.json();}).catch(function(){return null;}).then(function(d){
+                  if (d && (d.seasons || d.splits || d.groups)) return d;
+                  return fetch('https://site.api.espn.com/apis/common/v3/sports/football/nfl/athletes/' + resolvedId + '/statisticslog').then(function(r){return r.json();}).catch(function(){return null;});
+                })
               ]).then(function(results) {
                 if (cancelled) return;
                 setLiveData({ type: 'nfl', athlete: results[0], gamelog: results[1], stats: results[2] });
@@ -4928,7 +4937,10 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
           fetch(PROXY_NFL + '?league=nfl_gamelog&id=' + nflId).then(function(r){return r.json();}).catch(function(){
             return fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/athletes/' + nflId + '/gamelog').then(function(r){return r.json();}).catch(function(){return null;});
           }),
-          fetch(PROXY_NFL + '?league=nfl_stats&id=' + nflId).then(function(r){return r.json();}).catch(function(){return null;})
+          fetch(PROXY_NFL + '?league=nfl_stats&id=' + nflId).then(function(r){return r.json();}).catch(function(){return null;}).then(function(d){
+            if (d && (d.seasons || d.splits || d.groups)) return d;
+            return fetch('https://site.api.espn.com/apis/common/v3/sports/football/nfl/athletes/' + nflId + '/statisticslog').then(function(r){return r.json();}).catch(function(){return null;});
+          })
         ]).then(function(results) {
           if (cancelled) return;
           var athleteData = results[0];
@@ -5410,6 +5422,18 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       var grp0 = statsRaw.groups[0];
       statsLabels = (grp0.statistics || []).map(function(s){ return s.abbreviation || s.name; });
       careerSplits = (grp0.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 20);
+    } else if (statsRaw.seasonTypes && statsRaw.seasonTypes.length) {
+      // Format ESPN statisticslog direct: seasonTypes[].categories[].splits[]
+      var regST = statsRaw.seasonTypes.find(function(st){ return st.name && st.name.indexOf('Regular') !== -1; }) || statsRaw.seasonTypes[0];
+      if (regST && regST.categories && regST.categories.length) {
+        var cat0 = regST.categories[0];
+        statsLabels = (cat0.names || cat0.labels || []);
+        var seenYears = {};
+        (cat0.splits || []).filter(function(s){ return s.displayName && s.displayName !== 'Career' && !seenYears[s.displayName] && (seenYears[s.displayName] = true); }).forEach(function(s){
+          careerSplits.push({ displayName: s.displayName, team: (s.team && (s.team.abbreviation || s.team)) || '', stats: s.stats || [] });
+        });
+        careerSplits = careerSplits.slice(0, 25).reverse();
+      }
     }
     // Priorité 2 (fallback) : gamelog seasonTypes summary (ne contient que la saison courante)
     if (careerSplits.length === 0 && glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
@@ -5633,6 +5657,18 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       var nflGrp0 = nflStatsRaw.groups[0];
       nflStatsLabels = (nflGrp0.statistics || []).map(function(s){ return s.abbreviation || s.name; });
       nflCareerSplits = (nflGrp0.splits || []).filter(function(s){ return s.type !== 'career'; }).slice(0, 20);
+    } else if (nflStatsRaw.seasonTypes && nflStatsRaw.seasonTypes.length) {
+      // Format ESPN statisticslog direct: seasonTypes[].categories[].splits[]
+      var nflRegST = nflStatsRaw.seasonTypes.find(function(st){ return st.name && st.name.indexOf('Regular') !== -1; }) || nflStatsRaw.seasonTypes[0];
+      if (nflRegST && nflRegST.categories && nflRegST.categories.length) {
+        var nflCat0 = nflRegST.categories[0];
+        nflStatsLabels = (nflCat0.names || nflCat0.labels || []);
+        var nflSeenYears = {};
+        (nflCat0.splits || []).filter(function(s){ return s.displayName && s.displayName !== 'Career' && !nflSeenYears[s.displayName] && (nflSeenYears[s.displayName] = true); }).forEach(function(s){
+          nflCareerSplits.push({ displayName: s.displayName, team: (s.team && (s.team.abbreviation || s.team)) || '', stats: s.stats || [] });
+        });
+        nflCareerSplits = nflCareerSplits.slice(0, 25).reverse();
+      }
     }
     // Priorité 2 (fallback) : gamelog seasonTypes summary (saison courante seulement)
     if (nflCareerSplits.length === 0 && glRaw && glRaw.seasonTypes && glRaw.seasonTypes.length) {
