@@ -7062,6 +7062,18 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
 
   React.useEffect(function() {
     if (!_isFinal && !_isLive) return;
+    // Ne chercher la vidéo que si le match est FINAL et qu'au moins 30 min se sont écoulées depuis l'heure prévue
+    if (!_isFinal) return;
+    var matchDateRaw = matchData.date || matchData.gameDate || matchData.publishedAt || null;
+    if (matchDateRaw) {
+      var matchTs = new Date(matchDateRaw).getTime();
+      if (!isNaN(matchTs)) {
+        // Durée estimée : NHL/NBA ~2h30, NFL ~3h30, MLB ~3h → on prend 3h + 30min de marge = 3h30 pour tous
+        var matchDuration = { NHL: 2.5, NBA: 2.5, MLB: 3, NFL: 3.5 }[lg] || 2.5;
+        var bufferMs = (matchDuration + 0.5) * 60 * 60 * 1000; // durée estimée + 30 min
+        if (Date.now() < matchTs + bufferMs) return; // trop tôt, le résumé n'existe probablement pas encore
+      }
+    }
     var lg = matchData.lg;
     var home = homeAb || matchData.homeTeam || matchData.home || '';
     var away = awayAb || matchData.awayTeam || matchData.away || '';
@@ -7097,7 +7109,7 @@ function YouTubeHighlight({ matchData, isFinal, isLive, lc, homeAb, awayAb }) {
       if (!vid) { for (var j = 0; j < items.length; j++) { if (items[j].id && items[j].id.kind === 'youtube#video' && items[j].id.videoId) { vid = items[j].id.videoId; break; } } }
       setVideoId(vid || null);
     }).catch(function() {}).finally(function() { setLoading(false); });
-  }, [matchData.id, homeAb, awayAb, matchData.homeTeam, matchData.home, _isFinal, _isLive]);
+  }, [matchData.id, homeAb, awayAb, matchData.homeTeam, matchData.home, _isFinal, _isLive, matchData.date, matchData.gameDate]);
 
   if (!_isFinal && !_isLive) return null;
   /* NFL : pas de vidéo embedable en France */
