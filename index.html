@@ -199,6 +199,17 @@ img { content-visibility: auto; }
   .feed-grid-2 { grid-template-columns: 1fr !important; }
   .home-grid-3 { grid-template-columns: 1fr !important; }
 }
+/* MatchPage mobile — 1 colonne, sidebars sous le contenu */
+@media (max-width: 768px) {
+  .match-grid {
+    grid-template-columns: 1fr !important;
+    padding: 8px 10px 40px !important;
+    gap: 10px !important;
+  }
+  .match-grid > .match-sidebar-left { order: 2; }
+  .match-grid > .match-center       { order: 1; }
+  .match-grid > .match-sidebar-right { order: 3; }
+}
 ::-webkit-scrollbar { width: 0; height: 0; }
 </style>
 </head>
@@ -7719,16 +7730,16 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
     );
   }
   /* ===== GRID 3 COLONNES ===== */
-  return React.createElement("div",{style:{display:"grid",gridTemplateColumns:"240px 1fr 240px",gap:14,padding:"16px 16px 60px",alignItems:"flex-start"}},
+  return React.createElement("div",{className:"match-grid",style:{display:"grid",gridTemplateColumns:"240px 1fr 240px",gap:14,padding:"16px 16px 60px",alignItems:"flex-start"}},
     /* COLONNE GAUCHE — DOMICILE */
-    React.createElement("div",{style:{display:"flex",flexDirection:"column"}},
+    React.createElement("div",{className:"match-sidebar-left",style:{display:"flex",flexDirection:"column"}},
       sidebarHeader(_homeAb, hName, hc, true),
       sidebarPlayers(hPlayers, hc, _homeAb),
       sidebarStandings(_homeAb),
       sidebarArticles(_homeAb, hName, hc)
     ),
     /* COLONNE CENTRALE */
-    React.createElement("div",{style:{minWidth:0}}, /* @__PURE__ */ React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 8, padding: "28px 24px", marginBottom: 16, boxShadow: "0 6px 24px rgba(0,0,0,0.2)" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, letterSpacing: "0.16em", color: "rgba(255,255,255,0.55)" } }, isLive ? "\u{1F534} LIVE \u2014 " + (matchData.period || '') : isFinal ? "FINAL" : "\xC0 VENIR \u2014 " + matchData.time)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 24 } },
+    React.createElement("div",{className:"match-center",style:{minWidth:0}}, /* @__PURE__ */ React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 8, padding: "28px 24px", marginBottom: 16, boxShadow: "0 6px 24px rgba(0,0,0,0.2)" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, letterSpacing: "0.16em", color: "rgba(255,255,255,0.55)" } }, isLive ? "\u{1F534} LIVE \u2014 " + (matchData.period || '') : isFinal ? "FINAL" : "\xC0 VENIR \u2014 " + matchData.time)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 24 } },
     /* DOMICILE */
     /* @__PURE__ */ React.createElement("div", { style: { flex: 1, textAlign: "right" } },
       /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10, marginBottom: 2 } },
@@ -8840,7 +8851,7 @@ Object.entries(CONF_STANDINGS[matchData.lg] || {}).map(([div, teams]) => {
   )
   ), /* fin colonne centrale */
   /* COLONNE DROITE — VISITEUR */
-  React.createElement("div",{style:{display:"flex",flexDirection:"column"}},
+  React.createElement("div",{className:"match-sidebar-right",style:{display:"flex",flexDirection:"column"}},
     sidebarHeader(_awayAb, aName, ac, false),
     sidebarPlayers(aPlayers, ac, _awayAb),
     sidebarStandings(_awayAb),
