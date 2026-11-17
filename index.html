@@ -12033,9 +12033,11 @@ window.fetchStandings = async function(lg) {
     }
   }
   if (lg === 'NBA') {
+    /* Saison NBA : l'année de fin de saison. Oct-déc = saison suivante démarre. */
+    var _nbaNow = new Date(); var _nbaSeason = _nbaNow.getMonth() >= 9 ? _nbaNow.getFullYear()+1 : _nbaNow.getFullYear();
     try {
       /* Via proxy worker (nouveau endpoint nba_standings) */
-      var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_standings');
+      var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_standings&season='+_nbaSeason);
       var data = await resp.json();
       if (!data || !data.children) throw new Error('no proxy data');
       var confs = {};
@@ -12061,7 +12063,7 @@ window.fetchStandings = async function(lg) {
       console.log('NBA standings proxy error:', e.message);
       /* Fallback ESPN direct */
       try {
-        var resp2 = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=2026');
+        var resp2 = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season='+_nbaSeason);
         var data2 = await resp2.json();
         if (!data2 || !data2.children) throw new Error('no espn data');
         var confs2 = {};
