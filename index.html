@@ -11984,36 +11984,60 @@ var NFL_DIV = {'BUF':'AFC Est','MIA':'AFC Est','NE':'AFC Est','NYJ':'AFC Est','B
 window.fetchStandings = async function(lg) {
   if (lg === 'NHL') {
     try {
-      /* ESPN standings NHL — API publique, pas de CORS */
-      var resp = await fetch('https://site.api.espn.com/apis/v2/sports/hockey/nhl/standings?season=2025');
+      /* NHL standings via proxy worker (contourne CORS, données live) */
+      var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nhl_standings');
       var data = await resp.json();
-      if (!data || !data.children) throw new Error('no data');
+      if (!data || !data.standings) throw new Error('no data');
+      /* Format NHL API: standings[].teamAbbrev.default, standings[].points, standings[].wins, standings[].losses, standings[].conferenceAbbrev, standings[].divisionName */
       var confs = {};
-      data.children.forEach(function(conf) {
-        var entries = (conf.standings && conf.standings.entries) || [];
-        if (entries.length === 0 && conf.children) {
-          conf.children.forEach(function(div) { (div.standings&&div.standings.entries||[]).forEach(function(e){entries.push(e);}); });
-        }
-        var rows = entries.map(function(e,i) {
-          var stats = {}; (e.stats||[]).forEach(function(s){stats[s.name]=s.value;});
-          var pts = stats.points || 0;
-          return { r:i+1, ab:e.team&&e.team.abbreviation||'', w:stats.wins||0, l:stats.losses||0, pts:pts };
-        });
-        rows.sort(function(a,b){return b.pts-a.pts;}); rows.forEach(function(r,i){r.r=i+1;});
-        if (rows.length > 0) confs[conf.name||'Conference'] = rows;
+      data.standings.forEach(function(t) {
+        var ab = t.teamAbbrev && (t.teamAbbrev.default || t.teamAbbrev) || '';
+        var conf = t.conferenceName || t.conferenceAbbrev || 'Conference';
+        if (!confs[conf]) confs[conf] = [];
+        confs[conf].push({ r:0, ab:ab, w:t.wins||0, l:t.losses||0, pts:t.points||0, otl:t.otLosses||0 });
+      });
+      Object.keys(confs).forEach(function(c) {
+        confs[c].sort(function(a,b){return b.pts-a.pts;}); confs[c].forEach(function(r,i){r.r=i+1;});
       });
       if (Object.keys(confs).length > 0) {
         CONF_STANDINGS.NHL = confs; window.__CONF_STANDINGS__.NHL = confs;
         if (window.__setStandings__) window.__setStandings__('NHL', confs);
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
       }
-    } catch(e) { console.log('NHL standings error:', e.message); }
+    } catch(e) {
+      console.log('NHL standings proxy error:', e.message);
+      /* Fallback ESPN */
+      try {
+        var resp2 = await fetch('https://site.api.espn.com/apis/v2/sports/hockey/nhl/standings?season=2026');
+        var data2 = await resp2.json();
+        if (!data2 || !data2.children) throw new Error('no espn data');
+        var confs2 = {};
+        data2.children.forEach(function(conf) {
+          var entries = (conf.standings && conf.standings.entries) || [];
+          if (entries.length === 0 && conf.children) {
+            conf.children.forEach(function(div) { (div.standings&&div.standings.entries||[]).forEach(function(e){entries.push(e);}); });
+          }
+          var rows = entries.map(function(e,i) {
+            var stats = {}; (e.stats||[]).forEach(function(s){stats[s.name]=s.value;});
+            return { r:i+1, ab:e.team&&e.team.abbreviation||'', w:stats.wins||0, l:stats.losses||0, pts:stats.points||0 };
+          });
+          rows.sort(function(a,b){return b.pts-a.pts;}); rows.forEach(function(r,i){r.r=i+1;});
+          if (rows.length > 0) confs2[conf.name||'Conference'] = rows;
+        });
+        if (Object.keys(confs2).length > 0) {
+          CONF_STANDINGS.NHL = confs2; window.__CONF_STANDINGS__.NHL = confs2;
+          if (window.__setStandings__) window.__setStandings__('NHL', confs2);
+          if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+        }
+      } catch(e2) { console.log('NHL standings fallback error:', e2.message); }
+    }
   }
   if (lg === 'NBA') {
     try {
-      var resp = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=2026');
+      /* Via proxy worker (nouveau endpoint nba_standings) */
+      var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_standings');
       var data = await resp.json();
-      if (!data || !data.children) throw new Error('no data');
+      if (!data || !data.children) throw new Error('no proxy data');
       var confs = {};
       data.children.forEach(function(conf) {
         var entries = (conf.standings && conf.standings.entries) || [];
@@ -12033,13 +12057,40 @@ window.fetchStandings = async function(lg) {
         if (window.__setStandings__) window.__setStandings__('NBA', confs);
         if (window.__zoneus_refresh__) window.__zoneus_refresh__();
       }
-    } catch(e) { console.log('NBA standings error:', e.message); }
+    } catch(e) {
+      console.log('NBA standings proxy error:', e.message);
+      /* Fallback ESPN direct */
+      try {
+        var resp2 = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=2026');
+        var data2 = await resp2.json();
+        if (!data2 || !data2.children) throw new Error('no espn data');
+        var confs2 = {};
+        data2.children.forEach(function(conf) {
+          var entries = (conf.standings && conf.standings.entries) || [];
+          if (entries.length === 0 && conf.children) {
+            conf.children.forEach(function(div) { (div.standings&&div.standings.entries||[]).forEach(function(e){entries.push(e);}); });
+          }
+          var rows = entries.map(function(e,i) {
+            var stats = {}; (e.stats||[]).forEach(function(s){stats[s.name]=s.value;});
+            var pctDisp = e.stats&&e.stats.find(function(s){return s.name==='winPercent';});
+            return { r:i+1, ab:e.team&&e.team.abbreviation||'', w:stats.wins||0, l:stats.losses||0, pct:pctDisp?pctDisp.displayValue:'.000' };
+          });
+          rows.sort(function(a,b){return b.w-a.w;}); rows.forEach(function(r,i){r.r=i+1;});
+          if (rows.length > 0) confs2[conf.name||'Conference'] = rows;
+        });
+        if (Object.keys(confs2).length > 0) {
+          CONF_STANDINGS.NBA = confs2; window.__CONF_STANDINGS__.NBA = confs2;
+          if (window.__setStandings__) window.__setStandings__('NBA', confs2);
+          if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+        }
+      } catch(e2) { console.log('NBA standings fallback error:', e2.message); }
+    }
   }
   if (lg === 'MLB') {
     try {
       var resp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_standings');
       var data = await resp.json();
-      var divMap = {200:'NL Ouest',201:'AL Est',202:'AL Central',203:'AL Ouest',204:'NL Est',205:'NL Central',206:'NL Ouest'};
+      var divMap = {200:'NL Ouest',201:'AL Est',202:'AL Central',203:'AL Ouest',204:'NL Est',205:'NL Central',206:'NL Ouest Pacific'};
       var result = {};
       (data.records||[]).forEach(function(div) { result[divMap[div.division.id]||'Div'+div.division.id] = div.teamRecords.map(function(t,i) { return { r:i+1, ab:t.team.abbreviation==='AZ'?'ARI':t.team.abbreviation, w:t.wins, l:t.losses, pct:t.winningPercentage, gb:t.gamesBack==='-'?'-':t.gamesBack }; }); });
       window.__CONF_STANDINGS__.MLB = result; CONF_STANDINGS.MLB = result;
@@ -12049,7 +12100,9 @@ window.fetchStandings = async function(lg) {
   }
   if (lg === 'NFL') {
     try {
-      var resp2 = await fetch('https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=2026');
+      /* Via proxy worker (nouveau endpoint nfl_standings) — fallback ESPN direct */
+      var _nflResp = await fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nfl_standings').catch(function(){return null;});
+      var resp2 = (_nflResp && _nflResp.ok) ? _nflResp : await fetch('https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=2026');
       var data2 = await resp2.json();
       var result2 = {};
       (data2.children||[]).forEach(function(conf) { (conf.standings&&conf.standings.entries||[]).forEach(function(e) { var ab=e.team&&e.team.abbreviation||''; var div=NFL_DIV[ab]||'Autre'; if(!result2[div])result2[div]=[]; var wins=(e.stats.find(function(s){return s.name==='wins';})||{}).value||0; var losses=(e.stats.find(function(s){return s.name==='losses';})||{}).value||0; var pct=(e.stats.find(function(s){return s.name==='winPercent';})||{}).displayValue||'.000'; result2[div].push({ab:ab,w:wins,l:losses,pct:pct}); }); });
