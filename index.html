@@ -7174,11 +7174,6 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
   React.useEffect(function() {
     var lg2 = match.lg;
     if (!lg2) return;
-    // Si déjà chargé, forcer un tick pour afficher les données en cache
-    if (window.__STANDINGS_LOADED__ && window.__STANDINGS_LOADED__[lg2]) {
-      setStTick(function(t){return t+1;});
-      return;
-    }
     // Enregistrer un callback de refresh avant le fetch
     var prevRefresh = window.__zoneus_refresh__;
     var myRefresh = function() {
@@ -7186,6 +7181,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
       if (prevRefresh) prevRefresh();
     };
     window.__zoneus_refresh__ = myRefresh;
+    // Forcer un re-fetch en réinitialisant le guard (les données peuvent être périmées)
+    if (window.__STANDINGS_LOADED__) window.__STANDINGS_LOADED__[lg2] = false;
     fetchStandings(lg2);
     return function() { if (window.__zoneus_refresh__ === myRefresh) window.__zoneus_refresh__ = prevRefresh; };
   }, [match.lg]);
