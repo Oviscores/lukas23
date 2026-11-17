@@ -8825,17 +8825,17 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
           var eid2=m2.eventId||m2.id; var hasLink=!!(eid2&&onMatchClick);
           return React.createElement("div",{
             onClick: hasLink ? function(){ onMatchClick({ id: String(eid2), eventId: String(eid2), lg: m2.lg||lg2, homeTeam: m2.home, awayTeam: m2.away, homeScore: m2.hs, awayScore: m2.as, status: 'FINAL' }); } : undefined,
-            style:{display:"flex",alignItems:"center",gap:8,padding:"9px 14px",borderBottom:"1px solid #f5f5f5",borderLeft:"3px solid "+(won2?innerLc:"#ef4444"),cursor:hasLink?"pointer":"default"},
+            style:{display:"flex",alignItems:"center",gap:8,padding:"9px 14px",borderBottom:"1px solid #f5f5f5",borderLeft:"3px solid "+(won2?"#16a34a":"#ef4444"),cursor:hasLink?"pointer":"default"},
             onMouseEnter: hasLink ? function(e){e.currentTarget.style.background=innerLc+"10";} : undefined,
             onMouseLeave: hasLink ? function(e){e.currentTarget.style.background="transparent";} : undefined
           },
-            React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:900,color:won2?innerLc:"#ef4444",width:14}},won2?"V":"D"),
+            React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:900,color:won2?"#16a34a":"#ef4444",width:14}},won2?"V":"D"),
             getTeamLogo(opp2,lg2,22),
             React.createElement("div",{style:{flex:1}},
               React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:700,color:"#111"}},(isH2?"vs ":"@ ")+opp2),
               React.createElement("div",{style:{fontFamily:"'Barlow',sans-serif",fontSize:10,color:"#bbb"}},m2.dayLabel||"")
             ),
-            scoreStr2&&React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:won2?900:400,color:won2?innerLc:"#999"}},scoreStr2)
+            scoreStr2&&React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:won2?900:400,color:won2?"#16a34a":"#999"}},scoreStr2)
           );
         }
         function renderUpcomingRow(m2, teamAb, innerLc) {
@@ -11290,8 +11290,10 @@ async function fetchStandings(lg) {
       var d = await r.json();
       if (!d || !d.standings) return;
       var confEst = [], confOuest = [];
+      var _nhlAbMap = { LA: 'LAK', SJ: 'SJS', NJ: 'NJD', TB: 'TBL', NAS: 'NSH' };
       d.standings.forEach(function(t) {
-        var ab = t.teamAbbrev && t.teamAbbrev.default || '';
+        var ab0 = t.teamAbbrev && t.teamAbbrev.default || '';
+        var ab = _nhlAbMap[ab0] || ab0;
         var row = { ab: ab, w: t.wins || 0, l: t.losses || 0, pts: t.points || 0 };
         if (t.conferenceAbbrev === 'E') confEst.push(row);
         else confOuest.push(row);
