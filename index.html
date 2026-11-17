@@ -651,7 +651,20 @@ const TEAM_NAMES = {
   TB_MLB: "Tampa Bay Rays",
   TEX_MLB: "Texas Rangers",
   TOR_MLB: "Toronto Blue Jays",
-  WSH_MLB: "Washington Nationals"
+  WSH_MLB: "Washington Nationals",
+  // Alias abréviations courtes NHL (API NHL renvoie parfois 2 lettres)
+  LA_NHL: "LA Kings",
+  SJ_NHL: "San Jose Sharks",
+  NJ_NHL: "New Jersey Devils",
+  // Alias abréviations courtes NBA
+  SA_NBA: "San Antonio Spurs",
+  GS_NBA: "Golden State Warriors",
+  NY_NBA: "New York Knicks",
+  // Alias abréviations courtes MLB
+  SD_MLB: "San Diego Padres",
+  SF_MLB: "San Francisco Giants",
+  KC_MLB: "Kansas City Royals",
+  TB_MLB: "Tampa Bay Rays"
 };
 const CONF_STANDINGS = {
   NHL: {},
@@ -7436,8 +7449,15 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
   var _aEspn = React.useState(null); var aEspnSched = _aEspn[0], setAEspnSched = _aEspn[1];
   var _hMlb = React.useState(null); var hMlbSched = _hMlb[0], setHMlbSched = _hMlb[1];
   var _aMlb = React.useState(null); var aMlbSched = _aMlb[0], setAMlbSched = _aMlb[1];
-  var _homeAb0 = (match.homeTeam || match.home || '');
-  var _awayAb0 = (match.awayTeam || match.away || '');
+  var _NHL_ABBR_MAP0 = { LA: 'LAK', SJ: 'SJS', NJ: 'NJD', TB: 'TBL', NAS: 'NSH' };
+  var _NBA_ABBR_MAP0 = { SA: 'SAS', GS: 'GSW', NY: 'NYK', NO: 'NOP', BK: 'BKN' };
+  var _normAb0 = function(ab, lg) {
+    if (lg === 'NHL' && _NHL_ABBR_MAP0[ab]) return _NHL_ABBR_MAP0[ab];
+    if (lg === 'NBA' && _NBA_ABBR_MAP0[ab]) return _NBA_ABBR_MAP0[ab];
+    return ab;
+  };
+  var _homeAb0 = _normAb0(match.homeTeam || match.home || '', match.lg);
+  var _awayAb0 = _normAb0(match.awayTeam || match.away || '', match.lg);
   React.useEffect(function() {
     if (match.lg !== 'NFL') return;
     function fetchNFL(ab, setter) {
@@ -7470,7 +7490,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
       var slug = NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[ab]; if (!slug) return;
       fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/'+slug+'/schedule').then(function(r){return r.json();}).then(function(d){
         var today=new Date().toISOString().split('T')[0]; var upcoming=[],recent=[];
-        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=home.team&&home.team.abbreviation||'';var awayAb=away.team&&away.team.abbreviation||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NBA'});}else if(!completed&&evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NBA'});}});
+        var _nbaN={'SA':'SAS','GS':'GSW','NY':'NYK','NO':'NOP','BK':'BKN'};
+        (d.events||[]).forEach(function(ev){var comp=ev.competitions&&ev.competitions[0];if(!comp)return;var home=comp.competitors.find(function(c){return c.homeAway==='home';});var away=comp.competitors.find(function(c){return c.homeAway==='away';});if(!home||!away)return;var homeAb=_nbaN[home.team&&home.team.abbreviation]||(home.team&&home.team.abbreviation)||'';var awayAb=_nbaN[away.team&&away.team.abbreviation]||(away.team&&away.team.abbreviation)||'';var evDate=ev.date?ev.date.split('T')[0]:'';var completed=comp.status&&comp.status.type&&comp.status.type.completed;var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var label=evDate;if(completed){var hS=home.score?(home.score.value!==undefined?home.score.value:parseInt(home.score)):null;var aS=away.score?(away.score.value!==undefined?away.score.value:parseInt(away.score)):null;recent.push({id:ev.id,home:homeAb,away:awayAb,hs:hS,as:aS,time:time,dayLabel:label,lg:'NBA'});}else if(!completed&&evDate>=today){upcoming.push({id:ev.id,home:homeAb,away:awayAb,hs:null,as:null,time:time,dayLabel:label,lg:'NBA'});}});
         setter({upcoming:upcoming.slice(0,5),recent:recent.slice(-5).reverse()});
       }).catch(function(){setter({upcoming:[],recent:[]});});
     }
@@ -7489,8 +7510,9 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
           var home=comp.competitors.find(function(c){return c.homeAway==='home';});
           var away=comp.competitors.find(function(c){return c.homeAway==='away';});
           if(!home||!away)return;
-          var homeAb=home.team&&home.team.abbreviation||'';
-          var awayAb=away.team&&away.team.abbreviation||'';
+          var _nhlN={'LA':'LAK','SJ':'SJS','NJ':'NJD','TB':'TBL','NAS':'NSH'};
+          var homeAb=_nhlN[home.team&&home.team.abbreviation]||(home.team&&home.team.abbreviation)||'';
+          var awayAb=_nhlN[away.team&&away.team.abbreviation]||(away.team&&away.team.abbreviation)||'';
           var evDate=ev.date?ev.date.split('T')[0]:'';
           var completed=comp.status&&comp.status.type&&comp.status.type.completed;
           var time=ev.date?new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
@@ -7512,8 +7534,16 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
   const dk = LG[matchData.lg].dark;
   const _bsHome = (boxscore && boxscore.data && boxscore.data.homeTeam && boxscore.data.homeTeam.abbrev) || (function(){ var c = boxscore && boxscore.data && boxscore.data.header && boxscore.data.header.competitions && boxscore.data.header.competitions[0]; var t = c && c.competitors && c.competitors.find(function(x){return x.homeAway==='home';}); return (t && t.team && t.team.abbreviation) || ''; })() || '';
   const _bsAway = (boxscore && boxscore.data && boxscore.data.awayTeam && boxscore.data.awayTeam.abbrev) || (function(){ var c = boxscore && boxscore.data && boxscore.data.header && boxscore.data.header.competitions && boxscore.data.header.competitions[0]; var t = c && c.competitors && c.competitors.find(function(x){return x.homeAway==='away';}); return (t && t.team && t.team.abbreviation) || ''; })() || '';
-  const _homeAb = _bsHome || matchData.homeTeam || matchData.home || '';
-  const _awayAb = _bsAway || matchData.awayTeam || matchData.away || '';
+  // Normalise les abréviations courtes vers les abréviations standard
+  const _NHL_ABBR_MAP = { LA: 'LAK', SJ: 'SJS', NJ: 'NJD', TB: 'TBL', NAS: 'NSH' };
+  const _NBA_ABBR_MAP = { SA: 'SAS', GS: 'GSW', NY: 'NYK', NO: 'NOP', BK: 'BKN' };
+  const _normalizeAb = function(ab, lg) {
+    if (lg === 'NHL' && _NHL_ABBR_MAP[ab]) return _NHL_ABBR_MAP[ab];
+    if (lg === 'NBA' && _NBA_ABBR_MAP[ab]) return _NBA_ABBR_MAP[ab];
+    return ab;
+  };
+  const _homeAb = _normalizeAb(_bsHome || matchData.homeTeam || matchData.home || '', matchData.lg);
+  const _awayAb = _normalizeAb(_bsAway || matchData.awayTeam || matchData.away || '', matchData.lg);
   const hk = _homeAb + "_" + matchData.lg;
   const ak = _awayAb + "_" + matchData.lg;
   const hc = TC[hk] || { bg: lc, fg: "#fff" };
@@ -8787,7 +8817,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
         var LBL = { fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:900, letterSpacing:"0.1em", color:"#aaa", textTransform:"uppercase" };
         var SEP_H = { borderBottom:"1px solid #f0f0f0" };
         function renderMatchRow(m2, teamAb, innerLc) {
-          var isH2=m2.home===teamAb; var opp2=isH2?m2.away:m2.home;
+          var isH2=m2.home===teamAb; var opp2raw=isH2?m2.away:m2.home;
+          var opp2=TEAM_NAMES[opp2raw+'_'+(m2.lg||lg2)]||opp2raw;
           var ts2=isH2?m2.hs:m2.as; var os2=isH2?m2.as:m2.hs;
           var won2=ts2!==null&&ts2!==undefined&&os2!==null&&os2!==undefined&&parseInt(ts2)>parseInt(os2);
           var scoreStr2=(ts2!==null&&ts2!==undefined&&os2!==null&&os2!==undefined)?parseInt(ts2)+"–"+parseInt(os2):"";
@@ -8808,7 +8839,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
           );
         }
         function renderUpcomingRow(m2, teamAb, innerLc) {
-          var isH2=m2.home===teamAb; var opp2=isH2?m2.away:m2.home;
+          var isH2=m2.home===teamAb; var opp2raw=isH2?m2.away:m2.home;
+          var opp2=TEAM_NAMES[opp2raw+'_'+(m2.lg||lg2)]||opp2raw;
           var eid2=m2.eventId||m2.id; var hasLink=!!(eid2&&onMatchClick);
           return React.createElement("div",{
             onClick: hasLink ? function(){ onMatchClick({ id: String(eid2), eventId: String(eid2), lg: m2.lg||lg2, homeTeam: m2.home, awayTeam: m2.away, homeScore: null, awayScore: null, status: 'upcoming' }); } : undefined,
