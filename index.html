@@ -7169,7 +7169,26 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
   var _enriched = React.useRef(false);
   var _retryDone = React.useRef(false);
   var _r2 = React.useState(false); var retry2Triggered = _r2[0], setRetry2Triggered = _r2[1];
-  var _stTick = React.useState(0); var setStTick = _stTick[1];
+  var _stTick = React.useState(0); var standTick = _stTick[0]; var setStTick = _stTick[1];
+  /* ===== STANDINGS: fetch live au montage ===== */
+  React.useEffect(function() {
+    var lg2 = match.lg;
+    if (!lg2) return;
+    // Si déjà chargé, forcer un tick pour afficher les données en cache
+    if (window.__STANDINGS_LOADED__ && window.__STANDINGS_LOADED__[lg2]) {
+      setStTick(function(t){return t+1;});
+      return;
+    }
+    // Enregistrer un callback de refresh avant le fetch
+    var prevRefresh = window.__zoneus_refresh__;
+    var myRefresh = function() {
+      setStTick(function(t){return t+1;});
+      if (prevRefresh) prevRefresh();
+    };
+    window.__zoneus_refresh__ = myRefresh;
+    fetchStandings(lg2);
+    return function() { if (window.__zoneus_refresh__ === myRefresh) window.__zoneus_refresh__ = prevRefresh; };
+  }, [match.lg]);
   React.useEffect(function() {
     _enriched.current = false;
     _retryDone.current = false;
@@ -7559,6 +7578,8 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
   const h2hKey = _awayAb + "-" + _homeAb;
   const h2hKeyAlt = _homeAb + "-" + _awayAb;
   const h2h = H2H[h2hKey] || H2H[h2hKeyAlt] || { wins: [0, 0], last5: [], avgGoals: 0 };
+  // standTick force le recalcul quand fetchStandings met à jour CONF_STANDINGS
+  void standTick;
   const hStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === _homeAb);
   const aStand = Object.values(CONF_STANDINGS[matchData.lg] || {}).flat().find((s) => s.ab === _awayAb);
   /* ── TOP SCOREURS SIDEBAR (live via proxy) ── */
