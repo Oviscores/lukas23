@@ -3901,7 +3901,7 @@ function VideoCard({ a, onClick, small }) {
   const [hov, setHov] = React.useState(false);
   const lc = (LG[a.league] && LG[a.league].color) || '#D50A0A';
   const ytId = a.youtubeId || '';
-  const thumb = a.img || (ytId ? 'https://img.youtube.com/vi/' + ytId + '/mqdefault.jpg' : null);
+  const thumb = a.img || (ytId ? 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg' : null);
   const h = small ? 164 : 320;
   if (playing && ytId) {
     return React.createElement('div', {
@@ -3930,7 +3930,7 @@ function VideoCard({ a, onClick, small }) {
   },
     /* Thumbnail background */
     thumb && React.createElement('div', { style:{ position:'absolute', inset:0, transform: hov ? 'scale(1.04)' : 'scale(1)', transition:'transform 0.5s' } },
-      React.createElement('img', { src: thumb, style:{ width:'100%', height:'100%', objectFit:'cover' }, alt:'' })
+      React.createElement('img', { src: thumb, style:{ width:'100%', height:'100%', objectFit:'cover' }, alt:'', onError: function(e){ if(e.target.src.indexOf('maxresdefault')!==-1) e.target.src=e.target.src.replace('maxresdefault','hqdefault'); } })
     ),
     /* Overlay gradient */
     React.createElement('div', { style:{ position:'absolute', inset:0, background: hov ? 'linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.25) 50%,rgba(0,0,0,0.1) 100%)' : 'linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.35) 55%,rgba(0,0,0,0.05) 100%)', transition:'background 0.25s' } }),
@@ -10545,7 +10545,7 @@ function ZoneUS() {
     history.pushState({}, '', '/videos/' + vslug);
     document.title = (v.title || 'Vidéo') + ' | Zone US';
     var ogImg = document.querySelector('meta[property="og:image"]');
-    var ytThumb = v.img || (v.youtubeId ? 'https://img.youtube.com/vi/' + v.youtubeId + '/mqdefault.jpg' : null);
+    var ytThumb = v.img || (v.youtubeId ? 'https://img.youtube.com/vi/' + v.youtubeId + '/maxresdefault.jpg' : null);
     if (ogImg && ytThumb) ogImg.setAttribute('content', ytThumb);
     setSelArticle(null); setSelMatch(null); setSelTeam(null); setSelPlayer(null);
     setSelVideo(v);
@@ -10771,7 +10771,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   if (selVideo) {
     var _vLc = (LG[selVideo.league] && LG[selVideo.league].color) || '#D50A0A';
     var _vYtId = selVideo.youtubeId || '';
-    var _vThumb = selVideo.img || (_vYtId ? 'https://img.youtube.com/vi/' + _vYtId + '/mqdefault.jpg' : null);
+    var _vThumb = selVideo.img || (_vYtId ? 'https://img.youtube.com/vi/' + _vYtId + '/maxresdefault.jpg' : null);
     return React.createElement('div', { style: { minHeight: '100vh', background: '#0a0e1a' } },
       React.createElement('div', { style: { maxWidth: 900, margin: '0 auto', padding: '24px 16px' } },
         React.createElement('button', {
@@ -10796,7 +10796,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
                 mozAllowFullScreen: true
               })
             )
-          : (_vThumb && React.createElement('img', { src: _vThumb, alt: selVideo.title, style: { width: '100%', borderRadius: 6 } }))
+          : (_vThumb && React.createElement('img', { src: _vThumb, alt: selVideo.title, style: { width: '100%', borderRadius: 6 }, onError: function(e){ if(e.target.src.indexOf('maxresdefault')!==-1) e.target.src=e.target.src.replace('maxresdefault','hqdefault'); } }))
       )
     );
   }
