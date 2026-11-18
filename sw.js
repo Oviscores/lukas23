@@ -1,4 +1,4 @@
-// Zone US — Service Worker v1
+// Zone US - Service Worker v1
 // Stratégie : Cache First pour les assets statiques, Network First pour les données
 
 const CACHE_NAME = 'zoneus-v1'
