@@ -4179,14 +4179,14 @@ function MatchScoreInArticle({ matchId, matchLg }) {
         setBx(boxData); setGoals(goalsList); setLoading(false);
       }).catch(function(){setLoading(false);});
     } else if (matchLg === 'MLB') {
-      var mlbId = (matchId+'').replace('mlb_','');
+      var mlbId = (matchId+'').replace(/mlb_/i,'');
       fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=mlb_boxscore&gamePk=' + mlbId)
         .then(function(r){return r.json();})
         .then(function(d){setBx(d);setLoading(false);})
         .catch(function(){setLoading(false);});
     } else if (matchLg === 'NBA') {
       /* NBA : même source que la page match (proxy), avec repli direct sur ESPN basket */
-      var nbaId = (matchId+'').replace('nba_','');
+      var nbaId = (matchId+'').replace(/nba_/i,'');
       var espnNba = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + nbaId;
       fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_boxscore&eventId=' + nbaId)
         .then(function(r){return r.json();})
@@ -4195,7 +4195,7 @@ function MatchScoreInArticle({ matchId, matchLg }) {
         .then(function(d){setBx(d);setLoading(false);})
         .catch(function(){setLoading(false);});
     } else {
-      var nflId = (matchId+'').replace('nfl_','');
+      var nflId = (matchId+'').replace(/nfl_/i,'');
       var url = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + nflId;
       fetch(url).then(function(r){return r.json();}).then(function(d){setBx(d);setLoading(false);}).catch(function(){setLoading(false);});
     }
