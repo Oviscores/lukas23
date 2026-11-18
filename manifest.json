@@ -1,0 +1,58 @@
+{
+  "name": "Zone US",
+  "short_name": "Zone US",
+  "description": "Le média sportif francophone NHL, NFL, NBA et MLB",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "news"],
+  "shortcuts": [
+    {
+      "name": "NHL",
+      "short_name": "NHL",
+      "url": "/nhl",
+      "description": "Scores et résultats NHL"
+    },
+    {
+      "name": "NBA",
+      "short_name": "NBA",
+      "url": "/nba",
+      "description": "Scores et résultats NBA"
+    },
+    {
+      "name": "NFL",
+      "short_name": "NFL",
+      "url": "/nfl",
+      "description": "Scores et résultats NFL"
+    },
+    {
+      "name": "MLB",
+      "short_name": "MLB",
+      "url": "/mlb",
+      "description": "Scores et résultats MLB"
+    }
+  ]
+}
