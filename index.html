@@ -5,17 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name='impact-site-verification' value='9d6519ec-1bbf-4af0-b572-3fe47cdf098e'>
   <meta name="description" content="Zone US, le media sportif francophone spécialisé NHL, NFL, NBA et MLB. Scores en direct, résultats, feuilles de match et actualités.">
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BF1HDYD8C0"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BF1HDYD8C0');</script>
+  <!-- Google Analytics (chargé après load, pas ici) -->
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://a.espncdn.com">
   <link rel="preconnect" href="https://cdn.sanity.io">
   <link rel="preconnect" href="https://raw.githubusercontent.com">
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="dns-prefetch" href="https://zoneus-proxy.vivienfrappier.workers.dev">
+  <link rel="preload" as="script" href="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin>
+  <link rel="preload" as="script" href="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin>
   <link rel="preload" as="image" href="https://raw.githubusercontent.com/Oviscores/lukas23/main/banner-zoneus.webp" fetchpriority="high">
 
   <!-- SEO : title/description/canonical/OG injectés avant React selon l'URL -->
@@ -136,7 +140,6 @@
     });
   </script>
   <!-- Fin Google Analytics -->
-  <link rel="icon" type="image/png" href="data:image/png;base64,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">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <style>
@@ -292,7 +295,7 @@ function getTeamLogo(abbr, lg, sz) {
   else src='https://zoneus-proxy.vivienfrappier.workers.dev?logo='+abbr+'&lg='+lg;
   var actualSz = lg === 'NHL' ? Math.round(sz * 1.35) : sz;
   var s = { width: actualSz, height: actualSz, objectFit: 'contain', flexShrink: 0, display: 'block' };
-  return React.createElement('img', { src: src, alt: abbr, style: s, onError: function(e){e.target.style.display='none';} });
+  return React.createElement('img', { src: src, alt: abbr, style: s, loading:'lazy', decoding:'async', onError: function(e){e.target.style.display='none';} });
 }
 </script>
 <script>
@@ -3832,7 +3835,7 @@ function MatchInner({ a, hov, h }) {
     ),
     React.createElement('div', { style: { position:'relative', zIndex:1, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 16px', height:'100%' } },
       React.createElement('div', { style:{ display:'flex', flexDirection:'column', alignItems:'center', gap:3, flex:1 } },
-        React.createElement('img', { src: logoUrl(a._mAway), style:{ width:logoSz, height:logoSz, objectFit:'contain', opacity: aWin?1:isFinal?0.45:1, filter:hov?'drop-shadow(0 2px 8px rgba(0,0,0,0.6))':'none', transition:'all 0.25s' }, onError:function(e){e.target.style.display='none';} }),
+        React.createElement('img', { src: logoUrl(a._mAway), style:{ width:logoSz, height:logoSz, objectFit:'contain', opacity: aWin?1:isFinal?0.45:1, filter:hov?'drop-shadow(0 2px 8px rgba(0,0,0,0.6))':'none', transition:'all 0.25s' }, loading:'lazy', decoding:'async', onError:function(e){e.target.style.display='none';} }),
         React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:900, color:aWin?'#fff':'rgba(255,255,255,0.65)', letterSpacing:'0.08em' } }, a._mAway)
       ),
       React.createElement('div', { style:{ display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:3, minWidth:70 } },
@@ -3845,7 +3848,7 @@ function MatchInner({ a, hov, h }) {
           : React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:scoreSz, fontWeight:900, color:'rgba(255,255,255,0.9)' } }, timeStr||'@')
       ),
       React.createElement('div', { style:{ display:'flex', flexDirection:'column', alignItems:'center', gap:3, flex:1 } },
-        React.createElement('img', { src: logoUrl(a._mHome), style:{ width:logoSz, height:logoSz, objectFit:'contain', opacity:hWin?1:isFinal?0.45:1, filter:hov?'drop-shadow(0 2px 8px rgba(0,0,0,0.6))':'none', transition:'all 0.25s' }, onError:function(e){e.target.style.display='none';} }),
+        React.createElement('img', { src: logoUrl(a._mHome), style:{ width:logoSz, height:logoSz, objectFit:'contain', opacity:hWin?1:isFinal?0.45:1, filter:hov?'drop-shadow(0 2px 8px rgba(0,0,0,0.6))':'none', transition:'all 0.25s' }, loading:'lazy', decoding:'async', onError:function(e){e.target.style.display='none';} }),
         React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:900, color:hWin?'#fff':'rgba(255,255,255,0.65)', letterSpacing:'0.08em' } }, a._mHome)
       )
     ),
@@ -3936,7 +3939,7 @@ function VideoCard({ a, onClick, small }) {
   },
     /* Thumbnail background */
     thumb && React.createElement('div', { style:{ position:'absolute', inset:0, transform: hov ? 'scale(1.04)' : 'scale(1)', transition:'transform 0.5s' } },
-      React.createElement('img', { src: thumb, style:{ width:'100%', height:'100%', objectFit:'cover' }, alt:'', onError: function(e){ if(e.target.src.indexOf('maxresdefault')!==-1) e.target.src=e.target.src.replace('maxresdefault','hqdefault'); } })
+      React.createElement('img', { src: thumb, style:{ width:'100%', height:'100%', objectFit:'cover' }, alt:'', loading:'lazy', decoding:'async', onError: function(e){ if(e.target.src.indexOf('maxresdefault')!==-1) e.target.src=e.target.src.replace('maxresdefault','hqdefault'); } })
     ),
     /* Overlay gradient */
     React.createElement('div', { style:{ position:'absolute', inset:0, background: hov ? 'linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.25) 50%,rgba(0,0,0,0.1) 100%)' : 'linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.35) 55%,rgba(0,0,0,0.05) 100%)', transition:'background 0.25s' } }),
@@ -4008,7 +4011,7 @@ function SanityMatchCard({ m, onClick }) {
     ),
     React.createElement('div', { style: { position:'relative', zIndex:1, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 20px', flex:1 } },
       React.createElement('div', { style:{ display:'flex', flexDirection:'column', alignItems:'center', gap:4, flex:1 } },
-        React.createElement('img', { src: logoUrl(m.away), style:{ width:72, height:72, objectFit:'contain', opacity: aWin ? 1 : isFinal ? 0.45 : 1, filter: hov ? 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' : 'none', transition:'all 0.25s' }, onError: function(e){ e.target.style.display='none'; } }),
+        React.createElement('img', { src: logoUrl(m.away), style:{ width:72, height:72, objectFit:'contain', opacity: aWin ? 1 : isFinal ? 0.45 : 1, filter: hov ? 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' : 'none', transition:'all 0.25s' }, loading:'lazy', decoding:'async', onError: function(e){ e.target.style.display='none'; } }),
         React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:900, color: aWin ? '#fff' : 'rgba(255,255,255,0.65)', letterSpacing:'0.08em' } }, m.away)
       ),
       React.createElement('div', { style:{ display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:4, minWidth:80 } },
@@ -4022,7 +4025,7 @@ function SanityMatchCard({ m, onClick }) {
         isFinal && React.createElement('span', { style:{ fontFamily:"'Barlow',sans-serif", fontSize:10, color:'rgba(255,255,255,0.5)', marginTop:2 } }, dateStr)
       ),
       React.createElement('div', { style:{ display:'flex', flexDirection:'column', alignItems:'center', gap:4, flex:1 } },
-        React.createElement('img', { src: logoUrl(m.home), style:{ width:72, height:72, objectFit:'contain', opacity: hWin ? 1 : isFinal ? 0.45 : 1, filter: hov ? 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' : 'none', transition:'all 0.25s' }, onError: function(e){ e.target.style.display='none'; } }),
+        React.createElement('img', { src: logoUrl(m.home), style:{ width:72, height:72, objectFit:'contain', opacity: hWin ? 1 : isFinal ? 0.45 : 1, filter: hov ? 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' : 'none', transition:'all 0.25s' }, loading:'lazy', decoding:'async', onError: function(e){ e.target.style.display='none'; } }),
         React.createElement('span', { style:{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:900, color: hWin ? '#fff' : 'rgba(255,255,255,0.65)', letterSpacing:'0.08em' } }, m.home)
       )
     ),
@@ -4669,7 +4672,7 @@ function ArticlePage({ article, onBack, articles, onPlayerClick, onTeamClick, on
             onMouseLeave: function(e) { e.currentTarget.style.background = lc + "0d"; }
           },
             getTeamLogo(p.team, pLg, 20),
-            photoUrl && React.createElement("img", { src: photoUrl, alt: p.name, style: { width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top", background: "#eee", border: "2px solid " + lc + "44", flexShrink: 0 }, onError: function(e){ e.target.style.display='none'; } }),
+            photoUrl && React.createElement("img", { src: photoUrl, alt: p.name, style: { width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top", background: "#eee", border: "2px solid " + lc + "44", flexShrink: 0 }, loading:'lazy', decoding:'async', onError: function(e){ e.target.style.display='none'; } }),
             React.createElement("div", null,
               React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#111" } }, p.name),
               React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 9, color: "#777" } }, (p.pos ? p.pos + " · " : "") + (p.team || '') )
@@ -5208,7 +5211,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       React.createElement("div", { style: { maxWidth: 1100, margin: "0 auto", padding: "20px 20px 60px", display: "flex", flexDirection: "column", gap: 10 } },
         // Hero banner
         React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 6, padding: "24px 28px", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", position: "relative", overflow: "hidden" } },
-          p.headshot ? React.createElement("img", { src: p.headshot, alt: p.name, style: { width: 90, height: 90, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.4)", objectFit: "cover", flexShrink: 0 } }) :
+          p.headshot ? React.createElement("img", { src: p.headshot, alt: p.name, style: { width: 90, height: 90, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.4)", objectFit: "cover", flexShrink: 0, loading: "lazy", decoding: "async" } }) :
           React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.15)", border: "3px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } },
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, "#" + p.jersey)
           ),
@@ -5503,7 +5506,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       React.createElement("div", { style: { maxWidth: 1100, margin: "0 auto", padding: "20px 20px 60px", display: "flex", flexDirection: "column", gap: 10 } },
         // Hero — avec tuiles stats saison intégrées (comme NHL)
         React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 6, padding: "24px 28px", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", position: "relative", overflow: "hidden" } },
-          p.headshot ? React.createElement("img", { src: p.headshot, alt: p.name, style: { width: 90, height: 90, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.4)", objectFit: "cover", flexShrink: 0 } }) :
+          p.headshot ? React.createElement("img", { src: p.headshot, alt: p.name, style: { width: 90, height: 90, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.4)", objectFit: "cover", flexShrink: 0, loading: "lazy", decoding: "async" } }) :
           React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.15)", border: "3px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } },
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, p.jersey ? "#" + p.jersey : p.pos)
           ),
@@ -5714,7 +5717,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       React.createElement("div", { style: { maxWidth: 1100, margin: "0 auto", padding: "20px 20px 60px", display: "flex", flexDirection: "column", gap: 10 } },
         // Hero — avec tuiles stats saison intégrées (comme NHL)
         React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 6, padding: "24px 28px", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", position: "relative", overflow: "hidden" } },
-          p.headshot ? React.createElement("img", { src: p.headshot, alt: p.name, style: { width: 90, height: 90, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.4)", objectFit: "cover", flexShrink: 0 } }) :
+          p.headshot ? React.createElement("img", { src: p.headshot, alt: p.name, style: { width: 90, height: 90, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.4)", objectFit: "cover", flexShrink: 0, loading: "lazy", decoding: "async" } }) :
           React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.15)", border: "3px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } },
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, p.jersey ? "#" + p.jersey : p.pos)
           ),
@@ -5847,7 +5850,7 @@ function PlayerPage({ playerId: playerIdRaw, lg, onBack, articles, onArticleClic
       React.createElement("div", { style: { maxWidth: 1100, margin: "0 auto", padding: "20px 20px 60px", display: "flex", flexDirection: "column", gap: 10 } },
         // Hero
         React.createElement("div", { style: { background: "linear-gradient(135deg," + dk + " 0%," + lc + " 100%)", borderRadius: 6, padding: "24px 28px", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" } },
-          p.headshot ? React.createElement("img", { src: p.headshot, alt: p.name, style: { width: 90, height: 90, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.4)", objectFit: "cover", flexShrink: 0 } }) :
+          p.headshot ? React.createElement("img", { src: p.headshot, alt: p.name, style: { width: 90, height: 90, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.4)", objectFit: "cover", flexShrink: 0, loading: "lazy", decoding: "async" } }) :
           React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.15)", border: "3px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } },
             React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "#fff" } }, p.jersey ? "#" + p.jersey : p.pos)
           ),
@@ -7707,7 +7710,7 @@ function MatchPage({ match, onBack, articles, onArticleClick, onMatchClick, onTe
       onMouseLeave:function(e){e.currentTarget.style.background="rgba(255,255,255,0.88)";}
     },
       imgOk && p.headshot
-        ? React.createElement("img",{src:p.headshot, alt:p.name, style:{width:44,height:44,borderRadius:"50%",objectFit:"cover",objectPosition:"top center",border:"2px solid "+col.bg+"66",flexShrink:0,background:"#f0f0f0"},
+        ? React.createElement("img",{src:p.headshot, alt:p.name, style:{width:44,height:44,borderRadius:"50%",objectFit:"cover",objectPosition:"top center",border:"2px solid "+col.bg+"66",flexShrink:0,background:"#f0f0f0",loading:"lazy",decoding:"async"},
             onError:function(){ setImgOk(false); }
           })
         : React.createElement("div",{style:{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg,"+col.bg+"30,"+col.bg+"10)",border:"2px solid "+col.bg+"55",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
@@ -9166,7 +9169,7 @@ function CalendarPage({ lg, onBack, onMatchClick }) {
           e.currentTarget.style.background = "transparent";
         }
       },
-      /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 28, height: 28, borderRadius: 3, background: m.awayLogo ? "transparent" : acol.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ m.awayLogo ? React.createElement("img", { src: m.awayLogo, alt: m.away, style: { height: 24, width: 24, objectFit: "contain" }, onError: function(e) { e.target.style.display="none"; } }) : React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: acol.fg } }, m.away)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: isFinal && aw ? 900 : isFinal && !aw ? 500 : 700, color: isFinal && !aw ? "#aaa" : "#111" } }, TEAM_NAMES[m.away + "_" + lg] || m.away), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb" } }, "VISITEUR"), m.odd_away && (function() {
+      /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 28, height: 28, borderRadius: 3, background: m.awayLogo ? "transparent" : acol.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ m.awayLogo ? React.createElement("img", { src: m.awayLogo, alt: m.away, style: { height: 24, width: 24, objectFit: "contain" }, loading:"lazy", decoding:"async", onError: function(e) { e.target.style.display="none"; } }) : React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: acol.fg } }, m.away)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: isFinal && aw ? 900 : isFinal && !aw ? 500 : 700, color: isFinal && !aw ? "#aaa" : "#111" } }, TEAM_NAMES[m.away + "_" + lg] || m.away), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb" } }, "VISITEUR"), m.odd_away && (function() {
         var isFav = parseFloat(m.odd_away) < parseFloat(m.odd_home);
         return /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: isFav ? "#16a34a" : "#ef4444", marginTop: 2 } }, m.odd_away);
       })())),
@@ -9174,7 +9177,7 @@ function CalendarPage({ lg, onBack, onMatchClick }) {
       /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right" } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: isFinal && hw ? 900 : isFinal && !hw ? 500 : 700, color: isFinal && !hw ? "#aaa" : "#111" } }, TEAM_NAMES[m.home + "_" + lg] || m.home), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb" } }, "DOMICILE"), m.odd_home && (function() {
         var isFav = parseFloat(m.odd_home) < parseFloat(m.odd_away);
         return /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: isFav ? "#16a34a" : "#ef4444", marginTop: 2 } }, m.odd_home);
-      })()), /* @__PURE__ */ React.createElement("div", { style: { width: 28, height: 28, borderRadius: 3, background: m.homeLogo ? "transparent" : hcol.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ m.homeLogo ? /* @__PURE__ */ React.createElement("img", { src: m.homeLogo, alt: m.home, style: { height: 24, width: 24, objectFit: "contain" }, onError: function(e) { e.target.style.display="none"; } }) : /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: hcol.fg } }, m.home)))
+      })()), /* @__PURE__ */ React.createElement("div", { style: { width: 28, height: 28, borderRadius: 3, background: m.homeLogo ? "transparent" : hcol.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ m.homeLogo ? /* @__PURE__ */ React.createElement("img", { src: m.homeLogo, alt: m.home, style: { height: 24, width: 24, objectFit: "contain" }, loading:"lazy", decoding:"async", onError: function(e) { e.target.style.display="none"; } }) : /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: hcol.fg } }, m.home)))
     );
   }))), confKeys.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "standings-table", style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(400px,1fr))", gap: 12 } }, confKeys.map(function(confName) {
     const rows = confs[confName];
@@ -9295,8 +9298,8 @@ function RightCol({ feed, statsVersion, onGen, generating, genLg, onArticleClick
       if (onMoreStats) onMoreStats(lg);
     } }));
   }),
-  React.createElement("a", { key: "banner-cp", href: "https://maps.google.com/?q=2+avenue+Saint+Augustin+06200+Nice", target: "_blank", rel: "noopener noreferrer", style: { display: "block", borderRadius: 4, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.18)" } }, React.createElement("img", { src: "/california-presse.jpg", alt: "California Presse Nice", style: { width: "100%", display: "block", aspectRatio: "2/3", objectFit: "cover" } })),
-  React.createElement("a", { key: "banner-ulyris", href: "https://maps.google.com/?q=212+avenue+de+la+Californie+06200+Nice", target: "_blank", rel: "noopener noreferrer", style: { display: "block", borderRadius: 4, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.18)", marginTop: 10 } }, React.createElement("img", { src: "/ulyris-optique.jpg", alt: "Ulyris Optique Nice", style: { width: "100%", display: "block", aspectRatio: "2/3", objectFit: "cover" } })));
+  React.createElement("a", { key: "banner-cp", href: "https://maps.google.com/?q=2+avenue+Saint+Augustin+06200+Nice", target: "_blank", rel: "noopener noreferrer", style: { display: "block", borderRadius: 4, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.18)" } }, React.createElement("img", { src: "/california-presse.jpg", alt: "California Presse Nice", style: { width: "100%", display: "block", aspectRatio: "2/3", objectFit: "cover" }, loading: "lazy", decoding: "async" })),
+  React.createElement("a", { key: "banner-ulyris", href: "https://maps.google.com/?q=212+avenue+de+la+Californie+06200+Nice", target: "_blank", rel: "noopener noreferrer", style: { display: "block", borderRadius: 4, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.18)", marginTop: 10 } }, React.createElement("img", { src: "/ulyris-optique.jpg", alt: "Ulyris Optique Nice", style: { width: "100%", display: "block", aspectRatio: "2/3", objectFit: "cover" }, loading: "lazy", decoding: "async" })));
 }
 const FANTASY_DATA = window.FANTASY_DATA = {
   NHL: {
@@ -10829,7 +10832,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
                 mozAllowFullScreen: true
               })
             )
-          : (_vThumb && React.createElement('img', { src: _vThumb, alt: selVideo.title, style: { width: '100%', borderRadius: 6 }, onError: function(e){ if(e.target.src.indexOf('maxresdefault')!==-1) e.target.src=e.target.src.replace('maxresdefault','hqdefault'); } }))
+          : (_vThumb && React.createElement('img', { src: _vThumb, alt: selVideo.title, style: { width: '100%', borderRadius: 6 }, loading:'lazy', decoding:'async', onError: function(e){ if(e.target.src.indexOf('maxresdefault')!==-1) e.target.src=e.target.src.replace('maxresdefault','hqdefault'); } }))
       )
     );
   }
