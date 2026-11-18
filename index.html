@@ -4364,17 +4364,22 @@ function MatchScoreInArticle({ matchId, matchLg }) {
     if (!nHome || !nAway) return null;
     var nHomeAb = (nHome.team && nHome.team.abbreviation) || '';
     var nAwayAb = (nAway.team && nAway.team.abbreviation) || '';
-    /* ESPN utilise GS, NY, SA, NO, UTAH, WSH : on ramène aux codes du site pour les couleurs */
+    /* ESPN utilise GS, NY, SA, NO, UTAH, WSH : on ramène aux codes du site pour les couleurs et logos */
     var espnToSite = { GS: 'GSW', NY: 'NYK', SA: 'SAS', NO: 'NOP', UTAH: 'UTA', WSH: 'WAS' };
-    var nhCol = TC[(espnToSite[nHomeAb]||nHomeAb)+'_NBA'] || {bg:'#333',fg:'#fff'};
-    var naCol = TC[(espnToSite[nAwayAb]||nAwayAb)+'_NBA'] || {bg:'#555',fg:'#fff'};
+    var nHomeAbSite = espnToSite[nHomeAb] || nHomeAb;
+    var nAwayAbSite = espnToSite[nAwayAb] || nAwayAb;
+    var nhCol = TC[nHomeAbSite+'_NBA'] || {bg:'#333',fg:'#fff'};
+    var naCol = TC[nAwayAbSite+'_NBA'] || {bg:'#555',fg:'#fff'};
     var nStatus = nComp.status && nComp.status.type;
     var nStatusTxt = nStatus && nStatus.completed ? ('FINAL' + ((nHome.linescores||[]).length > 4 ? ' — Prol.' : '')) : (nStatus && nStatus.shortDetail || '');
     var nHomeLs = nHome.linescores || []; var nAwayLs = nAway.linescores || [];
     var nQ = Math.max(nHomeLs.length, nAwayLs.length, 4);
     var nPlayers = (bx.boxscore && bx.boxscore.players) || [];
     function nbaTeamBlock(ab) {
-      var t = nPlayers.find(function(x){return x.team && x.team.abbreviation === ab;}) || {};
+      /* ESPN peut utiliser SA, GS, NY… dans les stats aussi — on cherche avec les deux versions */
+      var siteToEspn = { GSW:'GS', NYK:'NY', SAS:'SA', NOP:'NO', UTA:'UTAH', WAS:'WSH' };
+      var abEspn = siteToEspn[ab] || ab;
+      var t = nPlayers.find(function(x){return x.team && (x.team.abbreviation === ab || x.team.abbreviation === abEspn);}) || {};
       var st = (t.statistics && t.statistics[0]) || {};
       return { keys: st.keys || [], athletes: (st.athletes || []).filter(function(a){return a.athlete && a.stats && a.stats.length;}) };
     }
@@ -4420,16 +4425,16 @@ function MatchScoreInArticle({ matchId, matchLg }) {
       ),
       React.createElement("div", { style: { display: "flex", justifyContent: "space-around", alignItems: "center", padding: "16px 24px", background: "#111" } },
         React.createElement("div", { style: { textAlign: "center" } },
-          getTeamLogo(nAwayAb, 'NBA', 52),
-          React.createElement("div", { style: { color: "rgba(255,255,255,0.6)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 13, marginTop: 4 } }, nAwayAb)
+          getTeamLogo(nAwayAbSite, 'NBA', 52),
+          React.createElement("div", { style: { color: "rgba(255,255,255,0.6)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 13, marginTop: 4 } }, nAwayAbSite)
         ),
         React.createElement("div", { style: { textAlign: "center" } },
           React.createElement("div", { style: { color: "rgba(255,255,255,0.4)", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 700 } }, nStatusTxt),
           React.createElement("div", { style: { color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 42, letterSpacing: 4, lineHeight: 1 } }, (nAway.score || '0') + ' – ' + (nHome.score || '0'))
         ),
         React.createElement("div", { style: { textAlign: "center" } },
-          getTeamLogo(nHomeAb, 'NBA', 52),
-          React.createElement("div", { style: { color: "rgba(255,255,255,0.6)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 13, marginTop: 4 } }, nHomeAb)
+          getTeamLogo(nHomeAbSite, 'NBA', 52),
+          React.createElement("div", { style: { color: "rgba(255,255,255,0.6)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 13, marginTop: 4 } }, nHomeAbSite)
         )
       ),
       React.createElement("div", { style: { overflowX: "auto", background: "#fff", padding: "10px 12px" } },
@@ -4439,7 +4444,7 @@ function MatchScoreInArticle({ matchId, matchLg }) {
             Array.from({ length: nQ }, function(_, i){ return React.createElement("th", { key: i, style: head }, i < 4 ? 'Q'+(i+1) : 'Pr'+(nQ > 5 ? (i-3) : '')); }),
             React.createElement("th", { style: Object.assign({}, head, { color: lc, fontWeight: 900 }) }, "TOT")
           )),
-          React.createElement("tbody", null, [[nAwayAb, nAwayLs, nAway.score, naCol], [nHomeAb, nHomeLs, nHome.score, nhCol]].map(function(r) {
+          React.createElement("tbody", null, [[nAwayAbSite, nAwayLs, nAway.score, naCol], [nHomeAbSite, nHomeLs, nHome.score, nhCol]].map(function(r) {
             return React.createElement("tr", { key: r[0], style: { borderTop: "1px solid #f0f0f0" } },
               React.createElement("td", { style: Object.assign({}, cell, { textAlign: 'left', fontWeight: 900, color: r[3].bg }) }, r[0]),
               Array.from({ length: nQ }, function(_, i){ var q = r[1][i]; return React.createElement("td", { key: i, style: cell }, q ? (q.displayValue != null ? q.displayValue : q.value) : '-'); }),
@@ -4448,8 +4453,8 @@ function MatchScoreInArticle({ matchId, matchLg }) {
           }))
         )
       ),
-      renderNbaTeam(nAwayAb, naCol),
-      renderNbaTeam(nHomeAb, nhCol)
+      renderNbaTeam(nAwayAbSite, naCol),
+      renderNbaTeam(nHomeAbSite, nhCol)
     );
   }
 
