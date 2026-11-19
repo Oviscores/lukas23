@@ -9659,23 +9659,11 @@ function GoaliesMatchup({ onPlayerClick }) {
     var mounted = true;
     (async function() {
       try {
-        // Step 1: get the buildId from DailyFaceoff HTML
-        var pageR = await fetch('https://www.dailyfaceoff.com/starting-goalies');
-        var html = await pageR.text();
-        var match = html.match(/"buildId"\s*:\s*"([^"]+)"/);
-        var buildId = match && match[1];
-        if (!buildId) throw new Error('no buildId');
-
-        // Step 2: fetch the SSR data with today's date
-        var today = new Date().toLocaleString('sv-SE', {timeZone: 'America/New_York'}).slice(0,10);
-        var dataR = await fetch('https://www.dailyfaceoff.com/_next/data/' + buildId + '/starting-goalies/' + today + '.json');
-        var d = dataR.ok ? await dataR.json() : null;
-        // Fallback: without date param
-        if (!d || !d.pageProps) {
-          var dataR2 = await fetch('https://www.dailyfaceoff.com/_next/data/' + buildId + '/starting-goalies.json');
-          d = dataR2.ok ? await dataR2.json() : null;
-        }
-        var raw = (d && d.pageProps && d.pageProps.data) || [];
+        // Proxy via Cloudflare Worker (DailyFaceoff blocks direct CORS from zoneus.fr)
+        var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+        var resp = await fetch(PROXY + '?league=nhl_goalies_df');
+        var json = resp.ok ? await resp.json() : null;
+        var raw = (json && json.games) || [];
         var result = raw.map(function(g) {
           return {
             id: (g.homeTeamAbbreviation || '') + (g.awayTeamAbbreviation || ''),
