@@ -9654,29 +9654,52 @@ const FANTASY_DATA = window.FANTASY_DATA = {
 function GoaliesMatchup({ onPlayerClick }) {
   var _gs = React.useState(null); var games = _gs[0], setGames = _gs[1];
   var _lo = React.useState(true); var loading = _lo[0], setLoading = _lo[1];
-  var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
+
   React.useEffect(function() {
     var mounted = true;
     (async function() {
       try {
-        var r = await fetch(PROXY + '?league=nhl');
+        var r = await fetch('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard');
         var d = await r.json();
-        var today = new Date().toISOString().split('T')[0];
         var result = [];
-        (d.gamesByDate || []).forEach(function(dg) {
-          (dg.games || []).forEach(function(g) {
-            var gd = (g.gameDate || '').slice(0,10);
-            if (gd !== today) return;
-            var ht = g.homeTeam || {}, at = g.awayTeam || {};
-            var state = g.gameState || 'FUT';
-            var isFinal = state === 'OFF' || state === 'FINAL';
-            if (isFinal) return;
-            result.push({
-              id: g.id,
-              time: g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '',
-              home: { ab: ht.abbrev||'', name: ht.commonName&&ht.commonName.default||ht.abbrev||'', goalieId: ht.goalieId||null, goalieName: ht.goalieFullName||null, confirmed: !!ht.goalieId },
-              away: { ab: at.abbrev||'', name: at.commonName&&at.commonName.default||at.abbrev||'', goalieId: at.goalieId||null, goalieName: at.goalieFullName||null, confirmed: !!at.goalieId }
-            });
+        (d.events || []).forEach(function(ev) {
+          var comp = (ev.competitions || [])[0];
+          if (!comp) return;
+          var status = (comp.status && comp.status.type && comp.status.type.name) || '';
+          if (status === 'STATUS_FINAL') return;
+          var competitors = comp.competitors || [];
+          var homeComp = competitors.find(function(c){ return c.homeAway === 'home'; }) || {};
+          var awayComp = competitors.find(function(c){ return c.homeAway === 'away'; }) || {};
+          function parseGoalie(probable) {
+            if (!probable) return null;
+            var ath = probable.athlete || {};
+            return {
+              id: ath.id || null,
+              name: ath.displayName || ath.shortName || null,
+              photo: ath.id ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/' + ath.id + '.png&w=130&h=100' : null,
+              confirmed: !!(probable.status && probable.status !== 'Unconfirmed')
+            };
+          }
+          var homeProbable = (comp.probables || []).find(function(p){ return p.homeAway === 'home' || (homeComp.team && p.athlete && p.athlete.team && p.athlete.team.id === homeComp.team.id); });
+          var awayProbable = (comp.probables || []).find(function(p){ return p.homeAway === 'away' || (awayComp.team && p.athlete && p.athlete.team && p.athlete.team.id === awayComp.team.id); });
+          var startTime = '';
+          if (ev.date) {
+            try { startTime = new Date(ev.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', timeZone:'America/New_York'}); } catch(e) {}
+          }
+          result.push({
+            id: ev.id,
+            time: startTime,
+            status: status,
+            home: {
+              ab: (homeComp.team && homeComp.team.abbreviation) || '',
+              name: (homeComp.team && homeComp.team.shortDisplayName) || (homeComp.team && homeComp.team.displayName) || '',
+              goalie: parseGoalie(homeProbable)
+            },
+            away: {
+              ab: (awayComp.team && awayComp.team.abbreviation) || '',
+              name: (awayComp.team && awayComp.team.shortDisplayName) || (awayComp.team && awayComp.team.displayName) || '',
+              goalie: parseGoalie(awayProbable)
+            }
           });
         });
         if (mounted) { setGames(result); setLoading(false); }
@@ -9686,38 +9709,54 @@ function GoaliesMatchup({ onPlayerClick }) {
   }, []);
 
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
-  var lc = "#0066CC";
 
   function GoalieCard(props) {
-    var g = props.goalie, side = props.side;
+    var team = props.team, side = props.side;
     var isLeft = side === 'away';
-    var imgUrl = g.goalieId ? 'https://assets.nhle.com/mugs/nhl/skaters/' + g.goalieId + '.png' : null;
-    var tc = TC[g.ab + '_NHL'] || { bg: '#1a1a2e', fg: '#fff' };
-    var confirmed = g.confirmed && g.goalieName;
+    var g = team.goalie;
+    var tc = TC[team.ab + '_NHL'] || { bg: '#1a1a2e', fg: '#fff' };
+    var confirmed = g && g.confirmed && g.name;
     var sc = confirmed ? '#16a34a' : '#f59e0b';
     var confLabel = confirmed ? 'CONFIRMÉ' : 'NON CONFIRMÉ';
-    var confIcon = confirmed ? '✓' : '?';
-    return React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: isLeft ? "flex-end" : "flex-start", gap: 6, padding: "12px 10px" } },
-      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flexDirection: isLeft ? "row-reverse" : "row" } },
-        React.createElement("img", { src: 'https://assets.nhle.com/logos/nhl/svg/' + g.ab + '_light.svg', style: { width: 36, height: 36, objectFit: "contain" }, onError: function(e){ e.target.style.display='none'; } }),
-        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#555", letterSpacing: "0.08em" } }, g.name)
-      ),
-      imgUrl ? React.createElement("div", {
-        onClick: function() { if (g.goalieId && onPlayerClick) onPlayerClick(g.goalieId, 'NHL'); },
-        style: { cursor: g.goalieId ? "pointer" : "default", position: "relative" }
+    var hasGoalie = g && g.name;
+
+    return React.createElement("div", {
+      style: { flex: 1, display: "flex", flexDirection: "column", alignItems: isLeft ? "flex-end" : "flex-start", gap: 5, padding: "10px 10px 12px" }
+    },
+      React.createElement("div", {
+        style: { display: "flex", alignItems: "center", gap: 6, flexDirection: isLeft ? "row-reverse" : "row" }
       },
         React.createElement("img", {
-          src: imgUrl,
-          style: { width: 80, height: 80, objectFit: "cover", objectPosition: "top", borderRadius: 6, border: "2px solid " + tc.bg, background: tc.bg + "22" },
-          onError: function(e){ e.target.src='https://assets.nhle.com/logos/nhl/svg/'+g.ab+'_light.svg'; e.target.style.objectPosition='center'; e.target.style.padding='8px'; }
+          src: 'https://assets.nhle.com/logos/nhl/svg/' + team.ab + '_light.svg',
+          style: { width: 28, height: 28, objectFit: "contain" },
+          onError: function(e){ e.target.style.display='none'; }
+        }),
+        React.createElement("span", {
+          style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 800, color: "#666", letterSpacing: "0.07em", textTransform: "uppercase" }
+        }, team.name)
+      ),
+      hasGoalie ? React.createElement("div", {
+        onClick: function() { if (g.id && onPlayerClick) onPlayerClick(g.id, 'NHL'); },
+        style: { cursor: g.id ? "pointer" : "default" }
+      },
+        React.createElement("img", {
+          src: g.photo,
+          style: { width: 72, height: 72, objectFit: "cover", objectPosition: "top center", borderRadius: 6, border: "2px solid " + tc.bg + "55", background: tc.bg + "18", display: "block" },
+          onError: function(e){ e.target.src='https://assets.nhle.com/logos/nhl/svg/'+team.ab+'_light.svg'; e.target.style.objectPosition='center'; e.target.style.padding='10px'; e.target.style.objectFit='contain'; }
         })
-      ) : React.createElement("div", { style: { width: 80, height: 80, borderRadius: 6, background: tc.bg + "22", border: "2px solid " + tc.bg + "44", display: "flex", alignItems: "center", justifyContent: "center" } },
-        React.createElement("span", { style: { fontSize: 28, opacity: 0.3 } }, "🥅")
+      ) : React.createElement("div", {
+        style: { width: 72, height: 72, borderRadius: 6, background: tc.bg + "18", border: "2px solid " + tc.bg + "33", display: "flex", alignItems: "center", justifyContent: "center" }
+      },
+        React.createElement("span", { style: { fontSize: 24, opacity: 0.25 } }, "🥅")
       ),
       React.createElement("div", { style: { textAlign: isLeft ? "right" : "left" } },
-        React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 800, color: "#111", lineHeight: 1.1 } }, g.goalieName || "—"),
-        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 4, justifyContent: isLeft ? "flex-end" : "flex-start", marginTop: 3 } },
-          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: sc } }, confIcon),
+        React.createElement("div", {
+          style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: "#111", lineHeight: 1.1, maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }
+        }, hasGoalie ? g.name : "—"),
+        React.createElement("div", {
+          style: { display: "flex", alignItems: "center", gap: 3, justifyContent: isLeft ? "flex-end" : "flex-start", marginTop: 3 }
+        },
+          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: sc, lineHeight: 1 } }, confirmed ? "✓" : "?"),
           React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: sc } }, confLabel)
         )
       )
@@ -9736,21 +9775,36 @@ function GoaliesMatchup({ onPlayerClick }) {
   return React.createElement("div", { style: bs },
     React.createElement(HdGlobal, { label: "GARDIENS PARTANTS" }),
     games.map(function(g, i) {
-      return React.createElement("div", { key: g.id, style: { borderBottom: i < games.length-1 ? "1px solid rgba(0,0,0,0.07)" : "none" } },
-        React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "5px 10px 0", background: "rgba(0,0,0,0.02)" } },
-          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#aaa", letterSpacing: "0.08em" } }, g.time + " HE")
+      var isLive = g.status === 'STATUS_IN_PROGRESS';
+      return React.createElement("div", {
+        key: g.id,
+        style: { borderBottom: i < games.length-1 ? "1px solid rgba(0,0,0,0.07)" : "none" }
+      },
+        React.createElement("div", {
+          style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "5px 10px 2px", background: "rgba(0,0,0,0.025)" }
+        },
+          isLive ? React.createElement("span", {
+            style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#ef4444", letterSpacing: "0.1em" }
+          }, "● EN DIRECT") : React.createElement("span", {
+            style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#aaa", letterSpacing: "0.07em" }
+          }, g.time + " HE")
         ),
         React.createElement("div", { style: { display: "flex", alignItems: "stretch" } },
-          React.createElement(GoalieCard, { goalie: g.away, side: "away" }),
-          React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 8px", gap: 4, flexShrink: 0 } },
-            React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: "rgba(0,0,0,0.1)" } }, "VS")
+          React.createElement(GoalieCard, { team: g.away, side: "away" }),
+          React.createElement("div", {
+            style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 6px", gap: 2, flexShrink: 0 }
+          },
+            React.createElement("span", {
+              style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "rgba(0,0,0,0.12)", letterSpacing: "0.05em" }
+            }, "VS")
           ),
-          React.createElement(GoalieCard, { goalie: g.home, side: "home" })
+          React.createElement(GoalieCard, { team: g.home, side: "home" })
         )
       );
     })
   );
 }
+
 
 function FantasyPageNHL({ lg, onPlayerClick, onBack, onTeamClick }) {
   var _fv = React.useState(0);
