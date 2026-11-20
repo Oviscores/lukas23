@@ -9945,22 +9945,6 @@ const FANTASY_DATA = window.FANTASY_DATA = {
 function GoaliesMatchup({ onPlayerClick }) {
   var _gs = React.useState(null); var games = _gs[0], setGames = _gs[1];
   var _lo = React.useState(true); var loading = _lo[0], setLoading = _lo[1];
-  var _dt = React.useState(0); var dateOffset = _dt[0], setDateOffset = _dt[1]; // 0 = aujourd'hui, 1 = demain, etc.
-
-  function getDateForOffset(offset) {
-    var d = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    d.setDate(d.getDate() + offset);
-    return d.toISOString().slice(0, 10);
-  }
-  function formatDateLabel(offset) {
-    if (offset === 0) return "Aujourd'hui";
-    if (offset === 1) return "Demain";
-    var d = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    d.setDate(d.getDate() + offset);
-    var days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-    var months = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-    return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
-  }
 
   React.useEffect(function() {
     var mounted = true;
@@ -9969,8 +9953,7 @@ function GoaliesMatchup({ onPlayerClick }) {
       try {
         // Proxy via Cloudflare Worker (DailyFaceoff blocks direct CORS from zoneus.fr)
         var PROXY = 'https://zoneus-proxy.vivienfrappier.workers.dev';
-        var dateStr = getDateForOffset(dateOffset);
-        var resp = await fetch(PROXY + '?league=nhl_goalies_df&date=' + dateStr);
+        var resp = await fetch(PROXY + '?league=nhl_goalies_df');
         var json = resp.ok ? await resp.json() : null;
         var raw = (json && json.games) || [];
         var result = raw.map(function(g) {
@@ -9999,7 +9982,7 @@ function GoaliesMatchup({ onPlayerClick }) {
       } catch(e) { if (mounted) { setGames([]); setLoading(false); } }
     })();
     return function() { mounted = false; };
-  }, [dateOffset]);
+  }, []);
 
   var bs = { background: "rgba(200,200,200,0.12)", borderRadius: 4, overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(8px)" };
 
@@ -10054,38 +10037,17 @@ function GoaliesMatchup({ onPlayerClick }) {
     );
   }
 
-  var dateNavBar = React.createElement("div", {
-    style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 8px", borderBottom: "1px solid rgba(0,0,0,0.07)", background: "rgba(0,0,0,0.02)" }
-  },
-    React.createElement("button", {
-      onClick: function() { setDateOffset(function(o){ return o - 1; }); },
-      disabled: dateOffset <= 0,
-      style: { background: "none", border: "none", cursor: dateOffset <= 0 ? "default" : "pointer", color: dateOffset <= 0 ? "#ddd" : "#555", fontSize: 16, padding: "0 6px", lineHeight: 1 }
-    }, "\u2039"),
-    React.createElement("span", {
-      style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#666", letterSpacing: "0.05em" }
-    }, formatDateLabel(dateOffset).toUpperCase()),
-    React.createElement("button", {
-      onClick: function() { setDateOffset(function(o){ return o + 1; }); },
-      disabled: dateOffset >= 6,
-      style: { background: "none", border: "none", cursor: dateOffset >= 6 ? "default" : "pointer", color: dateOffset >= 6 ? "#ddd" : "#555", fontSize: 16, padding: "0 6px", lineHeight: 1 }
-    }, "\u203a")
-  );
-
   if (loading) return React.createElement("div", { style: bs },
     React.createElement(HdGlobal, { label: "GARDIENS PARTANTS" }),
-    dateNavBar,
     React.createElement("div", { style: { padding: "20px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, color: "#aaa" } }, "Chargement\u2026")
   );
   if (!games || games.length === 0) return React.createElement("div", { style: bs },
     React.createElement(HdGlobal, { label: "GARDIENS PARTANTS" }),
-    dateNavBar,
     React.createElement("div", { style: { padding: "16px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, color: "#aaa" } }, "Aucun match NHL ce jour")
   );
 
   return React.createElement("div", { style: bs },
     React.createElement(HdGlobal, { label: "GARDIENS PARTANTS" }),
-    dateNavBar,
     games.map(function(g, i) {
       return React.createElement("div", {
         key: g.id + i,
@@ -10343,30 +10305,10 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
   var _gm = React.useState(null); var games = _gm[0], setGames = _gm[1];
   var _ld = React.useState(true); var loading = _ld[0], setLoading = _ld[1];
   var _err = React.useState(null); var err = _err[0], setErr = _err[1];
-  var _dt = React.useState(0); var dateOffset = _dt[0], setDateOffset = _dt[1];
-
-  function getNbaDate(offset) {
-    var d = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    d.setDate(d.getDate() + offset);
-    return d.toISOString().slice(0, 10);
-  }
-  function formatNbaDateLabel(offset) {
-    if (offset === 0) return "Aujourd'hui";
-    if (offset === 1) return "Demain";
-    var d = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    d.setDate(d.getDate() + offset);
-    var days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-    var months = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-    return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
-  }
 
   React.useEffect(function() {
     setLoading(true); setErr(null); setGames(null);
-    var dateStr = getNbaDate(dateOffset);
-    var url = dateOffset === 0
-      ? 'https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_lineups_rw'
-      : 'https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_lineups_rw&date=' + dateStr;
-    fetch(url)
+    fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_lineups_rw')
       .then(function(r){ return r.json(); })
       .then(function(d){
         if (d.error) { setErr(d.error); setGames([]); }
@@ -10374,7 +10316,7 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
         setLoading(false);
       })
       .catch(function(e){ setErr(e.message); setLoading(false); });
-  }, [dateOffset]);
+  }, []);
 
   var lc = LG[lg] ? LG[lg].color : '#1d428a';
 
@@ -10517,35 +10459,6 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
     );
   }
 
-  var nbaDateNavBar = React.createElement('div', {
-    style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      background: 'rgba(0,0,0,0.04)', borderRadius: 8, padding: '6px 12px' }
-  },
-    React.createElement('button', {
-      onClick: function() { setDateOffset(function(o){ return o - 1; }); },
-      disabled: dateOffset <= 0,
-      style: { background: 'none', border: 'none', cursor: dateOffset <= 0 ? 'default' : 'pointer',
-        color: dateOffset <= 0 ? '#ddd' : lc, fontSize: 20, padding: '0 8px', lineHeight: 1,
-        fontWeight: 900 }
-    }, '‹'),
-    React.createElement('div', { style: { textAlign: 'center' } },
-      React.createElement('div', {
-        style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900,
-          color: '#111', letterSpacing: '0.08em' }
-      }, formatNbaDateLabel(dateOffset).toUpperCase()),
-      React.createElement('div', {
-        style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: '#999', marginTop: 1 }
-      }, getNbaDate(dateOffset))
-    ),
-    React.createElement('button', {
-      onClick: function() { setDateOffset(function(o){ return o + 1; }); },
-      disabled: dateOffset >= 6,
-      style: { background: 'none', border: 'none', cursor: dateOffset >= 6 ? 'default' : 'pointer',
-        color: dateOffset >= 6 ? '#ddd' : lc, fontSize: 20, padding: '0 8px', lineHeight: 1,
-        fontWeight: 900 }
-    }, '›')
-  );
-
   if (loading) return React.createElement('div', {
     style: { maxWidth: 1260, margin: '0 auto', padding: '14px 20px 40px', display: 'flex', flexDirection: 'column', gap: 12 }
   },
@@ -10555,7 +10468,6 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
       React.createElement(LB, { lg, sz: 16 }),
       React.createElement('span', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 21, fontWeight: 900, color: '#111', letterSpacing: '0.06em' } }, 'NBA — LINEUPS')
     ),
-    nbaDateNavBar,
     React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, color: '#aaa', letterSpacing: '0.1em' } }, 'CHARGEMENT DES LINEUPS...')
   );
 
@@ -10568,7 +10480,6 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
       React.createElement(LB, { lg, sz: 16 }),
       React.createElement('span', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 21, fontWeight: 900, color: '#111', letterSpacing: '0.06em' } }, 'NBA — LINEUPS')
     ),
-    nbaDateNavBar,
     React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, color: '#aaa', letterSpacing: '0.1em' } }, err ? 'ERREUR: ' + err : 'AUCUN MATCH CE JOUR')
   );
 
@@ -10587,16 +10498,8 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
       React.createElement('span', {
         style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 21, fontWeight: 900,
           color: '#111', letterSpacing: '0.06em' }
-      }, 'NBA — LINEUPS'),
-      React.createElement('div', {
-        style: { marginLeft: 'auto', background: lc, borderRadius: 12, padding: '3px 10px' }
-      }, React.createElement('span', {
-        style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900,
-          color: '#fff', letterSpacing: '0.1em' }
-      }, dateOffset === 0 ? '🔴 LIVE' : '📅'))
+      }, 'NBA — LINEUPS')
     ),
-    // Sélecteur de date
-    nbaDateNavBar,
     // Barre logos équipes
     React.createElement(TeamLogosBar, { lg: lg, onTeamClick: onTeamClick }),
     // Matchs
@@ -10871,10 +10774,6 @@ function ZoneUS() {
   React.useEffect(function() {
     function onHashChange() {
       var h = window.location.hash.slice(1);
-      var _pnH = window.location.pathname;
-      var _fpH = _pnH.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
-      if (_fpH) { _setPage('Fantasy-' + _fpH[1].toUpperCase()); return; }
-      if (_pnH.match(/^\/fantasy\/?$/i)) { _setPage('Fantasy'); return; }
       _setPage(h && h !== 'home' ? h : 'home');
     }
     window.addEventListener('hashchange', onHashChange);
@@ -11024,14 +10923,7 @@ function ZoneUS() {
   }, [arts]);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
-  const _pageState = useState(function() {
-    var _pn0 = window.location.pathname;
-    var _fp0 = _pn0.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
-    if (_fp0) return 'Fantasy-' + _fp0[1].toUpperCase();
-    if (_pn0.match(/^\/fantasy\/?$/i)) return 'Fantasy';
-    var h0 = window.location.hash;
-    return (h0 && h0.length > 1) ? h0.slice(1) : 'home';
-  });
+  const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
   const page = _pageState[0]; const _setPage = _pageState[1];
   React.useEffect(function() { var titles = { home: "Zone US", NHL: "NHL | Zone US", NFL: "NFL | Zone US", NBA: "NBA | Zone US", MLB: "MLB | Zone US" }; document.title = titles[page] || "Zone US"; }, [page]);
   const setPage = function(p) {
