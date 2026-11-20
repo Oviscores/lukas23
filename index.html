@@ -6260,20 +6260,26 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
           color: '#fff', letterSpacing: '0.06em' }
       }, pos)),
       // Photo
-      p.fantasydataFaceUrl
-        ? React.createElement('img', {
-            src: p.fantasydataFaceUrl, alt: p.name,
-            style: { width: 44, height: 44, borderRadius: '50%', objectFit: 'cover',
-              marginBottom: 6, border: '2px solid ' + col + '40', background: '#f0f0f0',
-              flexShrink: 0 },
-            onError: function(e){ e.target.style.display='none'; }
-          })
-        : React.createElement('div', {
-            style: { width: 44, height: 44, borderRadius: '50%', background: col+'22',
-              marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: col,
-              border: '2px solid ' + col + '40' }
-          }, (p.name||'').split(' ').map(function(w){return w[0];}).join('').slice(0,2)),
+      React.createElement('div', {
+        style: { width: 44, height: 44, borderRadius: '50%', marginBottom: 6,
+          border: '2px solid ' + col + '40', flexShrink: 0, overflow: 'hidden', background: '#e8e8e8' }
+      },
+        p.fantasydataFaceUrl
+          ? React.createElement('img', {
+              src: p.fantasydataFaceUrl, alt: p.name,
+              style: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
+              onError: function(e){
+                e.target.style.display='none';
+                e.target.parentNode.innerHTML = '<svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><rect width="44" height="44" fill="#e0e0e0"/><circle cx="22" cy="17" r="8" fill="#b0b0b0"/><ellipse cx="22" cy="36" rx="13" ry="9" fill="#b0b0b0"/></svg>';
+              }
+            })
+          : React.createElement('svg', { viewBox: '0 0 44 44', xmlns: 'http://www.w3.org/2000/svg',
+              style: { width: '100%', height: '100%', display: 'block' } },
+              React.createElement('rect', { width: 44, height: 44, fill: '#e0e0e0' }),
+              React.createElement('circle', { cx: 22, cy: 17, r: 8, fill: '#b0b0b0' }),
+              React.createElement('ellipse', { cx: 22, cy: 36, rx: 13, ry: 9, fill: '#b0b0b0' })
+            )
+      ),
       // Nom
       React.createElement('div', { style: { textAlign: 'center', marginBottom: 2, lineHeight: 1.2 } },
         React.createElement('div', {
