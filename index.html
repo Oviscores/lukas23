@@ -6427,11 +6427,13 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
         try { return new Date(data.updatedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}); } catch(e){return '';}
       })())
     ),
-    // Corps : Attaque / Défense côte à côte, puis PP / Gardiens côte à côte
+    // Corps : responsive — 2 colonnes sur desktop, 1 colonne sur mobile
     React.createElement('div', { style: { padding: '10px 10px 8px' } },
-      React.createElement('div', {
-        style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }
-      },
+      React.createElement('style', null,
+        '@media (min-width: 700px) { .lc-grid-2 { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; } .lc-mobile-only { display: none !important; } }' +
+        '@media (max-width: 699px) { .lc-grid-2 { display: flex !important; flex-direction: column; gap: 10px; } }'
+      ),
+      React.createElement('div', { className: 'lc-grid-2', style: { marginBottom: 10 } },
         React.createElement('div', {
           style: { border: '1px solid rgba(0,0,0,0.07)', borderRadius: 6, overflow: 'hidden' }
         }, Section(fwdLines, 'ATTAQUE', 'f')),
@@ -6439,15 +6441,13 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
           style: { border: '1px solid rgba(0,0,0,0.07)', borderRadius: 6, overflow: 'hidden' }
         }, Section(defLines, 'DÉFENSE', 'd'))
       ),
-      React.createElement('div', {
-        style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }
-      },
+      React.createElement('div', { className: 'lc-grid-2' },
         React.createElement('div', {
           style: { border: '1px solid rgba(0,0,0,0.07)', borderRadius: 6, overflow: 'hidden' }
-        }, Section(ppLines, 'AVANTAGE NUMÉRIQUE', 'pp')),
+        }, GoaliesSection()),
         React.createElement('div', {
           style: { border: '1px solid rgba(0,0,0,0.07)', borderRadius: 6, overflow: 'hidden' }
-        }, GoaliesSection())
+        }, Section(ppLines, 'AVANTAGE NUMÉRIQUE', 'pp'))
       )
     )
   );
