@@ -11115,7 +11115,10 @@ function ZoneUS() {
       setTimeout(_vidResolve, 300);
     }
     var equipeParam = params.get('equipe'); var ligueParam = params.get('ligue');
-    if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
+    // Détection URL /fantasy/nhl etc.
+    var _fpMatch = _pn2.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
+    if (_fpMatch) _setPage('Fantasy-' + _fpMatch[1].toUpperCase());
+    else if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
     if (equipeParam && ligueParam) setSelTeam({ teamId: equipeParam.toUpperCase(), lg: ligueParam.toUpperCase() });
     // ─── URLs SEO propres ──────────────────────────────────────────────────
     // /nhl/toronto-maple-leafs → TeamPage
@@ -11180,7 +11183,9 @@ function ZoneUS() {
         setSelMatch({ id: _gid2, eventId: _gid2, lg: _lgUp2, away: _calM2?(_calM2.away||''):'', home: _calM2?(_calM2.home||''):'', homeScore: _calM2?_calM2.hs:null, awayScore: _calM2?_calM2.as:null, status: _calM2?(_calM2.hs!==null?'FINAL':'UPCOMING'):'UPCOMING', time: _calM2?(_calM2.time||''):'', homeTeam: _calM2?(_calM2.home||''):'', awayTeam: _calM2?(_calM2.away||''):'' });
       } else setSelMatch(null);
       var pg2 = p.get('page');
-      if (pg2) _setPage(pg2.toUpperCase().replace('-', ' '));
+      var _fpPop = _pnPop.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
+      if (_fpPop) _setPage('Fantasy-' + _fpPop[1].toUpperCase());
+      else if (pg2) _setPage(pg2.toUpperCase().replace('-', ' '));
       else if (!p.get('article') && !p.get('equipe') && !p.get('match')) _setPage('home');
     };
     window.addEventListener('popstate', onPop);
@@ -11225,9 +11230,38 @@ function ZoneUS() {
   const setPage = function(p) {
     _setPage(p);
     var _leagues = ['nhl','nfl','nba','mlb'];
+    var _pl = p.toLowerCase().replace(' ', '-');
     if (p === 'home') history.pushState({}, '', '/');
-    else if (_leagues.indexOf(p.toLowerCase()) !== -1) history.pushState({}, '', '/' + p.toLowerCase());
-    else history.pushState({}, '', '?page=' + p.toLowerCase().replace(' ', '-'));
+    else if (_leagues.indexOf(_pl) !== -1) history.pushState({}, '', '/' + _pl);
+    else if (_pl.startsWith('fantasy-')) history.pushState({}, '', '/fantasy/' + _pl.replace('fantasy-', ''));
+    else history.pushState({}, '', '?page=' + _pl);
+    // Titre page
+    var _titles = {
+      'home': 'Zone US — Scores, résultats et actus NHL, NFL, NBA, MLB',
+      'nhl': 'NHL | Scores, résultats et actualités | Zone US',
+      'nfl': 'NFL | Scores, résultats et actualités | Zone US',
+      'nba': 'NBA | Scores, résultats et actualités | Zone US',
+      'mlb': 'MLB | Scores, résultats et actualités | Zone US',
+      'fantasy-nhl': 'Fantasy NHL — Gardiens partants, lineups et blessures | Zone US',
+      'fantasy-nba': 'Fantasy NBA — Lineups du soir et blessures | Zone US',
+      'fantasy-nfl': 'Fantasy NFL — Projections, blessures et lineups | Zone US',
+      'fantasy-mlb': 'Fantasy MLB — Lanceurs partants, lineups et blessures | Zone US'
+    };
+    var _descs = {
+      'home': 'Zone US, le média sportif francophone spécialisé NHL, NFL, NBA et MLB. Scores en direct, résultats, feuilles de match et actualités.',
+      'nhl': 'Scores en direct, résultats, feuilles de match, classements et actualités NHL sur Zone US.',
+      'nfl': 'Scores en direct, résultats, feuilles de match, classements et actualités NFL sur Zone US.',
+      'nba': 'Scores en direct, résultats, feuilles de match, classements et actualités NBA sur Zone US.',
+      'mlb': 'Scores en direct, résultats, feuilles de match, classements et actualités MLB sur Zone US.',
+      'fantasy-nhl': 'Gardiens partants, compositions de lignes, blessures et stats pour le fantasy hockey NHL. Mis à jour quotidiennement.',
+      'fantasy-nba': 'Compositions du soir, joueurs de départ, blessures et stats pour le fantasy basketball NBA. Mis à jour chaque soir.',
+      'fantasy-nfl': 'Projections, blessures, compositions et stats pour le fantasy football NFL. Toutes les infos pour vos décisions de lineup.',
+      'fantasy-mlb': 'Lanceurs partants, compositions, blessures et stats pour le fantasy baseball MLB. Mis à jour chaque jour de match.'
+    };
+    if (_titles[_pl]) document.title = _titles[_pl];
+    var _metaDesc = document.querySelector('meta[name="description"]');
+    if (_metaDesc && _descs[_pl]) _metaDesc.setAttribute('content', _descs[_pl]);
+    else if (_metaDesc) _metaDesc.setAttribute('content', _descs['home']);
   };
   const [prevPage, setPrevPage] = useState("home");
   const [statFull, setStatFull] = useState(null);
