@@ -11020,7 +11020,16 @@ function ZoneUS() {
   }, [arts]);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
-  const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
+  const _pageState = useState(function() {
+    var _pn = window.location.pathname;
+    var _fpM = _pn.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
+    if (_fpM) return 'Fantasy-' + _fpM[1].toUpperCase();
+    if (_pn.match(/^\/fantasy\/?$/i)) return 'Fantasy';
+    var _lgM = _pn.match(/^\/(nhl|nfl|nba|mlb)\/?$/i);
+    if (_lgM) return _lgM[1].toUpperCase();
+    if (window.location.hash && window.location.hash.length > 1) return window.location.hash.slice(1);
+    return 'home';
+  });
   const page = _pageState[0]; const _setPage = _pageState[1];
   React.useEffect(function() { var titles = { home: "Zone US", NHL: "NHL | Zone US", NFL: "NFL | Zone US", NBA: "NBA | Zone US", MLB: "MLB | Zone US" }; document.title = titles[page] || "Zone US"; }, [page]);
   const setPage = function(p) {
