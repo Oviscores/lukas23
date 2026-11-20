@@ -10770,6 +10770,8 @@ function AllArticlesPage({ arts, onArticleClick, onBack }) {
 }
 
 function ZoneUS() {
+  const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
+  const page = _pageState[0]; const _setPage = _pageState[1];
     const [menuOpen, setMenuOpen] = React.useState(false);
   const [arts, setArts] = useState(ARTICLES);
   var _saa = React.useState(false); var showAllArts = _saa[0], setShowAllArts = _saa[1];
@@ -10915,8 +10917,6 @@ function ZoneUS() {
   }, [arts]);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
-  const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
-  const page = _pageState[0]; const _setPage = _pageState[1];
   React.useEffect(function() {
     function onHashChange() {
       var h = window.location.hash.slice(1);
