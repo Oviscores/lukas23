@@ -12709,12 +12709,16 @@ function updateCanonical() {
 }
 updateCanonical();
 window.addEventListener('popstate', updateCanonical);
-// Observer les pushState
-var _origPush = history.pushState;
-history.pushState = function() {
-  _origPush.apply(history, arguments);
-  updateCanonical();
-};
+// MutationObserver sur <link rel="canonical"> pour détecter les changements d'URL
+// sans wrapper history.pushState (conflits avec GTM)
+var _canonicalObserver = new MutationObserver(updateCanonical);
+var _canonicalEl = document.querySelector('link[rel="canonical"]');
+if (_canonicalEl) _canonicalObserver.observe(_canonicalEl, { attributes: true });
+// Fallback : polling léger toutes les 500ms pour rattraper les pushState manqués
+var _lastCanPath = location.pathname;
+setInterval(function() {
+  if (location.pathname !== _lastCanPath) { _lastCanPath = location.pathname; updateCanonical(); }
+}, 500);
 // Stats NFL / classements : chargés uniquement à la navigation, pas au boot
 // (évite de saturer le Worker au démarrage et de bloquer la livebar)
 </script>
