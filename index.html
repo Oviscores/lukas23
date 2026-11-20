@@ -10765,6 +10765,8 @@ function ZoneUS() {
     // Détection URL /fantasy/nhl etc.
     var _fpMatch = _pn2.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
     if (_fpMatch) _setPage('Fantasy-' + _fpMatch[1].toUpperCase());
+    else if (_pn2.match(/^\/fantasy\/?$/i)) _setPage('Fantasy');
+    else if (pageParam === 'fantasy') _setPage('Fantasy');
     else if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
     if (equipeParam && ligueParam) setSelTeam({ teamId: equipeParam.toUpperCase(), lg: ligueParam.toUpperCase() });
     // ─── URLs SEO propres ──────────────────────────────────────────────────
@@ -10832,6 +10834,8 @@ function ZoneUS() {
       var pg2 = p.get('page');
       var _fpPop = _pnPop.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
       if (_fpPop) _setPage('Fantasy-' + _fpPop[1].toUpperCase());
+      else if (_pnPop.match(/^\/fantasy\/?$/i)) _setPage('Fantasy');
+      else if (pg2 === 'fantasy') _setPage('Fantasy');
       else if (pg2) _setPage(pg2.toUpperCase().replace('-', ' '));
       else if (!p.get('article') && !p.get('equipe') && !p.get('match')) _setPage('home');
     };
@@ -10880,6 +10884,7 @@ function ZoneUS() {
     var _pl = p.toLowerCase().replace(' ', '-');
     if (p === 'home') history.pushState({}, '', '/');
     else if (_leagues.indexOf(_pl) !== -1) history.pushState({}, '', '/' + _pl);
+    else if (_pl === 'fantasy') history.pushState({}, '', '/fantasy');
     else if (_pl.startsWith('fantasy-')) history.pushState({}, '', '/fantasy/' + _pl.replace('fantasy-', ''));
     else history.pushState({}, '', '?page=' + _pl);
     // Titre page
