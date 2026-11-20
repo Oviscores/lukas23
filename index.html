@@ -10771,14 +10771,6 @@ function AllArticlesPage({ arts, onArticleClick, onBack }) {
 
 function ZoneUS() {
     const [menuOpen, setMenuOpen] = React.useState(false);
-  React.useEffect(function() {
-    function onHashChange() {
-      var h = window.location.hash.slice(1);
-      _setPage(h && h !== 'home' ? h : 'home');
-    }
-    window.addEventListener('hashchange', onHashChange);
-    return function() { window.removeEventListener('hashchange', onHashChange); };
-  }, []);
   const [arts, setArts] = useState(ARTICLES);
   var _saa = React.useState(false); var showAllArts = _saa[0], setShowAllArts = _saa[1];
   React.useEffect(function() {
@@ -10925,6 +10917,14 @@ function ZoneUS() {
   const [tick, setTick] = useState(0);
   const _pageState = useState(window.location.hash && window.location.hash.length > 1 ? window.location.hash.slice(1) : "home");
   const page = _pageState[0]; const _setPage = _pageState[1];
+  React.useEffect(function() {
+    function onHashChange() {
+      var h = window.location.hash.slice(1);
+      _setPage(h && h !== 'home' ? h : 'home');
+    }
+    window.addEventListener('hashchange', onHashChange);
+    return function() { window.removeEventListener('hashchange', onHashChange); };
+  }, []);
   React.useEffect(function() { var titles = { home: "Zone US", NHL: "NHL | Zone US", NFL: "NFL | Zone US", NBA: "NBA | Zone US", MLB: "MLB | Zone US" }; document.title = titles[page] || "Zone US"; }, [page]);
   const setPage = function(p) {
     _setPage(p);
