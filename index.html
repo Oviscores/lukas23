@@ -10909,10 +10909,10 @@ function ZoneUS() {
     var equipeParam = params.get('equipe'); var ligueParam = params.get('ligue');
     // Détection URL /fantasy/nhl etc.
     var _fpMatch = _pn2.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
-    if (_fpMatch) _setPage('Fantasy-' + _fpMatch[1].toUpperCase());
-    else if (_pn2.match(/^\/fantasy\/?$/i)) _setPage('Fantasy');
-    else if (pageParam === 'fantasy') _setPage('Fantasy');
-    else if (pageParam) _setPage(pageParam.toUpperCase().replace('-', ' '));
+    if (_fpMatch) setPage('Fantasy-' + _fpMatch[1].toUpperCase());
+    else if (_pn2.match(/^\/fantasy\/?$/i)) setPage('Fantasy');
+    else if (pageParam === 'fantasy') setPage('Fantasy');
+    else if (pageParam) setPage(pageParam.toUpperCase().replace('-', ' '));
     if (equipeParam && ligueParam) setSelTeam({ teamId: equipeParam.toUpperCase(), lg: ligueParam.toUpperCase() });
     // ─── URLs SEO propres ──────────────────────────────────────────────────
     // /nhl/toronto-maple-leafs → TeamPage
