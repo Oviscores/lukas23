@@ -10076,6 +10076,31 @@ function GoaliesMatchup({ onPlayerClick }) {
 }
 
 
+const LEAGUE_TEAMS = {
+  NHL: ["ANA","BOS","BUF","CAR","CBJ","CGY","CHI","COL","DAL","DET","EDM","FLA","LAK","MIN","MTL","NJD","NSH","NYI","NYR","OTT","PHI","PIT","SEA","SJS","STL","TBL","TOR","UTA","VAN","VGK","WPG","WSH"],
+  NFL: ["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LAC","LAR","LV","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SEA","SF","TB","TEN","WSH"],
+  NBA: ["ATL","BOS","BKN","CHA","CHI","CLE","DAL","DEN","DET","GSW","HOU","IND","LAC","LAL","MEM","MIA","MIL","MIN","NOP","NYK","OKC","ORL","PHI","PHX","POR","SAC","SAS","TOR","UTA","WAS"],
+  MLB: ["ARI","ATL","BAL","BOS","CHC","CWS","CIN","CLE","COL","DET","HOU","KC","LAA","LAD","MIA","MIL","MIN","NYM","NYY","OAK","PHI","PIT","SD","SEA","SF","STL","TB","TEX","TOR","WSH"]
+};
+function TeamLogosBar({ lg, onTeamClick }) {
+  var teams = LEAGUE_TEAMS[lg] || [];
+  var lc = (LG[lg] || {}).color || "#333";
+  return React.createElement("div", {
+    style: { overflowX: "auto", display: "flex", gap: 6, padding: "6px 2px", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }
+  }, teams.map(function(t) {
+    return React.createElement("button", {
+      key: t,
+      onClick: function() { if (onTeamClick) onTeamClick(t, lg); },
+      title: t,
+      style: { flexShrink: 0, background: "rgba(255,255,255,0.7)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 6, padding: "4px 6px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, transition: "background 0.15s" },
+      onMouseEnter: function(e){ e.currentTarget.style.background = lc + "18"; },
+      onMouseLeave: function(e){ e.currentTarget.style.background = "rgba(255,255,255,0.7)"; }
+    },
+      getTeamLogo(t, lg, 22),
+      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 800, color: "#666", letterSpacing: "0.04em" } }, t)
+    );
+  }));
+}
 class FantasyErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false, error: null }; }
   static getDerivedStateFromError(error) { return { hasError: true, error: error }; }
