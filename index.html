@@ -2,6 +2,14 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>
+    (function() {
+      var pn = window.location.pathname;
+      var fp = pn.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
+      if (fp) window.__initialPage__ = 'Fantasy-' + fp[1].toUpperCase();
+      else if (/^\/fantasy\/?$/i.test(pn)) window.__initialPage__ = 'Fantasy';
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name='impact-site-verification' value='9d6519ec-1bbf-4af0-b572-3fe47cdf098e'>
   <meta name="description" content="Zone US, le media sportif francophone spécialisé NHL, NFL, NBA et MLB. Scores en direct, résultats, feuilles de match et actualités.">
@@ -11020,7 +11028,7 @@ function ZoneUS() {
   }, [arts]);
   const [feed, setFeed] = useState(NEWS_FEED);
   const [tick, setTick] = useState(0);
-  const _pageState = useState(function() {
+  const _pageState = useState(window.__initialPage__ || (function() {
     var _pn = window.location.pathname;
     var _fpM = _pn.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
     if (_fpM) return 'Fantasy-' + _fpM[1].toUpperCase();
@@ -11029,10 +11037,12 @@ function ZoneUS() {
     if (_lgM) return _lgM[1].toUpperCase();
     if (window.location.hash && window.location.hash.length > 1) return window.location.hash.slice(1);
     return 'home';
-  });
+  })());
   const page = _pageState[0]; const _setPage = _pageState[1];
   React.useEffect(function() { var titles = { home: "Zone US", NHL: "NHL | Zone US", NFL: "NFL | Zone US", NBA: "NBA | Zone US", MLB: "MLB | Zone US" }; document.title = titles[page] || "Zone US"; }, [page]);
   const setPage = function(p) {
+    // Ne pas écraser une page fantasy chargée directement par URL
+    if (p === 'home' && window.__initialPage__) return;
     _setPage(p);
     var _leagues = ['nhl','nfl','nba','mlb'];
     var _pl = p.toLowerCase().replace(' ', '-');
@@ -11344,6 +11354,7 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
   return /* @__PURE__ */ React.createElement("div", { style: Object.assign({}, bgStyle, { overflowX: "hidden" }) }, React.createElement("button", { className: "hamburger", onClick: function() { setMenuOpen(function(o) { return !o; }); }, style: { background: "none", border: "none", cursor: "pointer", padding: "8px", flexDirection: "column", gap: "5px", alignItems: "center", justifyContent: "center", opacity: menuOpen ? 0 : 1, pointerEvents: menuOpen ? "none" : "auto" } }, React.createElement("div", { style: { width: 22, height: 2, background: "#333", borderRadius: 2 } }), React.createElement("div", { style: { width: 22, height: 2, background: "#333", borderRadius: 2 } }), React.createElement("div", { style: { width: 22, height: 2, background: "#333", borderRadius: 2 } })), /* @__PURE__ */ React.createElement("div",
  { style: { position: "fixed", inset: 0, background: "rgba(245,243,240,0.78)", pointerEvents: "none", zIndex: 0 } }), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", zIndex: 1 } }, page === "home" && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNER_HOME, alt: "Zone US", style: { width: "100%", height: "auto", display: "block", maxHeight: "34vw", minHeight: 120, objectFit: "cover", objectPosition: "center center", aspectRatio: "3/1" } })), page === "Fantasy" && window.BANNER_FANTASY && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNER_FANTASY, alt: "Zone US Fantasy", style: { width: "100%", height: 200, objectFit: "fill", display: "block" } })), page === "NFL" && window.BANNERS["NFL"] && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNERS["NFL"], alt: "NFL", style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover", objectPosition: "center center", aspectRatio: "3/1" } })), (page === "Cal-NFL" || page === "Stats-NFL" || page === "Fantasy-NFL") && window.BANNERS["NFL"] && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNERS["NFL"], alt: "NFL", style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover", objectPosition: "center center", aspectRatio: "3/1" } })), (page === "NHL" || page === "Cal-NHL" || page === "Stats-NHL" || page === "Fantasy-NHL") && window.BANNERS["NHL"] && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNERS["NHL"], alt: "NHL", style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover", objectPosition: "center center", aspectRatio: "3/1" } })), (page === "NBA" || page === "Cal-NBA" || page === "Stats-NBA" || page === "Fantasy-NBA") && window.BANNERS["NBA"] && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNERS["NBA"], alt: "NBA", style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover", objectPosition: "center center", aspectRatio: "3/1" } })), (page === "MLB" || page === "Cal-MLB" || page === "Stats-MLB" || page === "Fantasy-MLB") && window.BANNERS["MLB"] && /* @__PURE__ */ React.createElement("div", { style: { width: "100%", lineHeight: 0 } }, /* @__PURE__ */ React.createElement("img", { src: window.BANNERS["MLB"], alt: "MLB", style: { width: "100%", height: "auto", maxHeight: "30vw", minHeight: 150, display: "block", objectFit: "cover", objectPosition: "center center", aspectRatio: "3/1" } })), /* @__PURE__ */ React.createElement("style", null, CSS), /* @__PURE__ */ React.createElement("header", { className: "header-sticky", style: { position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderBottom: "2px solid rgba(0,0,0,0.06)", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1260, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center", height: 52 } },
       /* @__PURE__ */ React.createElement(Logo, { w: 55, onClick: function() {
+    window.__initialPage__ = null;
     setPage("home");
     goBack();
   } }), /* @__PURE__ */ React.createElement("nav", { style: { display: "flex", flex: 1, marginLeft: 16 } }, ["NFL", "NBA", "NHL", "MLB"].map(function(lg) {
