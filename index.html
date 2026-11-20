@@ -10076,6 +10076,26 @@ function GoaliesMatchup({ onPlayerClick }) {
 }
 
 
+function TeamLogosBar({ lg, onTeamClick }) {
+  var teams = LEAGUE_TEAMS[lg] || [];
+  var lc = (LG[lg] || {}).color || "#333";
+  return React.createElement("div", {
+    style: { overflowX: "auto", display: "flex", gap: 6, padding: "6px 2px", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }
+  }, teams.map(function(t) {
+    return React.createElement("button", {
+      key: t,
+      onClick: function() { if (onTeamClick) onTeamClick(t, lg); },
+      title: t,
+      style: { flexShrink: 0, background: "rgba(255,255,255,0.7)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 6, padding: "4px 6px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, transition: "background 0.15s" },
+      onMouseEnter: function(e){ e.currentTarget.style.background = lc + "18"; },
+      onMouseLeave: function(e){ e.currentTarget.style.background = "rgba(255,255,255,0.7)"; }
+    },
+      getTeamLogo(t, lg, 22),
+      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 800, color: "#666", letterSpacing: "0.04em" } }, t)
+    );
+  }));
+}
+
 function FantasyPageNHL({ lg, onPlayerClick, onBack, onTeamClick }) {
   var _fv = React.useState(0);
   var fTick = _fv[0], setFTick = _fv[1];
