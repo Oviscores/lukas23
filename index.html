@@ -6197,7 +6197,11 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
   var fgc = tc && tc.fg ? tc.fg : '#fff';
   var players = data.players || [];
 
-  var posOrd = { lw:0, c:1, rw:2, ld:0, rd:1, sk1:0, sk2:1, sk3:2, sk4:3, sk5:4, g1:0, g2:1 };
+  var posOrd = { lw:0, c:1, rw:2, ld:0, rd:1, sk1:0, sk2:1, sk3:2, sk4:3, sk5:4, g1:0, g2:1,
+    // variantes possibles retournées par l'API
+    left_wing:0, center:1, right_wing:2, left_defense:0, right_defense:1,
+    'left wing':0, 'center':1, 'right wing':2, 'left defense':0, 'right defense':1,
+    LW:0, C:1, RW:2, LD:0, RD:1 };
   var posLabel = { lw:'AG', c:'C', rw:'AD', ld:'DG', rd:'DD', g1:'G1', g2:'G2',
     sk1:'AT1', sk2:'AT2', sk3:'AT3', sk4:'AT4', sk5:'AT5' };
   var posColor = { lw:col, c:col, rw:col, ld:col, rd:col,
@@ -6206,7 +6210,7 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
   function getGroup(gId, catId) {
     return players
       .filter(function(p) { return p.groupIdentifier === gId && p.categoryIdentifier === catId; })
-      .sort(function(a,b) { return (posOrd[a.positionIdentifier]||9)-(posOrd[b.positionIdentifier]||9); });
+      .sort(function(a,b) { var oa=posOrd[a.positionIdentifier]; var ob=posOrd[b.positionIdentifier]; return (oa!=null?oa:9)-(ob!=null?ob:9); });
   }
 
   var fwdLines = ['f1','f2','f3','f4'].map(function(g,i) {
