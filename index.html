@@ -6217,10 +6217,6 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
     return { n: i+1, label: 'P'+(i+1), players: getGroup(g,'ev') };
   }).filter(function(l){return l.players.length>0;});
 
-  var ppLines = ['pp1','pp2'].map(function(g,i) {
-    return { n: i+1, label: 'PP'+(i+1), players: getGroup(g,'pp') };
-  }).filter(function(l){return l.players.length>0;});
-
   var goalies = players
     .filter(function(p){return p.groupIdentifier==='g';})
     .sort(function(a,b){return (posOrd[a.positionIdentifier]||9)-(posOrd[b.positionIdentifier]||9);});
@@ -6447,14 +6443,9 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
           style: { border: '1px solid rgba(0,0,0,0.07)', borderRadius: 6, overflow: 'hidden' }
         }, Section(defLines, 'DÉFENSE', 'd'))
       ),
-      React.createElement('div', { className: 'lc-grid-2' },
-        React.createElement('div', {
-          style: { border: '1px solid rgba(0,0,0,0.07)', borderRadius: 6, overflow: 'hidden' }
-        }, GoaliesSection()),
-        React.createElement('div', {
-          style: { border: '1px solid rgba(0,0,0,0.07)', borderRadius: 6, overflow: 'hidden' }
-        }, Section(ppLines, 'AVANTAGE NUMÉRIQUE', 'pp'))
-      )
+      React.createElement('div', {
+        style: { border: '1px solid rgba(0,0,0,0.07)', borderRadius: 6, overflow: 'hidden' }
+      }, GoaliesSection())
     )
   );
 }
