@@ -37,9 +37,11 @@
     var _matchFromPath = _pn.match(/^\/matchs\/([^/]+)\/?$/);
     var _videoFromPath = _pn.match(/^\/videos\/([^/]+)\/?$/);
     var _lgFromPath = _pn.match(/^\/(nhl|nfl|nba|mlb)\/?$/i);
+    var _fantasyFromPath = _pn.match(/^\/fantasy\/(nhl|nfl|nba|mlb)\/?$/i);
     var _playerFromPath = _pn.match(/^\/(nhl|nfl|nba|mlb)\/([^/]+)\/([^/]+)\/?$/i);
     var _teamFromPath = _pn.match(/^\/(nhl|nfl|nba|mlb)\/([^/]+)\/?$/i);
     var article = (_artFromPath && _artFromPath[1]) || p.get('article');
+    var fantasy = (_fantasyFromPath && _fantasyFromPath[1].toLowerCase());
     var page = (_lgFromPath && _lgFromPath[1].toLowerCase()) || p.get('page');
     var match = (_matchFromPath && _matchFromPath[1]) || p.get('match');
     var video = (_videoFromPath && _videoFromPath[1]) || p.get('video');
@@ -78,6 +80,13 @@
       title = teamName + ' | ' + lgT + ' – Zone US';
       desc  = 'Roster, stats et résultats des ' + teamName + ' en ' + lgT + ' sur Zone US.';
       canonical = 'https://zoneus.fr/' + _teamFromPath[1].toLowerCase() + '/' + teamSlug;
+    } else if (fantasy) {
+      var fLg = fantasy.toUpperCase();
+      var fTitles = { NHL: 'Fantasy NHL — Gardiens partants, lineups et blessures', NFL: 'Fantasy NFL — Projections, blessures et lineups', NBA: 'Fantasy NBA — Lineups du soir et blessures', MLB: 'Fantasy MLB — Lanceurs partants, lineups et blessures' };
+      var fDescs = { NHL: 'Gardiens partants, compositions de lignes, blessures et stats pour le fantasy hockey NHL. Mis à jour quotidiennement.', NFL: "Projections, blessures, compositions et stats pour le fantasy football NFL. Toutes les infos pour vos décisions de lineup.", NBA: 'Compositions du soir, joueurs de départ, blessures et stats pour le fantasy basketball NBA. Mis à jour chaque soir.', MLB: 'Lanceurs partants, compositions, blessures et stats pour le fantasy baseball MLB. Mis à jour chaque jour de match.' };
+      title = (fTitles[fLg] || 'Fantasy ' + fLg) + ' | Zone US';
+      desc  = fDescs[fLg] || 'Outils fantasy ' + fLg + ' sur Zone US.';
+      canonical = 'https://zoneus.fr/fantasy/' + fantasy;
     } else if (page) {
       var lg = page.toUpperCase();
       var lgNames = { NHL: 'Hockey sur glace', NFL: 'Football américain', NBA: 'Basketball', MLB: 'Baseball' };

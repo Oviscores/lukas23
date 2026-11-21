@@ -2,31 +2,55 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://zoneus.fr/</loc>
-    <lastmod>2026-11-05</lastmod>
+    <lastmod>2026-11-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://zoneus.fr/?page=nhl</loc>
-    <lastmod>2026-11-05</lastmod>
+    <loc>https://zoneus.fr/nhl</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://zoneus.fr/nfl</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://zoneus.fr/nba</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://zoneus.fr/mlb</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://zoneus.fr/fantasy/nhl</loc>
+    <lastmod>2026-11-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zoneus.fr/?page=nfl</loc>
-    <lastmod>2026-11-05</lastmod>
+    <loc>https://zoneus.fr/fantasy/nfl</loc>
+    <lastmod>2026-11-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zoneus.fr/?page=nba</loc>
-    <lastmod>2026-11-05</lastmod>
+    <loc>https://zoneus.fr/fantasy/nba</loc>
+    <lastmod>2026-11-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://zoneus.fr/?page=mlb</loc>
-    <lastmod>2026-11-05</lastmod>
+    <loc>https://zoneus.fr/fantasy/mlb</loc>
+    <lastmod>2026-11-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
