@@ -12633,10 +12633,13 @@ window.fetchStandings = async function(lg) {
         if (entries.length === 0 && conf.children) {
           conf.children.forEach(function(div) { (div.standings&&div.standings.entries||[]).forEach(function(e){entries.push(e);}); });
         }
+        var _nbaNorm = {'SA':'SAS','GS':'GSW','NY':'NYK','NO':'NOP','BK':'BKN','UTAH':'UTA'};
         var rows = entries.map(function(e,i) {
           var stats = {}; (e.stats||[]).forEach(function(s){stats[s.name]=s.value;});
           var pctDisp = e.stats&&e.stats.find(function(s){return s.name==='winPercent';});
-          return { r:i+1, ab:e.team&&e.team.abbreviation||'', w:stats.wins||0, l:stats.losses||0, pct:pctDisp?pctDisp.displayValue:'.000' };
+          var rawAb = e.team&&e.team.abbreviation||'';
+          var ab = _nbaNorm[rawAb] || rawAb;
+          return { r:i+1, ab:ab, w:stats.wins||0, l:stats.losses||0, pct:pctDisp?pctDisp.displayValue:'.000' };
         });
         rows.sort(function(a,b){return b.w-a.w;}); rows.forEach(function(r,i){r.r=i+1;});
         if (rows.length > 0) confs[conf.name||'Conference'] = rows;
@@ -12659,10 +12662,13 @@ window.fetchStandings = async function(lg) {
           if (entries.length === 0 && conf.children) {
             conf.children.forEach(function(div) { (div.standings&&div.standings.entries||[]).forEach(function(e){entries.push(e);}); });
           }
+          var _nbaNorm2 = {'SA':'SAS','GS':'GSW','NY':'NYK','NO':'NOP','BK':'BKN','UTAH':'UTA'};
           var rows = entries.map(function(e,i) {
             var stats = {}; (e.stats||[]).forEach(function(s){stats[s.name]=s.value;});
             var pctDisp = e.stats&&e.stats.find(function(s){return s.name==='winPercent';});
-            return { r:i+1, ab:e.team&&e.team.abbreviation||'', w:stats.wins||0, l:stats.losses||0, pct:pctDisp?pctDisp.displayValue:'.000' };
+            var rawAb2 = e.team&&e.team.abbreviation||'';
+            var ab2 = _nbaNorm2[rawAb2] || rawAb2;
+            return { r:i+1, ab:ab2, w:stats.wins||0, l:stats.losses||0, pct:pctDisp?pctDisp.displayValue:'.000' };
           });
           rows.sort(function(a,b){return b.w-a.w;}); rows.forEach(function(r,i){r.r=i+1;});
           if (rows.length > 0) confs2[conf.name||'Conference'] = rows;
