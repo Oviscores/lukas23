@@ -10277,31 +10277,6 @@ function FantasyPageNFL({ lg, onPlayerClick, onBack, onTeamClick }) {
     var acol = TC[v.away + "_" + lg] || { bg: "#555", fg: "#fff" };
     var isOver = v.ou === "OVER";
     return /* @__PURE__ */ React.createElement("div", { key: i, style: { padding: "6px 10px", borderBottom: "1px solid rgba(0,0,0,0.04)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 60px 60px 60px", alignItems: "center", marginBottom: 3 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 18, borderRadius: 2, background: acol.bg, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: acol.fg } }, v.away)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, color: "#aaa" } }, "@"), /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 18, borderRadius: 2, background: hcol.bg, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 8, fontWeight: 900, color: hcol.fg } }, v.home)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 700, color: "#111", marginLeft: 2 } }, v.fav + " " + v.spread)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 700, color: "#333", textAlign: "center" } }, v.spread), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: lc, textAlign: "center" } }, v.total), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: isOver ? "#16a34a" : "#ef4444", background: (isOver ? "#16a34a" : "#ef4444") + "18", padding: "1px 5px", borderRadius: 2, textAlign: "center" } }, v.ou)), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#888", fontStyle: "italic" } }, v.note));
-  })), fd.milestones && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: "MILESTONE \u2014 \xC0 SUIVRE CE SOIR" }), fd.milestones.map(function(m, i) {
-    var tc2 = TC[m.team + "_" + lg] || { bg: lc, fg: "#fff" };
-    var pct = Math.round(m.current / m.target * 100);
-    var pl = (PLAYERS_DB[lg] || []).find(function(p) {
-      return m.player.includes(p.name.split(" ").pop());
-    });
-    return /* @__PURE__ */ React.createElement(
-      "div",
-      {
-        key: i,
-        onClick: function() {
-          if (pl && onPlayerClick) onPlayerClick(pl.id, lg);
-        },
-        style: { padding: "7px 10px", borderBottom: "1px solid rgba(0,0,0,0.04)", cursor: pl ? "pointer" : "default" },
-        onMouseEnter: function(e) {
-          if (pl) e.currentTarget.style.background = lc + "08";
-        },
-        onMouseLeave: function(e) {
-          e.currentTarget.style.background = "transparent";
-        }
-      },
-      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 4 } }, /* @__PURE__ */ getTeamLogo(m.team, lg, 20), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 800, color: "#111", flex: 1 } }, m.player), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: lc, padding: "1px 6px", borderRadius: 2, flexShrink: 0 } }, "\xC0 " + m.diff + " " + m.unit)),
-      /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#666", marginBottom: 4 } }, m.cat + " \u2014 " + m.current + "/" + m.target),
-      /* @__PURE__ */ React.createElement("div", { style: { height: 4, background: "rgba(0,0,0,0.06)", borderRadius: 2, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { height: "100%", width: pct + "%", background: "linear-gradient(90deg," + lc + "88," + lc + ")", borderRadius: 2, transition: "width 0.5s" } }))
-    );
   })), lg === "NHL" && /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: leaderLabel }), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "30px 1fr 60px 60px 60px 60px", background: "rgba(0,0,0,0.04)", padding: "4px 10px", borderBottom: "1px solid rgba(0,0,0,0.06)" } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#aaa" } }, "#"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#aaa" } }, "JOUEUR"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: lc, textAlign: "center" } }, "PTS"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#aaa", textAlign: "center" } }, lg === "NHL" ? "B" : lg === "NFL" ? "TD" : lg === "NBA" ? "PTS" : "HR"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#aaa", textAlign: "center" } }, lg === "NHL" ? "A" : lg === "NFL" ? "YDS" : lg === "NBA" ? "REB" : "RBI"), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 800, color: "#aaa", textAlign: "center" } }, lg === "NHL" ? "+/-" : lg === "NFL" ? "RAT." : lg === "NBA" ? "AST" : "K")), fd.fantasyLeaders.map(function(p, i) {
     var tc2 = TC[p.ab + "_" + lg] || { bg: lc, fg: "#fff" };
     var pl = (PLAYERS_DB[lg] || []).find(function(x) {
@@ -12424,6 +12399,20 @@ async function fetchFantasyData(lg) {
         }
         console.log('MLB pitchers:', pitchers.length, 'lineups:', lineups.length);
       } catch(e2) { console.log('MLB lineups error:', e2); }
+    }
+
+    // NFL : Vegas Lines live
+    if (lg === 'NFL') {
+      try {
+        var vegasR = await fetch(PROXY + '?league=nfl_vegas');
+        var vegasD = await vegasR.json();
+        var liveLines = vegasD.lines || [];
+        if (liveLines.length > 0 && typeof FANTASY_DATA !== 'undefined' && FANTASY_DATA['NFL']) {
+          FANTASY_DATA['NFL'].vegasLines = liveLines;
+          if (window.__zoneus_refresh__) window.__zoneus_refresh__();
+          console.log('NFL Vegas lines live:', liveLines.length);
+        }
+      } catch(e3) { console.log('NFL Vegas lines error:', e3); }
     }
 
   } catch(e) {
