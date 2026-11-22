@@ -10373,6 +10373,64 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
   }
 
   var _selDateRef = React.useRef(null);
+  // Cache ESPN roster : abbr -> { nameMap: {lastName -> {espnId, ppg}}, loaded: bool }
+  var _espnRosterCache = React.useRef({});
+
+  // Charge le roster ESPN d'une équipe et retourne nameMap
+  function loadEspnRoster(abbr) {
+    var cache = _espnRosterCache.current;
+    if (cache[abbr]) return Promise.resolve(cache[abbr]);
+    var slug = (NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[abbr]) || abbr.toLowerCase();
+    return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/' + slug + '/roster')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var nameMap = {};
+        var athletes = [];
+        if (d.athletes) { d.athletes.forEach(function(g){ (g.items||[g]).forEach(function(p){ athletes.push(p); }); }); }
+        athletes.forEach(function(p){
+          if (!p || !p.id) return;
+          var cats = p.statistics && p.statistics.splits && p.statistics.splits.categories || [];
+          var ppg = 0;
+          cats.forEach(function(c){ (c.stats||[]).forEach(function(sv){ if (sv.name === 'avgPoints') ppg = parseFloat(sv.value)||0; }); });
+          var lastName = (p.displayName||p.fullName||'').split(' ').slice(-1)[0].toLowerCase();
+          var fullNorm = (p.displayName||p.fullName||'').toLowerCase();
+          nameMap[fullNorm] = { espnId: String(p.id), ppg: ppg };
+          if (!nameMap[lastName]) nameMap[lastName] = { espnId: String(p.id), ppg: ppg };
+        });
+        cache[abbr] = nameMap;
+        return nameMap;
+      })
+      .catch(function(){ return {}; });
+  }
+
+  // Enrichit les joueurs d'un game avec espnId + ppg depuis le roster ESPN
+  function enrichGames(games) {
+    var abbrs = [];
+    games.forEach(function(g){
+      if (abbrs.indexOf(g.homeAbbr) < 0) abbrs.push(g.homeAbbr);
+      if (abbrs.indexOf(g.visitAbbr) < 0) abbrs.push(g.visitAbbr);
+    });
+    return Promise.all(abbrs.map(loadEspnRoster)).then(function(rosters){
+      var rMap = {};
+      abbrs.forEach(function(ab, i){ rMap[ab] = rosters[i]; });
+      return games.map(function(g){
+        function enrich(players, abbr) {
+          var nm = rMap[abbr] || {};
+          return players.map(function(p){
+            var fullNorm = (p.name||'').toLowerCase();
+            var lastNorm = (p.name||'').split(' ').slice(-1)[0].toLowerCase();
+            var hit = nm[fullNorm] || nm[lastNorm] || {};
+            return Object.assign({}, p, { espnId: hit.espnId || p.espnId || null, ppg: hit.ppg || null });
+          });
+        }
+        return Object.assign({}, g, {
+          homePlayers: enrich(g.homePlayers||[], g.homeAbbr),
+          visitPlayers: enrich(g.visitPlayers||[], g.visitAbbr)
+        });
+      });
+    });
+  }
+
   React.useEffect(function() {
     var dates = buildDateList();
     setCalDates(dates);
@@ -10384,13 +10442,13 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
       fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_lineups_rw')
         .then(function(r){ return r.json(); })
         .then(function(d){
-          if (d.error) { setErr(d.error); setGames([]); }
-          else {
-            var gs = d.games || [];
-            setAllGames(function(prev){ var u = Object.assign({}, prev); u[todayIso] = gs; return u; });
-            if (_selDateRef.current === todayIso) setGames(gs);
-          }
-          setLoading(false);
+          if (d.error) { setErr(d.error); setGames([]); setLoading(false); return; }
+          var gs = d.games || [];
+          enrichGames(gs).then(function(enriched){
+            setAllGames(function(prev){ var u = Object.assign({}, prev); u[todayIso] = enriched; return u; });
+            if (_selDateRef.current === todayIso) setGames(enriched);
+            setLoading(false);
+          });
         })
         .catch(function(e){ setErr(e.message); setLoading(false); });
     }
@@ -10469,10 +10527,15 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
           style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900,
             color: '#1a1a1a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }
         }, p.name || '—'),
-        injColor && React.createElement('span', {
-          style: { background: injColor, color: '#fff', borderRadius: 3, padding: '1px 6px',
-            fontSize: 9, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900 }
-        }, p.inj)
+        React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 5, marginTop: 1 } },
+          injColor && React.createElement('span', {
+            style: { background: injColor, color: '#fff', borderRadius: 3, padding: '1px 6px',
+              fontSize: 9, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900 }
+          }, p.inj),
+          p.ppg != null && p.ppg > 0 && React.createElement('span', {
+            style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: '#888' }
+          }, p.ppg.toFixed(1) + ' PPG')
+        )
       )
     );
   }
