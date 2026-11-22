@@ -10331,7 +10331,20 @@ function FantasyPageNFL({ lg, onPlayerClick, onBack, onTeamClick }) {
     );
   })))));
 }
+function useIsMobile(breakpoint) {
+  var bp = breakpoint || 640;
+  var _w = React.useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  var w = _w[0], setW = _w[1];
+  React.useEffect(function() {
+    function onResize() { setW(window.innerWidth); }
+    window.addEventListener('resize', onResize);
+    return function() { window.removeEventListener('resize', onResize); };
+  }, []);
+  return w <= bp;
+}
+
 function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
+  var isMobile = useIsMobile(640);
   var _gm = React.useState(null); var games = _gm[0], setGames = _gm[1];
   var _ld = React.useState(true); var loading = _ld[0], setLoading = _ld[1];
   var _err = React.useState(null); var err = _err[0], setErr = _err[1];
@@ -10739,13 +10752,13 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
               borderRadius: 4, padding: '2px 8px', fontWeight: 900, letterSpacing: '0.06em' }
           }, g.status.toUpperCase())
         ),
-        // 2 équipes côte à côte
+        // 2 équipes — côte à côte sur desktop, empilées sur mobile
         React.createElement('div', {
-          style: { display: 'grid', gridTemplateColumns: '1fr 1fr',
+          style: { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
             borderBottom: hasInj ? '1px solid rgba(0,0,0,0.06)' : 'none' }
         },
           TeamBlock(g.visitAbbr, g.visitLogo, g.visitName||g.visitAbbr, g.visitRecord, g.visitPlayers||[], 'visit'),
-          React.createElement('div', { style: { borderLeft: '2px solid rgba(0,0,0,0.05)' } },
+          React.createElement('div', { style: { borderLeft: isMobile ? 'none' : '2px solid rgba(0,0,0,0.05)', borderTop: isMobile ? '2px solid rgba(0,0,0,0.05)' : 'none' } },
             TeamBlock(g.homeAbbr, g.homeLogo, g.homeName||g.homeAbbr, g.homeRecord, g.homePlayers||[], 'home')
           )
         ),
@@ -10754,7 +10767,7 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
           style: { background: 'rgba(0,0,0,0.015)', padding: '6px 0 2px' }
         },
           React.createElement('div', { style: { padding: '0 12px 4px', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 900, color: '#ccc', letterSpacing: '0.12em' } }, 'ABSENTS / INCERTAINS'),
-          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 } },
+          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 0 } },
             InjuredTeam(g.visitPlayers||[], tc2Visit, g.visitName||g.visitAbbr),
             InjuredTeam(g.homePlayers||[], tc2Home, g.homeName||g.homeAbbr)
           )
