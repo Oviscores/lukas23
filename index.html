@@ -10372,30 +10372,38 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
       .catch(function(e){ setErr(e.message); setLoading(false); });
   }
 
+  var _selDateRef = React.useRef(null);
   React.useEffect(function() {
     var dates = buildDateList();
     setCalDates(dates);
     var todayIso = dates[0].iso;
     setSelDate(todayIso);
-    // Charge aujourd'hui via proxy RotoWire (meilleure data lineup)
+    _selDateRef.current = todayIso;
+
+    function fetchToday() {
+      fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_lineups_rw')
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (d.error) { setErr(d.error); setGames([]); }
+          else {
+            var gs = d.games || [];
+            setAllGames(function(prev){ var u = Object.assign({}, prev); u[todayIso] = gs; return u; });
+            if (_selDateRef.current === todayIso) setGames(gs);
+          }
+          setLoading(false);
+        })
+        .catch(function(e){ setErr(e.message); setLoading(false); });
+    }
+
     setLoading(true); setErr(null);
-    fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_lineups_rw')
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if (d.error) { setErr(d.error); setGames([]); }
-        else {
-          var gs = d.games || [];
-          var updated = {}; updated[todayIso] = gs;
-          setAllGames(updated); setGames(gs);
-        }
-        setLoading(false);
-      })
-      .catch(function(e){ setErr(e.message); setLoading(false); });
+    fetchToday();
+    var timer = setInterval(fetchToday, 5 * 60 * 1000);
+    return function(){ clearInterval(timer); };
   }, []);
 
   // Quand on change de date
   function handleDateSelect(iso) {
-    setSelDate(iso);
+    setSelDate(iso); _selDateRef.current = iso;
     var todayIso = calDates.length ? calDates[0].iso : null;
     if (iso === todayIso && allGames[iso]) { setGames(allGames[iso]); return; }
     loadGamesForDate(iso);
