@@ -11359,7 +11359,8 @@ TAG: [RESULTATS|TRANSFERT|RECORD|BLESSURE|ANALYSE|DRAFT|PLAYOFFS]` }]
     setSelMatch(null);
     setCalLg(null);
     var _pn = window.location.pathname;
-    if (_pn !== '/') history.pushState({}, '', '/');
+    // Ne pas reset l'URL si on vient de naviguer vers une page propre (fantasy/*, /nhl, etc.)
+    if (_pn !== '/' && !_pn.startsWith('/fantasy/') && !['/nhl','/nfl','/nba','/mlb'].includes(_pn)) history.pushState({}, '', '/');
   }
   function goScore(g, lg) {
     var _eid = g.eventId || (lg === 'NFL' ? (g.id||'').replace('nfl_','') : null) || null;
