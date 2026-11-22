@@ -12401,7 +12401,7 @@ async function fetchFantasyData(lg) {
       } catch(e2) { console.log('MLB lineups error:', e2); }
     }
 
-    // NFL : Vegas Lines live
+    // NFL : Vegas Lines + QB partants live
     if (lg === 'NFL') {
       try {
         var vegasR = await fetch(PROXY + '?league=nfl_vegas');
@@ -12409,10 +12409,29 @@ async function fetchFantasyData(lg) {
         var liveLines = vegasD.lines || [];
         if (liveLines.length > 0 && typeof FANTASY_DATA !== 'undefined' && FANTASY_DATA['NFL']) {
           FANTASY_DATA['NFL'].vegasLines = liveLines;
+
+          // Extraire les QB partants depuis les données du scoreboard
+          var qbList = [];
+          liveLines.forEach(function(game) {
+            if (game.homeQB) qbList.push({
+              name: game.homeQB, team: game.home, opp: game.away,
+              ha: 'D', conf: 'CONFIRMÉ', sc: '#16a34a',
+              record: '', gaa: null, svp: null, pos: 'QB',
+              status: game.status || '', homeScore: game.homeScore, awayScore: game.awayScore
+            });
+            if (game.awayQB) qbList.push({
+              name: game.awayQB, team: game.away, opp: game.home,
+              ha: 'V', conf: 'CONFIRMÉ', sc: '#16a34a',
+              record: '', gaa: null, svp: null, pos: 'QB',
+              status: game.status || '', homeScore: game.awayScore, awayScore: game.homeScore
+            });
+          });
+          if (qbList.length > 0) FANTASY_DATA['NFL'].startingGoalies = qbList;
+
           if (window.__zoneus_refresh__) window.__zoneus_refresh__();
-          console.log('NFL Vegas lines live:', liveLines.length);
+          console.log('NFL Vegas lines:', liveLines.length, 'QB starters:', qbList.length);
         }
-      } catch(e3) { console.log('NFL Vegas lines error:', e3); }
+      } catch(e3) { console.log('NFL Vegas/QB error:', e3); }
     }
 
   } catch(e) {
