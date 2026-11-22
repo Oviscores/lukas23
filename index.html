@@ -10195,6 +10195,7 @@ function FantasyPageNHL({ lg, onPlayerClick, onBack, onTeamClick }) {
     }));
   })))));
 }
+var FantasyPageMLB = FantasyPageNHL;
 function FantasyPageNFL({ lg, onPlayerClick, onBack, onTeamClick }) {
   var _fv = React.useState(0);
   var fTick = _fv[0], setFTick = _fv[1];
@@ -10390,12 +10391,16 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
         athletes.forEach(function(p){
           if (!p || !p.id) return;
           var cats = p.statistics && p.statistics.splits && p.statistics.splits.categories || [];
-          var ppg = 0;
-          cats.forEach(function(c){ (c.stats||[]).forEach(function(sv){ if (sv.name === 'avgPoints') ppg = parseFloat(sv.value)||0; }); });
+          var ppg = 0, reb = 0, ast = 0;
+          cats.forEach(function(c){ (c.stats||[]).forEach(function(sv){
+            if (sv.name === 'avgPoints') ppg = parseFloat(sv.value)||0;
+            if (sv.name === 'avgRebounds') reb = parseFloat(sv.value)||0;
+            if (sv.name === 'avgAssists') ast = parseFloat(sv.value)||0;
+          }); });
           var lastName = (p.displayName||p.fullName||'').split(' ').slice(-1)[0].toLowerCase();
           var fullNorm = (p.displayName||p.fullName||'').toLowerCase();
-          nameMap[fullNorm] = { espnId: String(p.id), ppg: ppg };
-          if (!nameMap[lastName]) nameMap[lastName] = { espnId: String(p.id), ppg: ppg };
+          nameMap[fullNorm] = { espnId: String(p.id), ppg: ppg, reb: reb, ast: ast };
+          if (!nameMap[lastName]) nameMap[lastName] = { espnId: String(p.id), ppg: ppg, reb: reb, ast: ast };
         });
         cache[abbr] = nameMap;
         return nameMap;
@@ -10420,7 +10425,7 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
             var fullNorm = (p.name||'').toLowerCase();
             var lastNorm = (p.name||'').split(' ').slice(-1)[0].toLowerCase();
             var hit = nm[fullNorm] || nm[lastNorm] || {};
-            return Object.assign({}, p, { espnId: hit.espnId || p.espnId || null, ppg: hit.ppg || null });
+            return Object.assign({}, p, { espnId: hit.espnId || p.espnId || null, ppg: hit.ppg || null, reb: hit.reb || null, ast: hit.ast || null });
           });
         }
         return Object.assign({}, g, {
@@ -10532,9 +10537,15 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
             style: { background: injColor, color: '#fff', borderRadius: 3, padding: '1px 6px',
               fontSize: 9, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900 }
           }, p.inj),
-          p.ppg != null && p.ppg > 0 && React.createElement('span', {
-            style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: '#888' }
-          }, p.ppg.toFixed(1) + ' PPG')
+          (p.ppg != null && p.ppg > 0) && React.createElement('span', {
+            style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: '#e05c00' }
+          }, p.ppg.toFixed(1) + ' Pts'),
+          (p.reb != null && p.reb > 0) && React.createElement('span', {
+            style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: '#1d6fa4' }
+          }, p.reb.toFixed(1) + ' Reb'),
+          (p.ast != null && p.ast > 0) && React.createElement('span', {
+            style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, fontWeight: 700, color: '#16a34a' }
+          }, p.ast.toFixed(1) + ' Ast')
         )
       )
     );
@@ -10655,6 +10666,8 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
       React.createElement('div', { style: { marginLeft: 'auto', background: '#ef4444', borderRadius: 12, padding: '3px 10px' } },
         React.createElement('span', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: '#fff', letterSpacing: '0.1em' } }, '🔴 LIVE'))
     ),
+    // Barre équipes
+    React.createElement(TeamLogosBar, { lg: 'NBA', onTeamClick: onTeamClick }),
     // Date affichée
     React.createElement('div', { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, color: '#999', fontWeight: 700, letterSpacing: '0.07em', marginBottom: 4 } }, dayLabel),
     // Calendrier scrollable centré
