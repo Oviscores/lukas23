@@ -6145,7 +6145,9 @@ function NFLRoster({ roster, lc, onPlayerClick, lg, team }) {
     var grp = ['QB','WR','TE','RB','FB','OL','OT','OG','C','G','T'].indexOf(pos) >= 0 ? 'ATTAQUE' :
               ['DE','DT','NT','LB','OLB','ILB','MLB','CB','S','SS','FS','DB'].indexOf(pos) >= 0 ? 'DEFENSE' : 'UNITES SPECIALES';
     if (p.id && p.name) window.__ROSTER_CACHE__[String(p.id)] = { name: p.name, team: team || '' };
-    groups[grp].push({ id: p.id, name: p.name, pos: p.pos, number: p.number, stats: statsIndex[p.name]||[] });
+    // Stats: prefer STATS_PAGES index, fallback to stats embedded in roster from proxy
+    var pStats = statsIndex[p.name] && statsIndex[p.name].length > 0 ? statsIndex[p.name] : (p.stats && p.stats.length > 0 ? p.stats.map(function(s){ return { label: s.label, unit: '', val: s.val }; }) : []);
+    groups[grp].push({ id: p.id, name: p.name, pos: p.pos, number: p.number, stats: pStats });
   });
   var tabs = ['ATTAQUE','DEFENSE','UNITES SPECIALES'].filter(function(t){ return groups[t].length > 0; });
   var curTab = groups[tab] && groups[tab].length ? tab : tabs[0];
