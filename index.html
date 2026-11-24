@@ -6138,6 +6138,8 @@ function NFLRoster({ roster, lc, onPlayerClick, lg, team }) {
   var statsIndex = {};
   var sp = window.STATS_PAGES && window.STATS_PAGES.NFL;
   if (sp && sp.players) sp.players.forEach(function(cat) { (cat.data||[]).forEach(function(p) { if (!statsIndex[p.name]) statsIndex[p.name] = []; statsIndex[p.name].push({ label: cat.label, unit: cat.unit||'', val: p.val }); }); });
+  // Position groups + sub-groups (NFL)
+  var POS_ORDER = { QB:0,RB:1,FB:2,WR:3,TE:4,OT:5,OG:6,C:7,G:8,T:9,OL:10, DE:0,DT:1,NT:2,LB:3,OLB:4,ILB:5,MLB:6,CB:7,S:8,SS:9,FS:10,DB:11, K:0,P:1,LS:2,KR:3,PR:4 };
   var groups = { 'ATTAQUE': [], 'DEFENSE': [], 'UNITES SPECIALES': [] };
   if (!window.__ROSTER_CACHE__) window.__ROSTER_CACHE__ = {};
   (roster||[]).forEach(function(p) {
@@ -6145,32 +6147,62 @@ function NFLRoster({ roster, lc, onPlayerClick, lg, team }) {
     var grp = ['QB','WR','TE','RB','FB','OL','OT','OG','C','G','T'].indexOf(pos) >= 0 ? 'ATTAQUE' :
               ['DE','DT','NT','LB','OLB','ILB','MLB','CB','S','SS','FS','DB'].indexOf(pos) >= 0 ? 'DEFENSE' : 'UNITES SPECIALES';
     if (p.id && p.name) window.__ROSTER_CACHE__[String(p.id)] = { name: p.name, team: team || '' };
-    // Stats: prefer STATS_PAGES index, fallback to stats embedded in roster from proxy
     var pStats = statsIndex[p.name] && statsIndex[p.name].length > 0 ? statsIndex[p.name] : (p.stats && p.stats.length > 0 ? p.stats.map(function(s){ return { label: s.label, unit: '', val: s.val }; }) : []);
-    groups[grp].push({ id: p.id, name: p.name, pos: p.pos, number: p.number, stats: pStats });
+    groups[grp].push({ id: p.id, name: p.name, pos: pos, number: p.number, stats: pStats, photo: p.photo || p.headshot || '' });
+  });
+  // Sort each group by position order then number
+  ['ATTAQUE','DEFENSE','UNITES SPECIALES'].forEach(function(g) {
+    groups[g].sort(function(a,b){ var po=(POS_ORDER[a.pos]||99)-(POS_ORDER[b.pos]||99); return po!==0?po:(parseInt(a.number)||99)-(parseInt(b.number)||99); });
   });
   var tabs = ['ATTAQUE','DEFENSE','UNITES SPECIALES'].filter(function(t){ return groups[t].length > 0; });
   var curTab = groups[tab] && groups[tab].length ? tab : tabs[0];
+  // Build sub-grouped rows with position headers
+  var rows = [];
+  var lastPos = null;
+  (groups[curTab]||[]).forEach(function(p, i) {
+    if (p.pos !== lastPos) {
+      rows.push({ type: 'header', pos: p.pos });
+      lastPos = p.pos;
+    }
+    rows.push({ type: 'player', p: p, i: i });
+  });
   return React.createElement("div", { style: { background: "rgba(0,0,0,0.35)", borderRadius: 8, overflow: "hidden", marginTop: 8 } },
-    React.createElement("div", { style: { background: lc, padding: "10px 16px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: "#fff", letterSpacing: "0.12em" } }, "EFFECTIF - " + roster.length + " JOUEURS"),
+    React.createElement("div", { style: { background: lc, padding: "10px 16px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 900, color: "#fff", letterSpacing: "0.12em" } }, "EFFECTIF - " + (roster||[]).length + " JOUEURS"),
     React.createElement("div", { style: { display: "flex", background: "rgba(0,0,0,0.4)", borderBottom: "2px solid " + lc } },
       tabs.map(function(t) {
         var active = curTab === t;
         return React.createElement("button", { key: t, onClick: function(){ setTab(t); }, style: { flex: 1, padding: "10px 4px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: active?"#fff":"rgba(255,255,255,0.35)", background: active?lc+"cc":"transparent", border: "none", cursor: "pointer" } }, t + " (" + groups[t].length + ")" );
       })
     ),
-    (groups[curTab]||[]).map(function(p, i) {
+    rows.map(function(row, ri) {
+      if (row.type === 'header') {
+        var POS_LABELS = { QB:'Quaterbacks',RB:'Running Backs',FB:'Fullbacks',WR:'Wide Receivers',TE:'Tight Ends',OT:'Offensive Tackles',OG:'Offensive Guards',C:'Centers',G:'Guards',T:'Tackles',OL:'Offensive Line',DE:'Defensive Ends',DT:'Defensive Tackles',NT:'Nose Tackles',LB:'Linebackers',OLB:'Outside Linebackers',ILB:'Inside Linebackers',MLB:'Middle Linebackers',CB:'Cornerbacks',S:'Safeties',SS:'Strong Safeties',FS:'Free Safeties',DB:'Defensive Backs',K:'Kickers',P:'Punters',LS:'Long Snappers',KR:'Kick Returners',PR:'Punt Returners' };
+        return React.createElement("div", { key: "h"+ri, style: { padding: "6px 16px 4px", background: "rgba(0,0,0,0.5)", borderTop: "1px solid "+lc+"55" } },
+          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: lc, letterSpacing: "0.1em", textTransform: "uppercase" } }, POS_LABELS[row.pos] || row.pos)
+        );
+      }
+      var p = row.p; var i = row.i;
       var hasStats = p.stats && p.stats.length > 0;
-      return React.createElement("div", { key: i, onClick: function(){ if(onPlayerClick && p.id) onPlayerClick(p.id, 'NFL'); }, style: { display: "flex", alignItems: "center", gap: 12, padding: "9px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)", background: i%2===0?"rgba(255,255,255,0.04)":"transparent", cursor: p.id ? "pointer" : "default" },
-        onMouseEnter: function(e){ if(p.id) e.currentTarget.style.background = lc + "30"; }, onMouseLeave: function(e){ e.currentTarget.style.background = i%2===0?"rgba(255,255,255,0.04)":"transparent"; } },
-        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: lc, minWidth: 36, textAlign: "center" } }, "#" + (p.number||"?")),
-        React.createElement("div", { style: { flex: 1 } },
-          React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: hasStats?15:14, fontWeight: hasStats?800:600, color: hasStats?"#fff":"rgba(255,255,255,0.8)" } }, p.name),
-          hasStats && React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: lc, marginTop: 1 } },
-            p.stats.map(function(s,si){ return React.createElement("span", { key: si, style: { marginRight: 10 } }, s.val+" "+s.unit+" "+s.label); })
+      var hasPhoto = !!p.photo;
+      return React.createElement("div", { key: "p"+ri, onClick: function(){ if(onPlayerClick && p.id) onPlayerClick(p.id, 'NFL'); }, style: { display: "flex", alignItems: "center", gap: 10, padding: "7px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)", background: i%2===0?"rgba(255,255,255,0.03)":"transparent", cursor: p.id ? "pointer" : "default" },
+        onMouseEnter: function(e){ if(p.id) e.currentTarget.style.background = lc+"25"; }, onMouseLeave: function(e){ e.currentTarget.style.background = i%2===0?"rgba(255,255,255,0.03)":"transparent"; } },
+        hasPhoto && React.createElement("img", { src: p.photo, alt: p.name, style: { width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top", border: "2px solid "+lc+"66", flexShrink: 0, background: "rgba(0,0,0,0.3)" }, onError: function(e){ e.target.style.display="none"; } }),
+        !hasPhoto && React.createElement("div", { style: { width: 38, height: 38, borderRadius: "50%", background: lc+"33", border: "2px solid "+lc+"44", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" } },
+          React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: lc } }, p.number||"?")
+        ),
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: lc+"cc", minWidth: 28, textAlign: "right", flexShrink: 0 } }, "#"+(p.number||"?")),
+        React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+          React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 800, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, p.name),
+          hasStats && React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: "0 10px", marginTop: 2 } },
+            p.stats.slice(0,4).map(function(s,si){
+              return React.createElement("span", { key: si, style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "rgba(255,255,255,0.55)" } },
+                React.createElement("span", { style: { color: lc, fontWeight: 800 } }, s.val),
+                " "+s.label
+              );
+            })
           )
         ),
-        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", background: lc, borderRadius: 3, padding: "2px 7px" } }, p.pos)
+        React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: lc, background: lc+"22", border: "1px solid "+lc+"55", borderRadius: 3, padding: "2px 6px", flexShrink: 0 } }, p.pos)
       );
     })
   );
@@ -7130,7 +7162,7 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
         if (endpoint) {
           var r = await fetch(endpoint);
           var d = await r.json();
-          if (lg === 'NFL' && d.athletes) { var nflP = []; (d.athletes||[]).forEach(function(g){(g.items||[]).forEach(function(p){nflP.push({id:p.id||'',name:p.displayName||'',pos:p.position&&p.position.abbreviation||'',number:p.jersey||''});});}); d = { roster: nflP }; }
+          if (lg === 'NFL' && d.athletes) { var nflP = []; (d.athletes||[]).forEach(function(g){(g.items||[]).forEach(function(p){nflP.push({id:p.id||'',name:p.displayName||p.fullName||'',pos:p.position&&p.position.abbreviation||'',number:p.jersey||'',photo:p.headshot&&p.headshot.href||'',stats:(p.stats||[])});});}); d = { roster: nflP }; }
           setLiveRoster(d);
         }
       } catch(e) { console.log('roster error:', e); }
@@ -9810,12 +9842,22 @@ const FANTASY_DATA = window.FANTASY_DATA = {
       { name: "Jalen Hurts", team: "PHI", opp: "DAL", ha: "V", record: "9-3", gaa: null, svp: null, conf: "CONFIRM\xC9", sc: "#16a34a" }
     ],
     vegasLines: [
-      { home: "KC", away: "LVR", spread: "-9.5", total: "47.5", ou: "OVER", fav: "KC", note: "KC favori \xE0 domicile \u2014 ciblez les receivers KC" },
-      { home: "SF", away: "SEA", spread: "-7", total: "44", ou: "UNDER", fav: "SF", note: "Defense SF dominante \u2014 limitez SEA" },
-      { home: "PHI", away: "DAL", spread: "-3.5", total: "48", ou: "OVER", fav: "PHI", note: "Match \xE9quilibr\xE9 \u2014 total \xE9lev\xE9, ciblez les WRs" },
-      { home: "MIA", away: "BUF", spread: "+2", total: "51.5", ou: "OVER", fav: "BUF", note: "Total tr\xE8s \xE9lev\xE9 \u2014 Allen et Hill \xE1 jouer" },
-      { home: "CIN", away: "BAL", spread: "+1.5", total: "45", ou: "UNDER", fav: "BAL", note: "Match d\xE9fensif \u2014 limitez les RBs BAL" },
-      { home: "DET", away: "MIN", spread: "-2.5", total: "49", ou: "OVER", fav: "DET", note: "DET offensive \u2014 Gibbs et Johnson \xE1 cibler" }
+      { home: "KC", away: "LVR", spread: "KC -9.5", total: "47.5", ou: "OVER", fav: "KC", homeQB: "Patrick Mahomes", awayQB: "Aidan O'Connell", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "SF", away: "SEA", spread: "SF -7", total: "44", ou: "UNDER", fav: "SF", homeQB: "Brock Purdy", awayQB: "Geno Smith", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "PHI", away: "DAL", spread: "PHI -3.5", total: "48", ou: "OVER", fav: "PHI", homeQB: "Jalen Hurts", awayQB: "Dak Prescott", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "BUF", away: "MIA", spread: "BUF -6", total: "51.5", ou: "OVER", fav: "BUF", homeQB: "Josh Allen", awayQB: "Tua Tagovailoa", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "BAL", away: "CIN", spread: "BAL -1.5", total: "45", ou: "UNDER", fav: "BAL", homeQB: "Lamar Jackson", awayQB: "Joe Burrow", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "DET", away: "MIN", spread: "DET -2.5", total: "49", ou: "OVER", fav: "DET", homeQB: "Jared Goff", awayQB: "Sam Darnold", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "GB", away: "CHI", spread: "GB -6", total: "43.5", ou: "UNDER", fav: "GB", homeQB: "Jordan Love", awayQB: "Caleb Williams", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "PIT", away: "CLE", spread: "PIT -4", total: "38.5", ou: "UNDER", fav: "PIT", homeQB: "Russell Wilson", awayQB: "Deshaun Watson", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "HOU", away: "TEN", spread: "HOU -7.5", total: "44", ou: "OVER", fav: "HOU", homeQB: "C.J. Stroud", awayQB: "Will Levis", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "ATL", away: "NO", spread: "ATL -3", total: "46.5", ou: "OVER", fav: "ATL", homeQB: "Kirk Cousins", awayQB: "Derek Carr", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "LAR", away: "ARI", spread: "LAR -4.5", total: "47", ou: "OVER", fav: "LAR", homeQB: "Matthew Stafford", awayQB: "Kyler Murray", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "LAC", away: "DEN", spread: "LAC -2.5", total: "42.5", ou: "UNDER", fav: "LAC", homeQB: "Justin Herbert", awayQB: "Bo Nix", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "NYJ", away: "NE", spread: "NYJ -3", total: "36", ou: "UNDER", fav: "NYJ", homeQB: "Aaron Rodgers", awayQB: "Drake Maye", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "WAS", away: "NYG", spread: "WAS -6.5", total: "43.5", ou: "OVER", fav: "WAS", homeQB: "Jayden Daniels", awayQB: "Tommy DeVito", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "TB", away: "CAR", spread: "TB -8", total: "44.5", ou: "OVER", fav: "TB", homeQB: "Baker Mayfield", awayQB: "Bryce Young", homeQBPhoto: "", awayQBPhoto: "" },
+      { home: "IND", away: "JAX", spread: "IND -3.5", total: "41.5", ou: "UNDER", fav: "IND", homeQB: "Anthony Richardson", awayQB: "Trevor Lawrence", homeQBPhoto: "", awayQBPhoto: "" }
     ],
     eveningLines: [
       { team: "KC", opp: "LVR", l1: "Kelce - Hill - Hardman", l2: "McKinnon - Pacheco", l3: "Gray - Bell - Robinson" },
