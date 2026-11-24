@@ -10281,15 +10281,16 @@ function FantasyPageNFL({ lg, onPlayerClick, onBack, onTeamClick }) {
         var spreadLabel = v.spread || 'PK';
         var scoreDisplay = (isLive || isFinal) && (v.homeScore !== '' && v.homeScore !== undefined) ? (v.awayScore + ' – ' + v.homeScore) : null;
         var ouColor = v.ou === "OVER" ? "#16a34a" : v.ou === "UNDER" ? "#ef4444" : "#888";
+        var gameTime = v.gameDate ? (function() { try { return new Date(v.gameDate).toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }); } catch(e) { return ''; } })() : '';
         /* QB last name helper */
         var lastName = function(full) { if (!full) return ''; var parts = full.trim().split(' '); return parts[parts.length - 1]; };
         return /* @__PURE__ */ React.createElement("div", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.07)", background: i % 2 === 0 ? "#fafafa" : "#fff" } },
-          /* ── Top bar : statut + score live ── */
-          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "5px 10px 0", minHeight: 20 } },
+          /* ── Top bar : heure + score live ── */
+          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "5px 10px 0", minHeight: 22 } },
             isLive ? /* @__PURE__ */ React.createElement("span", { style: { width: 7, height: 7, borderRadius: "50%", background: "#16a34a", display: "inline-block", flexShrink: 0 } }) : null,
             scoreDisplay
-              ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 900, color: isFinal ? "#777" : "#16a34a", letterSpacing: "0.04em" } }, scoreDisplay + (isFinal ? " · FINAL" : ""))
-              : /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb", letterSpacing: "0.07em", textTransform: "uppercase" } }, v.status === "STATUS_SCHEDULED" || !v.status ? "À VENIR" : v.status)
+              ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 900, color: "#16a34a", letterSpacing: "0.04em" } }, scoreDisplay)
+              : /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 600, color: "#888", letterSpacing: "0.04em" } }, gameTime)
           ),
           /* ── Carte principale ── */
           /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "stretch", padding: "8px 6px 10px" } },
