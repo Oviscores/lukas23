@@ -6165,100 +6165,92 @@ function NFLRoster({ roster, lc, onPlayerClick, lg, team }) {
     if (p.pos !== lastPos) { rows.push({ type:'header', pos:p.pos }); lastPos = p.pos; }
     rows.push({ type:'player', p:p, i:i });
   });
-  var TH = { padding:"5px 8px", textAlign:"center", fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:900, letterSpacing:"0.08em", color:"rgba(255,255,255,0.4)", background:"rgba(0,0,0,0.4)" };
-  var attaqHeaders = curTab==='ATTAQUE' ? [
-    React.createElement("th",{key:"y",style:Object.assign({},TH,{width:50,color:lc})},"YDS"),
-    React.createElement("th",{key:"td",style:Object.assign({},TH,{width:40,color:lc})},"TD"),
-    React.createElement("th",{key:"x",style:Object.assign({},TH,{width:40})},"INT"),
-    React.createElement("th",{key:"r",style:Object.assign({},TH,{width:40})},"REC"),
-  ] : curTab==='DEFENSE' ? [
-    React.createElement("th",{key:"p",style:Object.assign({},TH,{width:50,color:lc})},"PLQ"),
-    React.createElement("th",{key:"s",style:Object.assign({},TH,{width:50,color:lc})},"SCK"),
-    React.createElement("th",{key:"i",style:Object.assign({},TH,{width:40})},"INT"),
-  ] : [
-    React.createElement("th",{key:"f",style:Object.assign({},TH,{width:60,color:lc})},"STAT"),
-  ];
-  return React.createElement("div", { style: { background: "rgba(0,0,0,0.3)", borderRadius: 8, overflow: "hidden", marginTop: 8, border: "1px solid rgba(255,255,255,0.08)" } },
-    React.createElement("div", { style: { background: lc, padding: "10px 16px" } },
-      React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#fff", letterSpacing: "0.12em" } }, "EFFECTIF - " + (roster||[]).length + " JOUEURS")
+  var cell = { padding:'5px 6px', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:12 };
+  var head = Object.assign({}, cell, { fontWeight:800, color:'#888', fontSize:9 });
+  var ATT_COLS = curTab==='ATTAQUE'
+    ? [['YDS','YDS'],['TD','TD'],['INT','INT'],['REC','REC']]
+    : curTab==='DEFENSE'
+    ? [['PLQ','plaques'],['SCK','sacks'],['INT','INT']]
+    : [['STAT','FG']];
+  return React.createElement("div", { style: { background:"#fff", borderRadius:8, overflow:"hidden", marginTop:8 } },
+    React.createElement("div", { style: { background:lc, padding:"10px 16px" } },
+      React.createElement("span", { style: { fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:900, color:"#fff", letterSpacing:"0.12em" } },
+        "EFFECTIF - " + (roster||[]).length + " JOUEURS")
     ),
-    React.createElement("div", { style: { display: "flex", background: "rgba(0,0,0,0.5)", borderBottom: "2px solid " + lc } },
+    React.createElement("div", { style: { display:"flex", background:"#f5f5f5", borderBottom:"2px solid " + lc } },
       tabs.map(function(t) {
         var active = curTab === t;
-        return React.createElement("button", { key: t, onClick: function(){ setTab(t); }, style: { flex: 1, padding: "9px 4px", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: active?"#fff":"rgba(255,255,255,0.4)", background: active?(lc+"cc"):"transparent", border: "none", cursor: "pointer", letterSpacing:"0.06em" } }, t + " (" + groups[t].length + ")" );
+        return React.createElement("button", { key:t, onClick:function(){ setTab(t); },
+          style: { flex:1, padding:"9px 4px", fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:900,
+            color: active?"#fff":"#999", background: active?lc:"transparent", border:"none", cursor:"pointer", letterSpacing:"0.06em" } },
+          t + " (" + groups[t].length + ")"
+        );
       })
     ),
-    React.createElement("div", { style: { overflowX: "auto" } },
-      React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
+    React.createElement("div", { style: { overflowX:"auto" } },
+      React.createElement("table", { style: { width:"100%", borderCollapse:"collapse" } },
         React.createElement("thead", null,
-          React.createElement("tr", null,
-            React.createElement("th", { style: Object.assign({},TH,{width:60,textAlign:"left",paddingLeft:12}) }, "#"),
-            React.createElement("th", { style: Object.assign({},TH,{textAlign:"left"}) }, "JOUEUR"),
-            React.createElement("th", { style: Object.assign({},TH,{width:40}) }, "POS"),
-            attaqHeaders
+          React.createElement("tr", { style: { background:"#f5f5f5" } },
+            React.createElement("th", { style: Object.assign({},head,{textAlign:"left",paddingLeft:12,width:60}) }, "#"),
+            React.createElement("th", { style: Object.assign({},head,{textAlign:"left"}) }, "JOUEUR"),
+            React.createElement("th", { style: Object.assign({},head,{width:40}) }, "POS"),
+            ATT_COLS.map(function(c,i){ return React.createElement("th",{key:i,style:Object.assign({},head,{width:50,color:i===0?lc:'#888'})},c[0]); })
           )
         ),
         React.createElement("tbody", null,
           rows.map(function(row, ri) {
             if (row.type === 'header') {
               return React.createElement("tr", { key:"h"+ri },
-                React.createElement("td", { colSpan: 7, style: { padding:"5px 14px 3px", background:"rgba(0,0,0,0.5)", borderTop:"1px solid "+lc+"33" } },
-                  React.createElement("span", { style: { fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:900, color:lc, letterSpacing:"0.12em", textTransform:"uppercase" } }, POS_LABELS[row.pos]||row.pos)
+                React.createElement("td", { colSpan:7, style: { padding:"5px 14px 3px", background:"#f0f0f0", borderTop:"2px solid " + lc + "44" } },
+                  React.createElement("span", { style: { fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, fontWeight:900, color:lc, letterSpacing:"0.12em", textTransform:"uppercase" } },
+                    POS_LABELS[row.pos]||row.pos)
                 )
               );
             }
             var p = row.p; var i = row.i;
-            var bg = i%2===0?"rgba(255,255,255,0.025)":"transparent";
-            var getVal = function(key) {
+            var bg = i%2===0 ? "#fff" : "#fafafa";
+            var getV = function(key) {
               var v = p.stats[key];
               return (v!==undefined && v!=='' && v!==0 && v!=='0') ? v : null;
             };
-            var statCols;
+            var statVals;
             if (curTab==='ATTAQUE') {
-              var ydsKey = p.pos==='QB'?'YDS':(p.pos==='RB'||p.pos==='FB')?'YDS rush':'YDS rec';
-              var tdKey = p.pos==='QB'?'TD':(p.pos==='RB'||p.pos==='FB')?'TD rush':'TD rec';
-              var intKey = 'INT';
-              var recKey = p.pos==='QB'?'CMP%':'REC';
-              statCols = [
-                React.createElement("td",{key:"y",style:{padding:"5px 8px",textAlign:"center"}}, React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:getVal(ydsKey)?800:400,color:getVal(ydsKey)?lc:"rgba(255,255,255,0.15)"}}, getVal(ydsKey)!==null?getVal(ydsKey):"-")),
-                React.createElement("td",{key:"td",style:{padding:"5px 8px",textAlign:"center"}}, React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:getVal(tdKey)?800:400,color:getVal(tdKey)?lc:"rgba(255,255,255,0.15)"}}, getVal(tdKey)!==null?getVal(tdKey):"-")),
-                React.createElement("td",{key:"i",style:{padding:"5px 8px",textAlign:"center"}}, React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:getVal(intKey)?800:400,color:getVal(intKey)?"rgba(255,100,100,0.9)":"rgba(255,255,255,0.15)"}}, getVal(intKey)!==null?getVal(intKey):"-")),
-                React.createElement("td",{key:"r",style:{padding:"5px 8px",textAlign:"center"}}, React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:getVal(recKey)?800:400,color:getVal(recKey)?lc:"rgba(255,255,255,0.15)"}}, getVal(recKey)!==null?getVal(recKey):"-")),
-              ];
+              var yKey = (p.pos==='QB')?'YDS':(p.pos==='RB'||p.pos==='FB')?'YDS rush':'YDS rec';
+              var tKey = (p.pos==='QB')?'TD':(p.pos==='RB'||p.pos==='FB')?'TD rush':'TD rec';
+              var iKey = 'INT';
+              var rKey = (p.pos==='QB')?'CMP%':'rec';
+              statVals = [getV(yKey), getV(tKey), getV(iKey), getV(rKey)];
             } else if (curTab==='DEFENSE') {
-              statCols = [
-                React.createElement("td",{key:"p",style:{padding:"5px 8px",textAlign:"center"}}, React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:getVal('plaques')?800:400,color:getVal('plaques')?lc:"rgba(255,255,255,0.15)"}}, getVal('plaques')!==null?getVal('plaques'):"-")),
-                React.createElement("td",{key:"s",style:{padding:"5px 8px",textAlign:"center"}}, React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:getVal('sacks')?800:400,color:getVal('sacks')?lc:"rgba(255,255,255,0.15)"}}, getVal('sacks')!==null?getVal('sacks'):"-")),
-                React.createElement("td",{key:"i",style:{padding:"5px 8px",textAlign:"center"}}, React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:getVal('INT')?800:400,color:getVal('INT')?"rgba(255,100,100,0.9)":"rgba(255,255,255,0.15)"}}, getVal('INT')!==null?getVal('INT'):"-")),
-              ];
+              statVals = [getV('plaques'), getV('sacks'), getV('INT')];
             } else {
-              var stKey = p.pos==='K'?'FG':p.pos==='P'?'moy':'';
-              statCols = [
-                React.createElement("td",{key:"f",style:{padding:"5px 8px",textAlign:"center"}}, React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:stKey&&getVal(stKey)?800:400,color:stKey&&getVal(stKey)?lc:"rgba(255,255,255,0.15)"}}, stKey&&getVal(stKey)!==null?getVal(stKey):"-")),
-              ];
+              statVals = [(p.pos==='K'?getV('FG'):p.pos==='P'?getV('moy'):null)];
             }
             return React.createElement("tr", { key:"p"+ri,
               onClick: function(){ if(onPlayerClick && p.id) onPlayerClick(p.id,'NFL'); },
-              style: { background: bg, cursor: p.id?"pointer":"default", borderBottom:"1px solid rgba(255,255,255,0.03)" },
-              onMouseEnter: function(e){ e.currentTarget.style.background=lc+"1a"; },
+              style: { background:bg, cursor:p.id?"pointer":"default", borderTop:"1px solid #f0f0f0" },
+              onMouseEnter: function(e){ e.currentTarget.style.background=lc+"18"; },
               onMouseLeave: function(e){ e.currentTarget.style.background=bg; }
             },
-              React.createElement("td", { style:{padding:"5px 4px 5px 10px"} },
+              React.createElement("td", { style:{padding:"4px 10px"} },
                 React.createElement("div", { style:{display:"flex",alignItems:"center",gap:6} },
-                  React.createElement("div", { style:{width:28,height:28,borderRadius:"50%",overflow:"hidden",border:"1.5px solid "+lc+"55",flexShrink:0,background:"rgba(0,0,0,0.3)"} },
+                  React.createElement("div", { style:{width:28,height:28,borderRadius:"50%",overflow:"hidden",border:"2px solid "+lc+"44",flexShrink:0,background:"#eee"} },
                     p.photo ? React.createElement("img",{src:p.photo,alt:p.name,style:{width:"100%",height:"100%",objectFit:"cover",objectPosition:"top"},onError:function(e){e.target.style.display="none";}})
-                              : React.createElement("span",{style:{display:"flex",alignItems:"center",justifyContent:"center",width:"100%",height:"100%",fontFamily:"'Barlow Condensed',sans-serif",fontSize:8,fontWeight:900,color:lc}},p.number||"?")
+                    : React.createElement("span",{style:{display:"flex",alignItems:"center",justifyContent:"center",width:"100%",height:"100%",fontFamily:"'Barlow Condensed',sans-serif",fontSize:8,fontWeight:900,color:lc}},p.number||"?")
                   ),
-                  React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.4)"}}, "#"+(p.number||"?"))
+                  React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:700,color:"#999"}}, "#"+(p.number||"?"))
                 )
               ),
               React.createElement("td", { style:{padding:"5px 10px 5px 4px"} },
-                React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:800,color:"#fff",whiteSpace:"nowrap"}}, p.name)
+                React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:800,color:"#111",whiteSpace:"nowrap"}}, p.name)
               ),
               React.createElement("td", { style:{padding:"5px 6px",textAlign:"center"} },
-                React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,fontWeight:900,color:lc,background:lc+"1a",border:"1px solid "+lc+"33",borderRadius:3,padding:"2px 5px"}}, p.pos)
+                React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,fontWeight:900,color:lc,background:lc+"18",border:"1px solid "+lc+"44",borderRadius:3,padding:"2px 5px"}}, p.pos)
               ),
-              statCols
+              statVals.map(function(val,ci){
+                return React.createElement("td",{key:ci,style:{padding:"5px 8px",textAlign:"center"}},
+                  React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:val?900:400,color:val?(ci===0?lc:'#444'):'#ccc'}}, val!==null?val:"-")
+                );
+              })
             );
           })
         )
