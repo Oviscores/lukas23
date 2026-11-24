@@ -10277,43 +10277,81 @@ function FantasyPageNFL({ lg, onPlayerClick, onBack, onTeamClick }) {
         var hcol = TC[v.home + "_NFL"] || { bg: lc, fg: "#fff" };
         var acol = TC[v.away + "_NFL"] || { bg: "#555", fg: "#fff" };
         var isFinal = v.status && (v.status.toUpperCase().indexOf('FINAL') >= 0 || v.status.toUpperCase().indexOf('TERMINÉ') >= 0);
-        var isLive = v.status && !isFinal && v.homeScore !== undefined && v.homeScore !== null && v.homeScore !== '';
-        var spreadLabel = v.spread && v.fav ? v.fav + ' ' + (v.spread > 0 ? '+' : '') + v.spread : (v.spread ? v.spread : 'PK');
-        var scoreDisplay = (isLive || isFinal) && v.homeScore !== undefined ? v.awayScore + ' - ' + v.homeScore : null;
-        return /* @__PURE__ */ React.createElement("div", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.06)", padding: "10px 10px 8px" } },
-          /* Spread pill + status */
-          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
-            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: "#1a1a2e", borderRadius: 3, padding: "2px 7px", letterSpacing: "0.08em" } }, spreadLabel),
-            scoreDisplay ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: isFinal ? "#555" : "#16a34a" } }, scoreDisplay + (isFinal ? " FINAL" : " •")) :
-            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#aaa", letterSpacing: "0.06em" } }, v.status || "À VENIR"),
-            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: v.ou === "OVER" ? "#16a34a" : "#ef4444", background: (v.ou === "OVER" ? "#16a34a" : "#ef4444") + "18", borderRadius: 3, padding: "2px 7px" } }, "TOT " + v.total + " " + (v.ou || ""))
+        var isLive = v.status && v.status.toUpperCase().indexOf('IN_PROGRESS') >= 0;
+        var spreadLabel = v.spread || 'PK';
+        var scoreDisplay = (isLive || isFinal) && (v.homeScore !== '' && v.homeScore !== undefined) ? (v.awayScore + ' – ' + v.homeScore) : null;
+        var ouColor = v.ou === "OVER" ? "#16a34a" : v.ou === "UNDER" ? "#ef4444" : "#888";
+        /* QB last name helper */
+        var lastName = function(full) { if (!full) return ''; var parts = full.trim().split(' '); return parts[parts.length - 1]; };
+        return /* @__PURE__ */ React.createElement("div", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.07)", background: i % 2 === 0 ? "#fafafa" : "#fff" } },
+          /* ── Top bar : statut + score live ── */
+          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "5px 10px 0", minHeight: 20 } },
+            isLive ? /* @__PURE__ */ React.createElement("span", { style: { width: 7, height: 7, borderRadius: "50%", background: "#16a34a", display: "inline-block", flexShrink: 0 } }) : null,
+            scoreDisplay
+              ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 900, color: isFinal ? "#777" : "#16a34a", letterSpacing: "0.04em" } }, scoreDisplay + (isFinal ? " · FINAL" : ""))
+              : /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb", letterSpacing: "0.07em", textTransform: "uppercase" } }, v.status === "STATUS_SCHEDULED" || !v.status ? "À VENIR" : v.status)
           ),
-          /* Matchup row */
-          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 0 } },
-            /* Away team */
-            /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 } },
-              /* @__PURE__ */ React.createElement("div", { style: { width: 44, height: 44, borderRadius: 8, background: acol.bg, display: "flex", alignItems: "center", justifyContent: "center" } },
-                getTeamLogo(v.away, "NFL", 36) || /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: acol.fg } }, v.away)
+          /* ── Carte principale ── */
+          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "stretch", padding: "8px 6px 10px" } },
+
+            /* ── AWAY ── */
+            /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 } },
+              /* Logo équipe */
+              /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 10, background: acol.bg, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px " + acol.bg + "55" } },
+                getTeamLogo(v.away, "NFL", 38)
               ),
-              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#333" } }, v.away),
-              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa" } }, "VIS."),
-              v.awayQB ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", textAlign: "center", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, v.awayQB) :
-              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb" } }, "—")
-            ),
-            /* VS separator */
-            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "0 8px" } },
-              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#ccc" } }, "@")
-            ),
-            /* Home team */
-            /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 } },
-              /* @__PURE__ */ React.createElement("div", { style: { width: 44, height: 44, borderRadius: 8, background: hcol.bg, display: "flex", alignItems: "center", justifyContent: "center" } },
-                getTeamLogo(v.home, "NFL", 36) || /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: hcol.fg } }, v.home)
+              /* Abbrev */
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#222", letterSpacing: "0.04em" } }, v.away),
+              /* Photo QB */
+              /* @__PURE__ */ React.createElement("div", { style: { width: 54, height: 54, borderRadius: "50%", background: acol.bg + "22", border: "2px solid " + acol.bg + "55", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } },
+                v.awayQBPhoto
+                  ? /* @__PURE__ */ React.createElement("img", { src: v.awayQBPhoto, alt: v.awayQB || "", style: { width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }, onError: function(e) { e.target.style.display = "none"; } })
+                  : /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, color: acol.bg } }, "?")
               ),
-              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#333" } }, v.home),
-              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa" } }, "DOM."),
-              v.homeQB ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", textAlign: "center", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, v.homeQB) :
-              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb" } }, "—")
+              /* Nom QB */
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111", textAlign: "center", lineHeight: 1.1 } },
+                v.awayQB ? lastName(v.awayQB) : /* @__PURE__ */ React.createElement("span", { style: { color: "#ccc" } }, "—")
+              ),
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.08em" } }, "VISITEUR")
+            ),
+
+            /* ── CENTRE : spread + O/U ── */
+            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: "0 8px", minWidth: 70 } },
+              /* Spread pill */
+              /* @__PURE__ */ React.createElement("div", { style: { background: "#1a1a2e", borderRadius: 6, padding: "5px 10px", textAlign: "center" } },
+                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#888", letterSpacing: "0.1em", marginBottom: 1 } }, "FAVORI"),
+                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#fff", letterSpacing: "0.02em" } }, spreadLabel)
+              ),
+              /* Séparateur @ */
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#ddd" } }, "@"),
+              /* O/U pill */
+              /* @__PURE__ */ React.createElement("div", { style: { background: ouColor + "15", border: "1.5px solid " + ouColor + "55", borderRadius: 6, padding: "4px 8px", textAlign: "center" } },
+                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: ouColor, letterSpacing: "0.1em", marginBottom: 1 } }, v.ou || "O/U"),
+                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: ouColor } }, v.total || "—")
+              )
+            ),
+
+            /* ── HOME ── */
+            /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 } },
+              /* Logo équipe */
+              /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 10, background: hcol.bg, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px " + hcol.bg + "55" } },
+                getTeamLogo(v.home, "NFL", 38)
+              ),
+              /* Abbrev */
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: "#222", letterSpacing: "0.04em" } }, v.home),
+              /* Photo QB */
+              /* @__PURE__ */ React.createElement("div", { style: { width: 54, height: 54, borderRadius: "50%", background: hcol.bg + "22", border: "2px solid " + hcol.bg + "55", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } },
+                v.homeQBPhoto
+                  ? /* @__PURE__ */ React.createElement("img", { src: v.homeQBPhoto, alt: v.homeQB || "", style: { width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }, onError: function(e) { e.target.style.display = "none"; } })
+                  : /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, color: hcol.bg } }, "?")
+              ),
+              /* Nom QB */
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 800, color: "#111", textAlign: "center", lineHeight: 1.1 } },
+                v.homeQB ? lastName(v.homeQB) : /* @__PURE__ */ React.createElement("span", { style: { color: "#ccc" } }, "—")
+              ),
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa", letterSpacing: "0.08em" } }, "DOMICILE")
             )
+
           )
         );
       })
