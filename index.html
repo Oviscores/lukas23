@@ -10270,7 +10270,55 @@ function FantasyPageNFL({ lg, onPlayerClick, onBack, onTeamClick }) {
     return /* @__PURE__ */ React.createElement("div", { key: i, style: { padding: "7px 10px", borderBottom: "1px solid rgba(0,0,0,0.04)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 3 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#aaa", flexShrink: 0 } }, p.match), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: lc, flexShrink: 0 } }, p.cote), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 1, flexShrink: 0 } }, [1, 2, 3].map(function(s) {
       return /* @__PURE__ */ React.createElement("span", { key: s, style: { fontSize: 12, opacity: s <= p.conf ? 1 : 0.2 } }, "\u2B50");
     }))), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 700, color: "#111", marginBottom: 2 } }, p.pred), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow',sans-serif", fontSize: 10, color: "#888", fontStyle: "italic" } }, p.tip));
-  }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, lg === "MLB" ? /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: "LANCEURS PARTANTS" }), /* @__PURE__ */ React.createElement("div", { style: { padding: "24px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#bbb", letterSpacing: "0.08em" } }, "HORS SAISON")) : /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: goalieLabel }), fd.startingGoalies.map(function(g, i) {
+  }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, lg === "MLB" ? /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: "LANCEURS PARTANTS" }), /* @__PURE__ */ React.createElement("div", { style: { padding: "24px 10px", textAlign: "center", fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, color: "#bbb", letterSpacing: "0.08em" } }, "HORS SAISON")) : lg === "NFL" && fd.vegasLines && fd.vegasLines.length > 0 ? /* @__PURE__ */ React.createElement("div", { style: bs },
+    /* @__PURE__ */ React.createElement(HdGlobal, { label: "QBs PARTANTS — MATCHUPS" }),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 0 } },
+      fd.vegasLines.map(function(v, i) {
+        var hcol = TC[v.home + "_NFL"] || { bg: lc, fg: "#fff" };
+        var acol = TC[v.away + "_NFL"] || { bg: "#555", fg: "#fff" };
+        var isFinal = v.status && (v.status.toUpperCase().indexOf('FINAL') >= 0 || v.status.toUpperCase().indexOf('TERMINÉ') >= 0);
+        var isLive = v.status && !isFinal && v.homeScore !== undefined && v.homeScore !== null && v.homeScore !== '';
+        var spreadLabel = v.spread && v.fav ? v.fav + ' ' + (v.spread > 0 ? '+' : '') + v.spread : (v.spread ? v.spread : 'PK');
+        var scoreDisplay = (isLive || isFinal) && v.homeScore !== undefined ? v.awayScore + ' - ' + v.homeScore : null;
+        return /* @__PURE__ */ React.createElement("div", { key: i, style: { borderBottom: "1px solid rgba(0,0,0,0.06)", padding: "10px 10px 8px" } },
+          /* Spread pill + status */
+          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
+            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: "#fff", background: "#1a1a2e", borderRadius: 3, padding: "2px 7px", letterSpacing: "0.08em" } }, spreadLabel),
+            scoreDisplay ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, fontWeight: 900, color: isFinal ? "#555" : "#16a34a" } }, scoreDisplay + (isFinal ? " FINAL" : " •")) :
+            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#aaa", letterSpacing: "0.06em" } }, v.status || "À VENIR"),
+            /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: v.ou === "OVER" ? "#16a34a" : "#ef4444", background: (v.ou === "OVER" ? "#16a34a" : "#ef4444") + "18", borderRadius: 3, padding: "2px 7px" } }, "TOT " + v.total + " " + (v.ou || ""))
+          ),
+          /* Matchup row */
+          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 0 } },
+            /* Away team */
+            /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 } },
+              /* @__PURE__ */ React.createElement("div", { style: { width: 44, height: 44, borderRadius: 8, background: acol.bg, display: "flex", alignItems: "center", justifyContent: "center" } },
+                getTeamLogo(v.away, "NFL", 36) || /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: acol.fg } }, v.away)
+              ),
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#333" } }, v.away),
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa" } }, "VIS."),
+              v.awayQB ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", textAlign: "center", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, v.awayQB) :
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb" } }, "—")
+            ),
+            /* VS separator */
+            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "0 8px" } },
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#ccc" } }, "@")
+            ),
+            /* Home team */
+            /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 } },
+              /* @__PURE__ */ React.createElement("div", { style: { width: 44, height: 44, borderRadius: 8, background: hcol.bg, display: "flex", alignItems: "center", justifyContent: "center" } },
+                getTeamLogo(v.home, "NFL", 36) || /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, fontWeight: 900, color: hcol.fg } }, v.home)
+              ),
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: "#333" } }, v.home),
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#aaa" } }, "DOM."),
+              v.homeQB ? /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#111", textAlign: "center", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, v.homeQB) :
+              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#bbb" } }, "—")
+            )
+          )
+        );
+      })
+    )
+  ) : /* @__PURE__ */ React.createElement("div", { style: bs }, /* @__PURE__ */ React.createElement(HdGlobal, { label: goalieLabel }), fd.startingGoalies.map(function(g, i) {
     var tc2 = TC[g.team + "_" + lg] || { bg: lc, fg: "#fff" };
     var opp2 = TC[g.opp + "_" + lg] || { bg: "#555", fg: "#fff" };
     return /* @__PURE__ */ React.createElement("div", { key: i, style: { padding: "8px 10px", borderBottom: "1px solid rgba(0,0,0,0.05)", borderLeft: "3px solid " + g.sc } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 4 } }, /* @__PURE__ */ getTeamLogo(g.team, lg, 20), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 800, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, g.name), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 4 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#aaa" } }, g.record), g.gaa && /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888" } }, "GAA: " + g.gaa), g.svp && /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, color: "#888" } }, "SV%: " + g.svp))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3, justifyContent: "flex-end", marginBottom: 2 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, color: "#aaa" } }, g.ha === "D" ? "DOM." : "VIS."), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 12, fontWeight: 700, color: "#333" } }, "vs " + g.opp)), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 900, color: g.sc, background: g.sc + "18", padding: "1px 6px", borderRadius: 2 } }, g.conf))));
