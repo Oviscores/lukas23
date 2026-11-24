@@ -10316,20 +10316,27 @@ function FantasyPageNFL({ lg, onPlayerClick, onBack, onTeamClick }) {
             ),
 
             /* ── CENTRE : spread + O/U ── */
-            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: "0 8px", minWidth: 70 } },
-              /* Spread pill */
-              /* @__PURE__ */ React.createElement("div", { style: { background: "#1a1a2e", borderRadius: 6, padding: "5px 10px", textAlign: "center" } },
-                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: "#888", letterSpacing: "0.1em", marginBottom: 1 } }, "FAVORI"),
-                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: "#fff", letterSpacing: "0.02em" } }, spreadLabel)
-              ),
-              /* Séparateur @ */
-              /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 700, color: "#ddd" } }, "@"),
-              /* O/U pill */
-              /* @__PURE__ */ React.createElement("div", { style: { background: ouColor + "15", border: "1.5px solid " + ouColor + "55", borderRadius: 6, padding: "4px 8px", textAlign: "center" } },
-                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 9, color: ouColor, letterSpacing: "0.1em", marginBottom: 1 } }, v.ou || "O/U"),
-                /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 900, color: ouColor } }, v.total || "—")
-              )
-            ),
+            (function() {
+              /* Parse spread : "KC -9.5" → favAb="KC", pts="-9.5" */
+              var spreadParts = (v.spread || '').trim().split(' ');
+              var favAb = spreadParts.length >= 2 ? spreadParts[0] : (v.fav || '');
+              var spreadPts = spreadParts.length >= 2 ? spreadParts.slice(1).join(' ') : (v.spread || 'PK');
+              var favCol = TC[favAb + "_NFL"] || { bg: "#1a1a2e", fg: "#fff" };
+              return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: "0 8px", minWidth: 76 } },
+                /* Spread pill : couleur de l'équipe favorite */
+                /* @__PURE__ */ React.createElement("div", { style: { background: favCol.bg, borderRadius: 8, padding: "6px 10px", textAlign: "center", minWidth: 68, boxShadow: "0 2px 8px " + favCol.bg + "66" } },
+                  /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: favCol.fg, opacity: 0.75, letterSpacing: "0.1em", marginBottom: 2 } }, favAb),
+                  /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: favCol.fg, letterSpacing: "0.02em", lineHeight: 1 } }, spreadPts)
+                ),
+                /* Séparateur @ */
+                /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, color: "#bbb" } }, "@"),
+                /* O/U pill */
+                /* @__PURE__ */ React.createElement("div", { style: { background: ouColor + "12", border: "1.5px solid " + ouColor + "66", borderRadius: 8, padding: "5px 10px", textAlign: "center", minWidth: 68 } },
+                  /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 900, color: ouColor, letterSpacing: "0.1em", marginBottom: 2 } }, v.ou || "O/U"),
+                  /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: ouColor, lineHeight: 1 } }, v.total || "—")
+                )
+              );
+            })(),
 
             /* ── HOME ── */
             /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 } },
