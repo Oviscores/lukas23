@@ -7214,7 +7214,7 @@ function TeamPage({ teamId, lg, onBack, articles, onArticleClick, onPlayerClick,
         if (endpoint) {
           var r = await fetch(endpoint);
           var d = await r.json();
-          if (lg === 'NFL' && d.athletes) { var nflP = []; (d.athletes||[]).forEach(function(g){(g.items||[]).forEach(function(p){nflP.push({id:p.id||'',name:p.displayName||p.fullName||'',pos:p.position&&p.position.abbreviation||'',number:p.jersey||'',photo:p.headshot&&p.headshot.href||'',stats:(p.stats||[])});});}); d = { roster: nflP }; }
+          if (lg === 'NFL' && d.roster) { d = { roster: d.roster }; }
           setLiveRoster(d);
         }
       } catch(e) { console.log('roster error:', e); }
