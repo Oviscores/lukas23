@@ -6289,8 +6289,12 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
           // Alimenter __ROSTER_CACHE__ avec l'équipe pour goPlayer
           if (!window.__ROSTER_CACHE__) window.__ROSTER_CACHE__ = {};
           (comb.players || []).forEach(function(p) {
-            if (p.playerId && p.name) {
-              window.__ROSTER_CACHE__[String(p.playerId)] = { name: p.name, team: teamId };
+            if (p.name) {
+              var nameSlug = p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+              // Clé = slug du nom → goPlayer le retrouvera via __ROSTER_CACHE__
+              window.__ROSTER_CACHE__[nameSlug] = { name: p.name, team: teamId };
+              // Aussi par playerId (fallback)
+              if (p.playerId) window.__ROSTER_CACHE__[String(p.playerId)] = { name: p.name, team: teamId };
             }
           });
         }
@@ -6353,7 +6357,12 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
 
     return React.createElement('div', {
       key: p.playerId,
-      onClick: function() { if (onPlayerClick) onPlayerClick(p.playerId||p.playerSlug,'NHL'); },
+      onClick: function() {
+        // Utiliser le slug du nom (ex: "jake-sanderson") plutôt que l'ID DailyFaceoff interne
+        // → PlayerPage fera nhl_search par nom → vrai ID NHL
+        var nameSlug = (p.name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+        if (onPlayerClick) onPlayerClick(nameSlug || p.playerSlug || String(p.playerId), 'NHL');
+      },
       style: {
         flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
         padding: '10px 6px', cursor: 'pointer', borderRadius: 6,
