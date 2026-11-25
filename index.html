@@ -10579,7 +10579,7 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
     if (cache[abbr]) return Promise.resolve(cache[abbr]);
     // Utilise le proxy ESPN v3 qui retourne les stats (avgPoints/avgRebounds/avgAssists) embarquées
     var espnId = (NBA_TEAM_IDS && NBA_TEAM_IDS[abbr]) || (NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[abbr]) || abbr.toLowerCase();
-    return fetch(PROXY + '?league=nba_roster&team=' + espnId)
+    return fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_roster&team=' + espnId)
       .then(function(r){ return r.json(); })
       .then(function(d){
         var nameMap = {};
