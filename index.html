@@ -10577,14 +10577,13 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
   function loadEspnRoster(abbr) {
     var cache = _espnRosterCache.current;
     if (cache[abbr]) return Promise.resolve(cache[abbr]);
-    var teamId = (NBA_TEAM_IDS && NBA_TEAM_IDS[abbr]) || (NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[abbr]) || abbr.toLowerCase();
-    return fetch('https://zoneus-proxy.vivienfrappier.workers.dev?league=nba_roster&team=' + teamId)
+    var slug = (NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[abbr]) || abbr.toLowerCase();
+    return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/' + slug + '/roster')
       .then(function(r){ return r.json(); })
       .then(function(d){
         var nameMap = {};
         var athletes = [];
-        var src = d.athletes || (d.roster && d.roster.athletes) || [];
-        if (src.length) { src.forEach(function(g){ (g.items||[g]).forEach(function(p){ athletes.push(p); }); }); }
+        if (d.athletes) { d.athletes.forEach(function(g){ (g.items||[g]).forEach(function(p){ athletes.push(p); }); }); }
         athletes.forEach(function(p){
           if (!p || !p.id) return;
           var cats = p.statistics && p.statistics.splits && p.statistics.splits.categories || [];
