@@ -10577,22 +10577,38 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
   function loadEspnRoster(abbr) {
     var cache = _espnRosterCache.current;
     if (cache[abbr]) return Promise.resolve(cache[abbr]);
-    var slug = (NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[abbr]) || abbr.toLowerCase();
-    return fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/' + slug + '/roster')
+    // Utilise le proxy ESPN v3 qui retourne les stats (avgPoints/avgRebounds/avgAssists) embarquées
+    var espnId = (NBA_TEAM_IDS && NBA_TEAM_IDS[abbr]) || (NBA_ESPN_TEAMS && NBA_ESPN_TEAMS[abbr]) || abbr.toLowerCase();
+    return fetch(PROXY + '?league=nba_roster&team=' + espnId)
       .then(function(r){ return r.json(); })
       .then(function(d){
         var nameMap = {};
         var athletes = [];
-        if (d.athletes) { d.athletes.forEach(function(g){ (g.items||[g]).forEach(function(p){ athletes.push(p); }); }); }
+        // ESPN v3 retourne { athletes: [...] } avec joueurs à plat ou groupés
+        var src = d.athletes || [];
+        src.forEach(function(g){ (g.items||[g]).forEach(function(p){ athletes.push(p); }); });
         athletes.forEach(function(p){
           if (!p || !p.id) return;
-          var cats = p.statistics && p.statistics.splits && p.statistics.splits.categories || [];
+          // ESPN v3 : stats dans p.statistics (tableau de catégories avec labels/stats)
           var ppg = 0, reb = 0, ast = 0;
-          cats.forEach(function(c){ (c.stats||[]).forEach(function(sv){
-            if (sv.name === 'avgPoints') ppg = parseFloat(sv.value)||0;
-            if (sv.name === 'avgRebounds') reb = parseFloat(sv.value)||0;
-            if (sv.name === 'avgAssists') ast = parseFloat(sv.value)||0;
-          }); });
+          var statsArr = p.statistics || [];
+          if (Array.isArray(statsArr)) {
+            statsArr.forEach(function(cat){
+              var labels = cat.labels || cat.names || [];
+              var vals = cat.stats || cat.values || [];
+              labels.forEach(function(lbl, i){
+                var v = parseFloat(vals[i]) || 0;
+                if (lbl === 'avgPoints' || lbl === 'PTS') ppg = v;
+                if (lbl === 'avgRebounds' || lbl === 'REB') reb = v;
+                if (lbl === 'avgAssists' || lbl === 'AST') ast = v;
+              });
+            });
+          } else if (statsArr && typeof statsArr === 'object') {
+            // Fallback : objet avec propriétés directes
+            ppg = parseFloat(statsArr.avgPoints || statsArr.points || 0) || 0;
+            reb = parseFloat(statsArr.avgRebounds || statsArr.rebounds || 0) || 0;
+            ast = parseFloat(statsArr.avgAssists || statsArr.assists || 0) || 0;
+          }
           var lastName = (p.displayName||p.fullName||'').split(' ').slice(-1)[0].toLowerCase();
           var fullNorm = (p.displayName||p.fullName||'').toLowerCase();
           nameMap[fullNorm] = { espnId: String(p.id), ppg: ppg, reb: reb, ast: ast };
