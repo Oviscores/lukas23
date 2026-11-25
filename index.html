@@ -6284,7 +6284,16 @@ function NhlLineCombinations({ teamId, lc, tc, onPlayerClick }) {
       .then(function(r) { return r.json(); })
       .then(function(d) {
         var comb = d && d.lines && d.lines.combinations;
-        if (comb && comb.players) setData(comb);
+        if (comb && comb.players) {
+          setData(comb);
+          // Alimenter __ROSTER_CACHE__ avec l'équipe pour goPlayer
+          if (!window.__ROSTER_CACHE__) window.__ROSTER_CACHE__ = {};
+          (comb.players || []).forEach(function(p) {
+            if (p.playerId && p.name) {
+              window.__ROSTER_CACHE__[String(p.playerId)] = { name: p.name, team: teamId };
+            }
+          });
+        }
         setLoading(false);
       })
       .catch(function() { setLoading(false); });
