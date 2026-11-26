@@ -10859,11 +10859,7 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
       padding: 60, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, color: '#aaa', letterSpacing: '0.1em' }
   }, 'CHARGEMENT DES LINEUPS...');
 
-  if (err || !games || !games.length) return React.createElement('div', null,
-    React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: 60, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, color: '#aaa', letterSpacing: '0.1em' }
-    }, err ? 'ERREUR: ' + err : 'AUCUN MATCH CE JOUR')
-  );
+  var noGames = !err && (!games || !games.length);
 
   var activeDate = calDates.find(function(d){ return d.iso === selDate; }) || calDates[0] || {};
   var dayLabel = activeDate.iso ? (function(){
@@ -10910,6 +10906,12 @@ function FantasyPageNBA({ lg, onPlayerClick, onBack, onTeamClick }) {
       }))
     ),
     // Matchs
+    err ? React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 40, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, color: '#e55', letterSpacing: '0.08em' }
+    }, 'ERREUR: ' + err) :
+    noGames ? React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 40, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, color: '#aaa', letterSpacing: '0.08em' }
+    }, 'AUCUN MATCH CE JOUR') :
     games.map(function(g, gi) {
       var visitInj = (g.visitPlayers||[]).filter(function(p){ return p.inj && !p.starter; });
       var homeInj = (g.homePlayers||[]).filter(function(p){ return p.inj && !p.starter; });
